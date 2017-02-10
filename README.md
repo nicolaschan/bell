@@ -1,5 +1,5 @@
 # Bell Schedule Countdown
-Web application to synchronize a timer to indicate the end of the periods at school. A live on is currently running for Los Altos High school at [bell.lahs.club](https://bell.lahs.club).
+Web application to synchronize a timer to indicate the end of the periods at school. A live copy of this program is currently running for Los Altos High school at [bell.lahs.club](https://bell.lahs.club).
 
 ## Features
 - Support for weekly schedules
