@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bell Stats</title>
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/Chart.bundle.min.js"></script>
+  <script type="text/javascript">
+    var makeBarChart = function(name, data, colors) {
+      var labels = [];
+      var backgroundColors = [];
+      var values = [];
+      for (var label in data) {
+        labels.push(label);
+        values.push(parseInt(data[label]));
+        if (colors[label])
+          backgroundColors.push(colors[label]);
+        else
+          backgroundColors.push('rgba(128,128,128,0.5)');
+      }
+      var chart = new Chart(name, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: name,
+            backgroundColor: backgroundColors,
+            data: values
+          }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                min: 0,
+                stepSize: 1
+              }
+            }]
+          }
+        }
+      });
+    };
+    $(function() {
+      $.get('/api/stats?v=' + Date.now(), function(data) {
+        var hits = [];
+        var devices = [];
+
+        for (var date in data.dailyStats) {
+          hits.push({
+            x: new Date(date),
+            y: parseInt(data.dailyStats[date].totalHits)
+          });
+          devices.push({
+            x: new Date(date),
+            y: parseInt(data.dailyStats[date].devices)
+          });
+        }
+        var scatterChart = new Chart('dailyStats', {
+          type: 'line',
+          data: {
+              datasets: [{
+                  fill: false,
+                  label: 'Devices',
+                  data: devices,
+                  backgroundColor: 'rgba(0, 255, 0, 0.4)'
+              }, {
+                  fill: false,
+                  label: 'Total Hits',
+                  data: hits,
+                  backgroundColor: 'rgba(255, 255, 0, 0.4)'
+              }]
+          },
+          options: {
+            title: {
+              display: true,
+              text: 'Daily stats for bell.lahs.club'
+            },
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                      unit: 'day',
+                      unitStepSize: 1,
+                      displayFormats: {
+                        day: 'ddd MM/DD'
+                      }
+                    },
+                    position: 'bottom'
+                }],
+                yAxes: [{
+                  ticks: {
+                    min: 0
+                  }
+                }]
+            },
+            elements: {
+              point: {
+                radius: 8,
+                hoverRadius: 10
+              }
+            },
+            tooltips: {
+              enabled: true,
+              mode: 'single',
+              callbacks: {
+                title: function(tooltipItems, data) {
+                  var date = tooltipItems[0].xLabel;
+                  return date.toLocaleDateString();
+                }
+              }
+            }
+          }
+        });
+
+        makeBarChart('Themes', data.userStats.theme, {});
+        makeBarChart('Browsers', data.userStats.browser, { firefox: 'rgba(255,165,0,0.5)', chrome: 'rgba(54,105,241,0.5)', safari: 'cyan', opera: 'red' });
+      });
+    });
+  </script>
+</head>
+<body>
+  <div>
+    <canvas id="dailyStats" width="400px" height="200px"></canvas>
+    <canvas id="Themes" width="400px" height="200px"></canvas>
+    <canvas id="Browsers" width="400px" height="200px"></canvas>
+  </div>
+</body>
+</html>
