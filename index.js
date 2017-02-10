@@ -137,10 +137,6 @@ var startWebServer = function(callback) {
     res.sendFile(__dirname + '/html/index.html');
   });
 
-  app.get('/style.css', (req, res) => {
-    res.sendFile(__dirname + '/css/style.css');
-  });
-
   if (config['enable redis'])
     app.get('/stats', (req, res) => {
       res.sendFile(__dirname + '/html/stats.html');
@@ -284,21 +280,6 @@ var startWebServer = function(callback) {
 
   app.use('/favicons', express.static('favicons'));
   app.use('/js', express.static('js'));
-  app.get('/js/Chart.bundle.min.js', (req, res) => {
-    res.sendFile(__dirname + '/node_modules/chart.js/dist/Chart.bundle.min.js');
-  });
-  app.get('/js/jquery.min.js', (req, res) => {
-    res.sendFile(__dirname + '/node_modules/jquery/dist/jquery.min.js');
-  });
-  app.get('/js/js.cookie.js', (req, res) => {
-    res.sendFile(__dirname + '/node_modules/js-cookie/src/js.cookie.js');
-  });
-  app.get('/js/lodash.min.js', (req, res) => {
-    res.sendFile(__dirname + '/node_modules/lodash/lodash.min.js');
-  });
-  app.get('/js/async.min.js', (req, res) => {
-    res.sendFile(__dirname + '/node_modules/async/dist/async.min.js');
-  });
   app.use('/css', express.static('css'));
 
   server.listen(config.port, function() {
