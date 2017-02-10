@@ -9,6 +9,6 @@ gulp.task('default', shell.task([
   'browserify js/client.js -r async -r lodash -r jquery -r js-cookie -r ./js/BellTimer.js -r ./js/SimpleLogger.js > bundle.js',
   'uglifyjs -c -m -- bundle.js > js/bundle.js',
   //'cp bundle.js js/bundle.js',
-  'rm bundle.js',
+  'del bundle.js',
   'node index.js'
 ]));

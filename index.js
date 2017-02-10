@@ -134,16 +134,16 @@ var startWebServer = function(callback) {
   };
 
   app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/html/index.html');
   });
 
   app.get('/style.css', (req, res) => {
-    res.sendFile(__dirname + '/style.css');
+    res.sendFile(__dirname + '/css/style.css');
   });
 
   if (config['enable redis'])
     app.get('/stats', (req, res) => {
-      res.sendFile(__dirname + '/stats.html');
+      res.sendFile(__dirname + '/html/stats.html');
     });
   if (config['enable redis'])
     app.get('/api/stats', (req, res) => {

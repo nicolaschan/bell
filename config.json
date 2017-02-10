@@ -1,5 +1,5 @@
 {
-  "enable redis": true,
+  "enable redis": false,
   "redis password": null,
   "port": 8005
 }
