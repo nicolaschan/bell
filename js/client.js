@@ -63,6 +63,7 @@ var intervals = {
 };
 var intervalManager = new IntervalManager(intervals);
 bellTimer.setDebugLogFunction(logger.debug);
+//bellTimer.enableDevMode(new Date('2017-02-16 23:59:55'), 1);
 
 $(window).on('load', function() {
   async.series([
@@ -87,7 +88,7 @@ $(window).on('load', function() {
 
   ], function(err) {
 
-    intervalManager.startAll()
+    intervalManager.startAll();
     logger.success('Ready!');
 
   });

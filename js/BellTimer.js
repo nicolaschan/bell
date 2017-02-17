@@ -94,7 +94,9 @@ var self;
   };
   BellTimer.prototype.getTimeRemainingNumber = function() {
     var date = this.getDate();
-    return timeArrayToDate(date, this.getNextPeriod().time).getTime() - date.getTime();
+    if (!this.getNextPeriod().timestamp.getTime)
+      console.log(this.getNextPeriod());
+    return this.getNextPeriod().timestamp.getTime() - (Math.floor(date.getTime() / 1000) * 1000);
   };
   BellTimer.prototype.getTimeRemainingString = function() {
     var date = this.getDate();
@@ -108,7 +110,7 @@ var self;
         minutes = '0' + minutes;
       return (hours < 1) ? minutes + ':' + seconds : hours + ':' + minutes + ':' + seconds;
     };
-    return displayTimeNumber(this.getTimeRemainingNumber(date));
+    return displayTimeNumber(this.getTimeRemainingNumber());
   };
   BellTimer.prototype.getWaitUntilNextTick = function() {
     return this.getDate().getMilliseconds();
@@ -116,8 +118,8 @@ var self;
   BellTimer.prototype.getProportionElapsed = function() {
     var date = this.getDate();
 
-    var currentPeriodStart = timeArrayToDate(date, this.getCurrentPeriod().time, true).getTime();
-    var nextPeriodStart = timeArrayToDate(date, this.getNextPeriod().time, true).getTime();
+    var currentPeriodStart = this.getCurrentPeriod().timestamp.getTime();
+    var nextPeriodStart = this.getNextPeriod().timestamp.getTime();
 
     var totalTime = nextPeriodStart - currentPeriodStart;
     var elapsedTime = date.getTime() - currentPeriodStart;
@@ -134,19 +136,21 @@ var self;
   };
   BellTimer.prototype.getPeriodByNumber = function(date, i) {
     var currentPeriods = this.getCurrentSchedule(date).periods;
-    if (i == -1)
+    if (i == -1) {
       return {
         name: 'None',
-        time: [0, 0]
+        time: this.getPreviousPeriod().time,
+        timestamp: this.getPreviousPeriod().timestamp
       };
+    }
     if (i == currentPeriods.length) {
       var newDate = new Date(date.getTime());
       newDate.setSeconds(0);
       newDate.setMinutes(0);
       newDate.setHours(0);
       newDate.setDate(newDate.getDate() + 1);
-      var period = JSON.parse(JSON.stringify(this.getPeriodByNumber(newDate, 0)));
-      period.time[0] += 24;
+      var period = _.cloneDeep(this.getPeriodByNumber(newDate, 0));
+
       return period;
     }
     return currentPeriods[i];
@@ -182,17 +186,40 @@ var self;
     }
     return futurePeriods;
   };
+  BellTimer.prototype.getPreviousPeriod = function(date) {
+    var completedPeriods = this.getCompletedPeriods();
+    if (this.getCompletedPeriods().length > 0)
+      return _.last(this.getCompletedPeriods());
+
+    if (!date) date = self.getDate();
+    var date = new Date(date.getTime());
+    date.setDate(date.getDate() - 1);
+
+    var schedule = this.getCurrentSchedule(date);
+    if (schedule.periods.length > 0)
+      return _.last(schedule.periods);
+    else
+      return this.getPreviousPeriod(date);
+  };
   BellTimer.prototype.getCurrentSchedule = function(date) {
     if (!date) date = self.getDate();
     var dateString = date.toDateString();
     var specialDay = self.calendar.specialDays[dateString];
+
+    var schedule;
     if (specialDay) {
-      var schedule = self.schedules[specialDay.scheduleName];
+      schedule = self.schedules[specialDay.scheduleName];
       schedule.displayName = specialDay.customName;
-      return schedule;
     } else {
-      return self.schedules[self.calendar.defaultWeek[date.getDay()]];
+      schedule = self.schedules[self.calendar.defaultWeek[date.getDay()]];
     }
+
+    for (var i in schedule.periods) {
+      var timestamp = timeArrayToDate(date, schedule.periods[i].time, true);
+      schedule.periods[i].timestamp = timestamp;
+    }
+
+    return schedule;
   };
   BellTimer.prototype.synchronize = function(n, callback) {
     var getTimeCorrection = function(callback) {
