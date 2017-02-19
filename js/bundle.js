@@ -69,6 +69,11 @@ var self;
       self.calendar = data.calendar;
       self.bellCompensation = data.correction;
 
+      if (self.version && self.version != data.version)
+        $(window)[0].location.reload();
+      else
+        self.version = data.version;
+
       if (callback)
         callback();
     });

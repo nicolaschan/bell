@@ -1,0 +1,48 @@
+//
+  Copyright (c) 2017 Nicolas Chan <nicolas@nicolaschan.com>
+  MIT License (https://github.com/nicolaschan/bell)
+
+doctype html
+html
+  head
+    title Bell Countdown
+    link(rel="shortcut icon", type="image/pug", href="/favicons/empty.png")#favicon
+    link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto")
+    link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
+    link(rel="stylesheet", type="text/css", href="/css/style.css?v=" + version)
+    script(type="text/javascript", src="/js/bundle.min.js?v=" + version)
+  body
+    .container#page1
+      .centered#countdown
+        span#time
+        br
+        span.subtitle
+          span#subtitle
+          br
+          span.subtitle#scheduleName
+      canvas.centered#circle
+    .container#page2
+      .centered
+        span#scheduleDisplay
+          span.period#noClasses
+          span#schedule
+            table#scheduleTable
+        span#scheduleEntry
+          table#scheduleEntryTable
+          hr
+          table
+            tr
+              td.tableLabel Theme
+              td
+                select#themeSelect
+                  option(selected) Default - Light
+      .footer-right#icons
+        i.material-icons#settingsIcon settings
+        i.material-icons#doneIcon done
+      .footer-left
+    .centered.loading
+      i.material-icons#loadingIcon sync
+      br
+      span#loadingMessage Loading
+    .downArrow
+      i.material-icons#downIcon keyboard_arrow_down

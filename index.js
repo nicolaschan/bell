@@ -10,6 +10,7 @@ const async = require('async');
 const redis = require('redis');
 const _ = require('lodash');
 const Sniffr = require('sniffr');
+const crypto = require('crypto');
 var client; // redis client
 
 var connectToRedis = function(callback) {
@@ -121,20 +122,28 @@ var startWebServer = function(callback) {
 
     return calendar;
   };
+  var getVersion = function() {
+    var hash = crypto.createHash('md5');
+    return hash.update(fs.readFileSync('data/version.txt').toString()).digest('hex');
+  };
   var getData = function() {
     var schedules = parseSchedules(fs.readFileSync('data/schedules.txt').toString());
     var calendar = parseCalendar(fs.readFileSync('data/calendar.txt').toString(), schedules);
     var correction = _.parseInt(fs.readFileSync('data/correction.txt').toString());
+    var version = getVersion();
 
     return {
       schedules: schedules,
       calendar: calendar,
-      correction: correction
+      correction: correction,
+      version: version
     };
   };
 
   app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/html/index.html');
+    res.render('index', {
+      version: getVersion()
+    });
   });
 
   if (config['enable redis'])
@@ -209,7 +218,7 @@ var startWebServer = function(callback) {
   app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
   }));
-
+  app.set('view engine', 'pug');
 
   app.post('/api/analytics', (req, res) => {
     if (!config['enable redis'])
