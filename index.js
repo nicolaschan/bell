@@ -146,10 +146,12 @@ var startWebServer = function(callback) {
     });
   });
 
-  if (config['enable redis'])
-    app.get('/stats', (req, res) => {
-      res.sendFile(__dirname + '/html/stats.html');
+  //if (config['enable redis'])
+  app.get('/stats', (req, res) => {
+    res.render('stats', {
+      version: getVersion()
     });
+  })
   if (config['enable redis'])
     app.get('/api/stats', (req, res) => {
       var out = {};
