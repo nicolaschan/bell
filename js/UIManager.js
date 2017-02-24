@@ -105,14 +105,14 @@ const $ = require('jquery');
       var checkboxes = [];
       $('#scheduleEntryTable').empty();
       for (var i = 0; i < classes.length; i++) {
-        var input = $('<input type="text" name="period' +
+        var input = $('<input type="text" class="inputBox" name="period' +
           i + '" id="period' +
           i + '" maxlength="20" placeholder="Period ' +
           i + '" value="' + classes[i] + '">');
-        var checkbox = $('<input type="checkbox" name="checkbox' + i + '" id="checkbox' + i + '" checked>');
+        var checkbox = $('<input type="checkbox" name="checkbox' + i + '" id="checkbox' + i + '" class="checkbox" checked>');
         var checkboxLabel = $('<label class="control control--checkbox"></label>').append(checkbox).append($('<div class="control__indicator"></div>'));
-        var checkboxColumn = $('<td></td>').append(checkboxLabel);
-        var row = $('<tr></tr>').append($('<td class="tableLabel"></td>').text('Period ' + i)).append($('<td></td>').append(input)).append(checkboxColumn);
+        var checkboxColumn = $('<td class="tableCheckbox"></td>').append(checkboxLabel);
+        var row = $('<tr></tr>').append($('<td class="tableLabel"></td>').text('Period ' + i)).append($('<td class="tableInput"></td>').append(input)).append(checkboxColumn);
         $('#scheduleEntryTable').append(row);
         classesTexts.push(input);
         checkboxes.push(checkbox);
@@ -179,6 +179,19 @@ const $ = require('jquery');
 
       $('.period').css('font-size', (Math.min($(window).innerHeight() * 0.03)) + 'px');
       $('.current').css('font-size', (Math.min($(window).innerHeight() * 0.05)) + 'px');
+
+      // entry table size
+      var padding = ((Math.min($(window).innerHeight() * 0.015))) + 'px';
+      $('.tableLabel').css('font-size', ((Math.min($(window).innerHeight() * 0.025))) + 'px');
+      $('.tableLabel').css('padding', padding);
+      $('.tableCheckbox').css('padding', padding);
+      $('.tableInput').css('padding', padding);
+      $('#themeSelectColumn').css('padding', padding);
+      $('.inputBox').css('font-size', ((Math.min($(window).innerHeight() * 0.03))) + 'px');
+      $('.inputBox').css('padding', padding);
+      $('#themeSelect').css('font-size', ((Math.min($(window).innerHeight() * 0.03))) + 'px');
+      $('#themeSelect').css('padding', padding);
+
     };
 
     $(window).on('load resize', dynamicallySetFontSize);

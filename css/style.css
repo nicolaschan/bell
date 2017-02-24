@@ -152,7 +152,7 @@ td {
 #loadingMessage {
 	text-align: center;
 }
-#scheduleEntryTable tr td input {
+.inputBox {
 	font-family: 'Roboto', sans-serif;
 	border: 1px solid #dddddd;
 	font-size: 20px;
@@ -161,11 +161,11 @@ td {
 	width: 12em;
 	transition: border-color 1s ease;
 }
-#scheduleEntryTable tr td input:focus {
+.inputBox:focus {
 	border-color: darkturquoise;
 	outline: none;
 }
-#scheduleEntryTable tr td input:disabled {
+.inputBox:disabled {
 	text-decoration: line-through;
 	background-color: #eeeeee;
 }
@@ -286,6 +286,6 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
 	border-width: 0 2px 2px 0;
 }
 
-
-
-
+.checkbox {
+	width: 0px;
+}
