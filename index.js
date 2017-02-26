@@ -122,9 +122,16 @@ var startWebServer = function(callback) {
 
     return calendar;
   };
+
+  var previousCheck = 0;
+  var currentVersion;
   var getVersion = function() {
+    if (Date.now() - previousCheck < 1000 * 60 && currentVersion) return currentVersion;
+
+    previousCheck = Date.now();
     var hash = crypto.createHash('md5');
-    return hash.update(fs.readFileSync('data/version.txt').toString()).digest('hex');
+    currentVersion = hash.update(fs.readFileSync('data/version.txt').toString()).digest('hex');
+    return currentVersion;
   };
   var getData = function() {
     var schedules = parseSchedules(fs.readFileSync('data/schedules.txt').toString());
