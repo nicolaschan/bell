@@ -145,3 +145,37 @@
 11:40 Passing to {7}
 11:45 {7}
 12:15 After School
+
+* communication-even (Communication Even Block)
+7:15 Passing to {0}
+7:20 {0}
+8:05 Passing to {2}
+8:10 {2}
+9:15 Brunch
+9:30 Passing to Assembly/Tutorial #1
+9:35 Assembly/Tutorial #1
+10:35 Passing to {4}
+10:40 {4}
+11:40 Lunch
+12:25 Passing to Assembly/Tutorial #2
+12:30 Assembly/Tutorial #2
+13:30 Passing to {6}
+13:35 {6}
+14:35 After School
+
+* communication-odd (Communication Odd Block)
+8:05 Passing to {1}
+8:10 {1}
+9:10 Passing to Assembly/Tutorial #3
+9:15 Assembly/Tutorial #3
+10:15 Brunch
+10:25 Passing to {3}
+10:30 {3}
+11:30 Lunch
+12:15 Passing to Assembly/Tutorial #4
+12:20 Assembly/Tutorial #4
+13:20 Passing to {5}
+13:25 {5}
+14:25 Passing to {7}
+14:30 {7}
+15:30 After School

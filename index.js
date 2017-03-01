@@ -281,7 +281,7 @@ var startWebServer = function(callback) {
     var updateUserInfo = function(id, callback) {
       var s = new Sniffr();
       s.sniff(req.body.userAgent)
-      client.hmset(`users:${id}`, 'browser', s.browser.name, 'os', s.os.name, 'theme', req.body.theme, 'last seen', Date.now(), callback);
+      client.hmset(`users:${id}`, 'userAgent', req.body.userAgent, 'browser', s.browser.name, 'os', s.os.name, 'theme', req.body.theme, 'last seen', Date.now(), callback);
     };
     ensureUserId(function(err, id) {
       updateUserInfo(id);
