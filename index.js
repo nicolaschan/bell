@@ -19,6 +19,7 @@ var connectToRedis = function(callback) {
     return callback();
   }
   client = (config['redis password']) ? redis.createClient({
+    host: config['redis host'],
     password: config['redis password']
   }) : redis.createClient();
 
