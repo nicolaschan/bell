@@ -2,7 +2,7 @@ const $ = require('jquery');
 const Chart = require('chart.js');
 
 $(function() {
-  $.get('https://bell.lahs.club/api/stats', function(data) {
+  $.get('/api/stats', function(data) {
     var hits = [];
     var devices = [];
 
