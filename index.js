@@ -150,7 +150,8 @@ var startWebServer = function(callback) {
 
   app.get('/', (req, res) => {
     res.render('index', {
-      version: getVersion()
+      version: getVersion(),
+      server_name: config['server name']
     });
   });
 

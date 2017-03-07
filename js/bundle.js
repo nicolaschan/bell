@@ -1314,7 +1314,7 @@ function applyEach$1(eachfn) {
         var go = initialParams(function (args, callback) {
             var that = this;
             return eachfn(fns, function (fn, cb) {
-                fn.apply(that, args.concat([cb]));
+                fn.apply(that, args.concat(cb));
             }, callback);
         });
         if (args.length) {
@@ -1419,8 +1419,7 @@ function baseGetTag(value) {
   if (value == null) {
     return value === undefined ? undefinedTag : nullTag;
   }
-  value = Object(value);
-  return (symToStringTag && symToStringTag in value)
+  return (symToStringTag && symToStringTag in Object(value))
     ? getRawTag(value)
     : objectToString(value);
 }
@@ -1550,6 +1549,10 @@ function isLength(value) {
 function isArrayLike(value) {
   return value != null && isLength(value.length) && !isFunction(value);
 }
+
+// A temporary value used to identify if the loop should be broken.
+// See #1064, #1293
+var breakLoop = {};
 
 /**
  * This method returns `undefined`.
@@ -1855,7 +1858,7 @@ var freeProcess = moduleExports$1 && freeGlobal.process;
 /** Used to access faster Node.js helpers. */
 var nodeUtil = (function() {
   try {
-    return freeProcess && freeProcess.binding('util');
+    return freeProcess && freeProcess.binding && freeProcess.binding('util');
   } catch (e) {}
 }());
 
@@ -2060,10 +2063,6 @@ function onlyOnce(fn) {
     };
 }
 
-// A temporary value used to identify if the loop should be broken.
-// See #1064, #1293
-var breakLoop = {};
-
 function _eachOfLimit(limit) {
     return function (obj, iteratee, callback) {
         callback = once(callback || noop);
@@ -2148,10 +2147,10 @@ function eachOfArrayLike(coll, iteratee, callback) {
         callback(null);
     }
 
-    function iteratorCallback(err) {
+    function iteratorCallback(err, value) {
         if (err) {
             callback(err);
-        } else if (++completed === length) {
+        } else if (++completed === length || value === breakLoop) {
             callback(null);
         }
     }
@@ -2740,7 +2739,7 @@ var auto = function (tasks, concurrency, callback) {
     var runningTasks = 0;
     var hasError = false;
 
-    var listeners = {};
+    var listeners = Object.create(null);
 
     var readyTasks = [];
 
@@ -2768,7 +2767,7 @@ var auto = function (tasks, concurrency, callback) {
 
         arrayEach(dependencies, function (dependencyName) {
             if (!tasks[dependencyName]) {
-                throw new Error('async.auto task `' + key + '` has a non-existent dependency in ' + dependencies.join(', '));
+                throw new Error('async.auto task `' + key + '` has a non-existent dependency `' + dependencyName + '` in ' + dependencies.join(', '));
             }
             addListener(dependencyName, function () {
                 remainingDependencies--;
@@ -2830,7 +2829,7 @@ var auto = function (tasks, concurrency, callback) {
                 });
                 safeResults[key] = args;
                 hasError = true;
-                listeners = [];
+                listeners = Object.create(null);
 
                 callback(err, safeResults);
             } else {
@@ -3047,15 +3046,17 @@ function asciiToArray(string) {
 
 /** Used to compose unicode character classes. */
 var rsAstralRange = '\\ud800-\\udfff';
-var rsComboMarksRange = '\\u0300-\\u036f\\ufe20-\\ufe23';
-var rsComboSymbolsRange = '\\u20d0-\\u20f0';
+var rsComboMarksRange = '\\u0300-\\u036f';
+var reComboHalfMarksRange = '\\ufe20-\\ufe2f';
+var rsComboSymbolsRange = '\\u20d0-\\u20ff';
+var rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange;
 var rsVarRange = '\\ufe0e\\ufe0f';
 
 /** Used to compose unicode capture groups. */
 var rsZWJ = '\\u200d';
 
 /** Used to detect strings with [zero-width joiners or code points from the astral planes](http://eev.ee/blog/2015/09/12/dark-corners-of-unicode/). */
-var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboMarksRange + rsComboSymbolsRange + rsVarRange + ']');
+var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboRange + rsVarRange + ']');
 
 /**
  * Checks if `string` contains Unicode symbols.
@@ -3070,13 +3071,15 @@ function hasUnicode(string) {
 
 /** Used to compose unicode character classes. */
 var rsAstralRange$1 = '\\ud800-\\udfff';
-var rsComboMarksRange$1 = '\\u0300-\\u036f\\ufe20-\\ufe23';
-var rsComboSymbolsRange$1 = '\\u20d0-\\u20f0';
+var rsComboMarksRange$1 = '\\u0300-\\u036f';
+var reComboHalfMarksRange$1 = '\\ufe20-\\ufe2f';
+var rsComboSymbolsRange$1 = '\\u20d0-\\u20ff';
+var rsComboRange$1 = rsComboMarksRange$1 + reComboHalfMarksRange$1 + rsComboSymbolsRange$1;
 var rsVarRange$1 = '\\ufe0e\\ufe0f';
 
 /** Used to compose unicode capture groups. */
 var rsAstral = '[' + rsAstralRange$1 + ']';
-var rsCombo = '[' + rsComboMarksRange$1 + rsComboSymbolsRange$1 + ']';
+var rsCombo = '[' + rsComboRange$1 + ']';
 var rsFitz = '\\ud83c[\\udffb-\\udfff]';
 var rsModifier = '(?:' + rsCombo + '|' + rsFitz + ')';
 var rsNonAstral = '[^' + rsAstralRange$1 + ']';
@@ -3470,6 +3473,7 @@ function queue(worker, concurrency, payload) {
 
     var workers = 0;
     var workersList = [];
+    var isProcessing = false;
     var q = {
         _tasks: new DLL(),
         concurrency: concurrency,
@@ -3493,6 +3497,12 @@ function queue(worker, concurrency, payload) {
             _insert(data, true, callback);
         },
         process: function () {
+            // Avoid trying to start too many processing operations. This can occur
+            // when callbacks resolve synchronously (#1267).
+            if (isProcessing) {
+                return;
+            }
+            isProcessing = true;
             while (!q.paused && workers < q.concurrency && q._tasks.length) {
                 var tasks = [],
                     data = [];
@@ -3517,6 +3527,7 @@ function queue(worker, concurrency, payload) {
                 var cb = onlyOnce(_next(tasks));
                 worker(data, cb);
             }
+            isProcessing = false;
         },
         length: function () {
             return q._tasks.length;
@@ -3538,12 +3549,7 @@ function queue(worker, concurrency, payload) {
                 return;
             }
             q.paused = false;
-            var resumeCount = Math.min(q.concurrency, q._tasks.length);
-            // Need to call q.process once per concurrent
-            // worker to preserve full concurrency after pause
-            for (var w = 1; w <= resumeCount; w++) {
-                setImmediate$1(q.process);
-            }
+            setImmediate$1(q.process);
         }
     };
     return q;
@@ -3754,9 +3760,9 @@ var seq$1 = rest(function seq(functions) {
         }
 
         reduce(functions, args, function (newargs, fn, cb) {
-            fn.apply(that, newargs.concat([rest(function (err, nextargs) {
+            fn.apply(that, newargs.concat(rest(function (err, nextargs) {
                 cb(err, nextargs);
-            })]));
+            })));
         }, function (err, results) {
             cb.apply(that, [err].concat(results));
         });
@@ -3919,36 +3925,30 @@ var constant = rest(function (values) {
     });
 });
 
-function _createTester(eachfn, check, getResult) {
-    return function (arr, limit, iteratee, cb) {
-        function done() {
-            if (cb) {
-                cb(null, getResult(false));
-            }
-        }
-        function wrappedIteratee(x, _, callback) {
-            if (!cb) return callback();
-            iteratee(x, function (err, v) {
-                // Check cb as another iteratee may have resolved with a
-                // value or error since we started this iteratee
-                if (cb && (err || check(v))) {
-                    if (err) cb(err);else cb(err, getResult(true, x));
-                    cb = iteratee = false;
-                    callback(err, breakLoop);
+function _createTester(check, getResult) {
+    return function (eachfn, arr, iteratee, cb) {
+        cb = cb || noop;
+        var testPassed = false;
+        var testResult;
+        eachfn(arr, function (value, _, callback) {
+            iteratee(value, function (err, result) {
+                if (err) {
+                    callback(err);
+                } else if (check(result) && !testResult) {
+                    testPassed = true;
+                    testResult = getResult(true, value);
+                    callback(null, breakLoop);
                 } else {
                     callback();
                 }
             });
-        }
-        if (arguments.length > 3) {
-            cb = cb || noop;
-            eachfn(arr, limit, wrappedIteratee, done);
-        } else {
-            cb = iteratee;
-            cb = cb || noop;
-            iteratee = limit;
-            eachfn(arr, wrappedIteratee, done);
-        }
+        }, function (err) {
+            if (err) {
+                cb(err);
+            } else {
+                cb(null, testPassed ? testResult : getResult(false));
+            }
+        });
     };
 }
 
@@ -3991,7 +3991,7 @@ function _findGetResult(v, x) {
  *     // result now equals the first file in the list that exists
  * });
  */
-var detect = _createTester(eachOf, identity, _findGetResult);
+var detect = doParallel(_createTester(identity, _findGetResult));
 
 /**
  * The same as [`detect`]{@link module:Collections.detect} but runs a maximum of `limit` async operations at a
@@ -4015,7 +4015,7 @@ var detect = _createTester(eachOf, identity, _findGetResult);
  * (iteratee) or the value `undefined` if none passed. Invoked with
  * (err, result).
  */
-var detectLimit = _createTester(eachOfLimit, identity, _findGetResult);
+var detectLimit = doParallelLimit(_createTester(identity, _findGetResult));
 
 /**
  * The same as [`detect`]{@link module:Collections.detect} but runs only a single async operation at a time.
@@ -4037,11 +4037,11 @@ var detectLimit = _createTester(eachOfLimit, identity, _findGetResult);
  * (iteratee) or the value `undefined` if none passed. Invoked with
  * (err, result).
  */
-var detectSeries = _createTester(eachOfSeries, identity, _findGetResult);
+var detectSeries = doLimit(detectLimit, 1);
 
 function consoleFunc(name) {
     return rest(function (fn, args) {
-        fn.apply(null, args.concat([rest(function (err, args) {
+        fn.apply(null, args.concat(rest(function (err, args) {
             if (typeof console === 'object') {
                 if (err) {
                     if (console.error) {
@@ -4053,7 +4053,7 @@ function consoleFunc(name) {
                     });
                 }
             }
-        })]));
+        })));
     });
 }
 
@@ -4439,7 +4439,7 @@ function notId(v) {
  *     // if result is true then every file exists
  * });
  */
-var every = _createTester(eachOf, notId, notId);
+var every = doParallel(_createTester(notId, notId));
 
 /**
  * The same as [`every`]{@link module:Collections.every} but runs a maximum of `limit` async operations at a time.
@@ -4461,7 +4461,7 @@ var every = _createTester(eachOf, notId, notId);
  * `iteratee` functions have finished. Result will be either `true` or `false`
  * depending on the values of the async tests. Invoked with (err, result).
  */
-var everyLimit = _createTester(eachOfLimit, notId, notId);
+var everyLimit = doParallelLimit(_createTester(notId, notId));
 
 /**
  * The same as [`every`]{@link module:Collections.every} but runs only a single async operation at a time.
@@ -4839,14 +4839,14 @@ function memoize(fn, hasher) {
             queues[key].push(callback);
         } else {
             queues[key] = [callback];
-            fn.apply(null, args.concat([rest(function (args) {
+            fn.apply(null, args.concat(rest(function (args) {
                 memo[key] = args;
                 var q = queues[key];
                 delete queues[key];
                 for (var i = 0, l = q.length; i < l; i++) {
                     q[i].apply(null, args);
                 }
-            })]));
+            })));
         }
     });
     memoized.memo = memo;
@@ -5669,7 +5669,7 @@ var retryable = function (opts, task) {
     }
     return initialParams(function (args, callback) {
         function taskFn(cb) {
-            task.apply(null, args.concat([cb]));
+            task.apply(null, args.concat(cb));
         }
 
         if (opts) retry(opts, taskFn, callback);else retry(taskFn, callback);
@@ -5774,7 +5774,7 @@ function series(tasks, callback) {
  *     // if result is true then at least one of the files exists
  * });
  */
-var some = _createTester(eachOf, Boolean, identity);
+var some = doParallel(_createTester(Boolean, identity));
 
 /**
  * The same as [`some`]{@link module:Collections.some} but runs a maximum of `limit` async operations at a time.
@@ -5797,7 +5797,7 @@ var some = _createTester(eachOf, Boolean, identity);
  * Result will be either `true` or `false` depending on the values of the async
  * tests. Invoked with (err, result).
  */
-var someLimit = _createTester(eachOfLimit, Boolean, identity);
+var someLimit = doParallelLimit(_createTester(Boolean, identity));
 
 /**
  * The same as [`some`]{@link module:Collections.some} but runs only a single async operation at a time.
