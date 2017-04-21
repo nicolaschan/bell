@@ -12,6 +12,7 @@ const _ = require('lodash');
 const Sniffr = require('sniffr');
 const crypto = require('crypto');
 var client; // redis client
+const timesyncServer = require('timesync/server');
 
 var connectToRedis = function(callback) {
   if (!config['enable redis']) {
@@ -190,6 +191,8 @@ var startWebServer = function(callback) {
           client.hgetall('users', (err, users) => {
             async.forEachOf(users, (id, user, callback) => {
               client.hgetall(`users:${id}`, (err, data) => {
+                if (!data)
+                  return callback();
                 if (!out.userStats.browser[data.browser])
                   out.userStats.browser[data.browser] = 0;
                 out.userStats.browser[data.browser]++;
@@ -230,6 +233,7 @@ var startWebServer = function(callback) {
     extended: true
   }));
   app.set('view engine', 'pug');
+  app.use('/timesync', timesyncServer.requestHandler);
 
   app.post('/api/analytics', (req, res) => {
     if (!config['enable redis'])

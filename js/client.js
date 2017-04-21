@@ -13,6 +13,7 @@ const UIManager = require('./UIManager.js');
 const IntervalManager = require('./IntervalManager.js');
 
 var logger = new SimpleLogger();
+logger.setLevel('warn');
 var cookieManager = new CookieManager(Cookies);
 var themeManager = new ThemeManager(cookieManager);
 var classesManager = new ClassesManager(cookieManager);
@@ -65,13 +66,20 @@ var intervalManager = new IntervalManager(intervals);
 bellTimer.setDebugLogFunction(logger.debug);
 //bellTimer.enableDevMode(new Date('2017-02-16 23:59:55'), 1);
 
+global.bellTimer = bellTimer;
+global.logger = logger;
+logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
+
 $(window).on('load', function() {
   async.series([
 
     // Initialize BellTimer
+    async.asyncify(_.partial(logger.info, 'Loading data...')),
+    async.asyncify(_.partial(uiManager.setLoadingMessage, 'Loading')),
+    _.partial(bellTimer.reloadData),
+    async.asyncify(_.partial(logger.info, 'Synchronizing...')),
     async.asyncify(_.partial(uiManager.setLoadingMessage, 'Synchronizing')),
-    async.asyncify(_.partial(logger.info, 'Loading data and synchronizing...')),
-    _.partial(bellTimer.initialize, 10),
+    _.partial(bellTimer.initializeTimesync),
     async.asyncify(_.partial(logger.success, 'Bell timer initialized')),
     async.asyncify(uiManager.hideLoading),
 
@@ -90,6 +98,10 @@ $(window).on('load', function() {
 
     intervalManager.startAll();
     logger.success('Ready!');
+
+    // var adjustment = Math.round(bellTimer.getCorrection() / 1000);
+    // var adjustmentString = adjustment + ' ' + ((adjustment == 1) ? 'second' : 'seconds');
+    // uiManager.showAlert('Adjusted ' + adjustmentString + ' to match school time');
 
   });
 });

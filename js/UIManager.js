@@ -324,6 +324,17 @@ const $ = require('jquery');
   UIManager.prototype.hideLoading = function() {
     $('.loading').hide();
   };
+  UIManager.prototype.showAlert = function(message, time) {
+    time = (time) ? time : 3000;
+
+    $('#alert-container').css('opacity', 0);
+    $('#alert').text(message);
+    $('#alert-container').css('opacity', 0.4);
+
+    setTimeout(function() {
+      $('#alert-container').css('opacity', 0);
+    }, time);
+  };
 
   module.exports = UIManager;
   //window.UIManager = UIManager;

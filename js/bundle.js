@@ -336,14 +336,35 @@ var self;
         callback();
     });
   };
-  BellTimer.prototype.initialize = function(n, callback) {
+  BellTimer.prototype.initialize = function(callback) {
+
     async.series([
       self.reloadData,
-      _.partial(self.synchronize, n)
+      _.partial(self.initializeTimesync)
+      //_.partial(self.synchronize, n)
     ], callback);
   };
+  BellTimer.prototype.initializeTimesync = function(callback) {
+    var ts = timesync.create({
+      server: '/timesync',
+      interval: 10000
+    });
+
+    ts.on('change', function(offset) {
+      self.debug('Timesync offset: ' + offset);
+    });
+
+    ts.on('sync', _.once(function() {
+      callback();
+    }));
+
+    self.ts = ts;
+  };
   BellTimer.prototype.setCorrection = function(correction) {
-    this.correction = correction;
+    this.bellCompensation = correction;
+  };
+  BellTimer.prototype.getCorrection = function() {
+    return this.bellCompensation;
   };
   BellTimer.prototype.enableDevMode = function(startDate, scale) {
     this.devMode = true;
@@ -352,9 +373,11 @@ var self;
     this.timeScale = scale;
   }
   BellTimer.prototype.getDate = function() {
-    if (this.devMode)
-      return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
-    return new Date(Date.now() + this.bellCompensation + this.synchronizationCorrection);
+    return new Date(this.ts.now() + this.bellCompensation);
+
+    // if (this.devMode)
+    //   return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
+    // return new Date(Date.now() + this.bellCompensation + this.synchronizationCorrection);
   };
   BellTimer.prototype.getTimeRemainingNumber = function() {
     var date = this.getDate();
@@ -629,24 +652,65 @@ var self;
 })();
 },{}],7:[function(require,module,exports){
 (function() {
-  var Logger = function() {};
+  var Logger = function(level) {
+    this.level = (level) ? level : 0;
+  };
+
+  Logger.prototype.log = function(message, prefix, color) {
+    console.log('%c' + getTimestamp() + ' %c' + prefix + '%c: %c' + message, 'color:gray;', 'color:' + color + ';font-weight:600;', 'color:#aaaaaa;', 'color:black;');
+  };
+
   var getTimestamp = function() {
     return new Date().toTimeString().substring(0, 8);
   };
-  Logger.prototype.log = function(message, prefix, color) {
-    console.log('%c' + getTimestamp() + ' %c' + prefix + '%c: ' + message, 'color:gray;', 'color:' + color + ';font-weight:600;', 'color:black;');
+  var toFunction = function(name, color) {
+    return function(message) {
+      Logger.prototype.log(message, name, color);
+    };
   };
-  Logger.prototype.warn = console.warn;
-  Logger.prototype.error = console.error;
 
-  Logger.prototype.success = function(message) {
-    Logger.prototype.log(message, 'success', 'green');
-  };
-  Logger.prototype.info = function(message) {
-    Logger.prototype.log(message, 'info', 'blue');
-  };
-  Logger.prototype.debug = function(message) {
-    Logger.prototype.log(message, 'debug', 'gray');
+  var levels = [{
+    level: -2,
+    name: 'trace',
+    func: toFunction('TRACE', 'cyan')
+  }, {
+    level: -1,
+    name: 'debug',
+    func: toFunction('DEBUG', 'gray')
+  }, {
+    level: 0,
+    name: 'success',
+    func: toFunction('SUCCESS', 'green')
+  }, {
+    level: 0,
+    name: 'info',
+    func: toFunction('INFO', 'blue')
+  }, {
+    level: 1,
+    name: 'warn',
+    func: console.warn
+  }, {
+    level: 2,
+    name: 'error',
+    func: console.error
+  }];
+
+  levels.reduce(function(acc, level) {
+    Logger.prototype[level.name] = function(message) {
+      if (level.level >= this.level)
+        level.func(message);
+    };
+  });
+
+  Logger.prototype.setLevel = function(level) {
+    level = level.toLowerCase();
+    if (level == 'all')
+      return (this.level = -1000);
+    if (level == 'none')
+      return (this.level = 1000);
+    for (var i in levels)
+      if (levels[i].name == level)
+        return (this.level = levels[i].level);
   };
 
   module.exports = Logger;
@@ -741,11 +805,11 @@ const _ = require('lodash');
       if (sec > 6)
         return ['black', 'black', 'yellow'];
       if (sec > 4)
-        return ['black', 'black', 'green'];
+        return ['black', 'black', 'lime'];
       if (sec > 2)
-        return ['black', 'black', 'blue'];
+        return ['black', 'black', 'cyan'];
       else
-        return ['black', 'black', 'purple'];
+        return ['black', 'black', 'magenta'];
     },
     'Rainbow - Dark': function(time) {
       var time = parseTimeRemainingString(time);
@@ -758,11 +822,11 @@ const _ = require('lodash');
       if (sec > 6)
         return ['yellow', 'white', 'black'];
       if (sec > 4)
-        return ['green', 'white', 'black'];
+        return ['lime', 'white', 'black'];
       if (sec > 2)
-        return ['blue', 'white', 'black'];
+        return ['cyan', 'white', 'black'];
       else
-        return ['purple', 'white', 'black'];
+        return ['magenta', 'white', 'black'];
     }
   };
 
@@ -1115,11 +1179,23 @@ const $ = require('jquery');
   UIManager.prototype.hideLoading = function() {
     $('.loading').hide();
   };
+  UIManager.prototype.showAlert = function(message, time) {
+    time = (time) ? time : 3000;
+
+    $('#alert-container').css('opacity', 0);
+    $('#alert').text(message);
+    $('#alert-container').css('opacity', 0.4);
+
+    setTimeout(function() {
+      $('#alert-container').css('opacity', 0);
+    }, time);
+  };
 
   module.exports = UIManager;
   //window.UIManager = UIManager;
 })();
 },{"jquery":12,"lodash":14}],10:[function(require,module,exports){
+(function (global){
 const async = require('async');
 const _ = require('lodash');
 const $ = require('jquery');
@@ -1135,6 +1211,7 @@ const UIManager = require('./UIManager.js');
 const IntervalManager = require('./IntervalManager.js');
 
 var logger = new SimpleLogger();
+logger.setLevel('warn');
 var cookieManager = new CookieManager(Cookies);
 var themeManager = new ThemeManager(cookieManager);
 var classesManager = new ClassesManager(cookieManager);
@@ -1187,13 +1264,20 @@ var intervalManager = new IntervalManager(intervals);
 bellTimer.setDebugLogFunction(logger.debug);
 //bellTimer.enableDevMode(new Date('2017-02-16 23:59:55'), 1);
 
+global.bellTimer = bellTimer;
+global.logger = logger;
+logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
+
 $(window).on('load', function() {
   async.series([
 
     // Initialize BellTimer
+    async.asyncify(_.partial(logger.info, 'Loading data...')),
+    async.asyncify(_.partial(uiManager.setLoadingMessage, 'Loading')),
+    _.partial(bellTimer.reloadData),
+    async.asyncify(_.partial(logger.info, 'Synchronizing...')),
     async.asyncify(_.partial(uiManager.setLoadingMessage, 'Synchronizing')),
-    async.asyncify(_.partial(logger.info, 'Loading data and synchronizing...')),
-    _.partial(bellTimer.initialize, 10),
+    _.partial(bellTimer.initializeTimesync),
     async.asyncify(_.partial(logger.success, 'Bell timer initialized')),
     async.asyncify(uiManager.hideLoading),
 
@@ -1213,8 +1297,13 @@ $(window).on('load', function() {
     intervalManager.startAll();
     logger.success('Ready!');
 
+    // var adjustment = Math.round(bellTimer.getCorrection() / 1000);
+    // var adjustmentString = adjustment + ' ' + ((adjustment == 1) ? 'second' : 'seconds');
+    // uiManager.showAlert('Adjusted ' + adjustmentString + ' to match school time');
+
   });
 });
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./AnalyticsManager.js":2,"./BellTimer.js":3,"./ClassesManager.js":4,"./CookieManager.js":5,"./IntervalManager.js":6,"./SimpleLogger.js":7,"./ThemeManager.js":8,"./UIManager.js":9,"async":11,"jquery":12,"js-cookie":13,"lodash":14,"visibilityjs":15}],11:[function(require,module,exports){
 (function (process,global){
 (function (global, factory) {

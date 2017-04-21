@@ -23,7 +23,12 @@
 03/08/2017 communication-even
 03/09/2017 communication-odd
 03/20/2017 holiday (Teacher Service Day)
+04/07/2017 assembly (Diversity Assembly)
 04/10/2017-04/14/2017 holiday (Spring Recess)
+04/18/2017 sbac-even-a
+04/19/2017 sbac-odd
+04/20/2017 sbac-even-b
+04/21/2017 sbac-odd
 05/29/2017 holiday (Memorial Day)
 05/31/2017 finals-wed
 06/01/2017 finals-thu
