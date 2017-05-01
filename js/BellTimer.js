@@ -86,6 +86,13 @@ var self;
     ], callback);
   };
   BellTimer.prototype.initializeTimesync = function(callback) {
+    var callback = _.once(callback);
+
+    if (typeof timesync == 'undefined') {
+      self.ts = Date;
+      callback();
+    }
+
     var ts = timesync.create({
       server: '/timesync',
       interval: 10000

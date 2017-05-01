@@ -233,7 +233,7 @@ var startWebServer = function(callback) {
     extended: true
   }));
   app.set('view engine', 'pug');
-  app.use('/timesync', timesyncServer.requestHandler);
+  // app.use('/timesync', timesyncServer.requestHandler);
 
   app.post('/api/analytics', (req, res) => {
     if (!config['enable redis'])
