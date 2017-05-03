@@ -86,11 +86,11 @@ const _ = require('lodash');
       if (sec > 6)
         return ['black', 'black', 'yellow'];
       if (sec > 4)
-        return ['black', 'black', 'green'];
+        return ['black', 'black', 'lime'];
       if (sec > 2)
-        return ['black', 'black', 'blue'];
+        return ['black', 'black', 'cyan'];
       else
-        return ['black', 'black', 'purple'];
+        return ['black', 'black', 'magenta'];
     },
     'Rainbow - Dark': function(time) {
       var time = parseTimeRemainingString(time);
@@ -103,11 +103,11 @@ const _ = require('lodash');
       if (sec > 6)
         return ['yellow', 'white', 'black'];
       if (sec > 4)
-        return ['green', 'white', 'black'];
+        return ['lime', 'white', 'black'];
       if (sec > 2)
-        return ['blue', 'white', 'black'];
+        return ['cyan', 'white', 'black'];
       else
-        return ['purple', 'white', 'black'];
+        return ['magenta', 'white', 'black'];
     }
   };
 

@@ -77,14 +77,42 @@ var self;
         callback();
     });
   };
-  BellTimer.prototype.initialize = function(n, callback) {
+  BellTimer.prototype.initialize = function(callback) {
+
     async.series([
       self.reloadData,
-      _.partial(self.synchronize, n)
+      _.partial(self.initializeTimesync)
+      //_.partial(self.synchronize, n)
     ], callback);
   };
+  BellTimer.prototype.initializeTimesync = function(callback) {
+    var callback = _.once(callback);
+
+    if (typeof timesync == 'undefined') {
+      self.ts = Date;
+      callback();
+    }
+
+    var ts = timesync.create({
+      server: '/timesync',
+      interval: 10000
+    });
+
+    ts.on('change', function(offset) {
+      self.debug('Timesync offset: ' + offset);
+    });
+
+    ts.on('sync', _.once(function() {
+      callback();
+    }));
+
+    self.ts = ts;
+  };
   BellTimer.prototype.setCorrection = function(correction) {
-    this.correction = correction;
+    this.bellCompensation = correction;
+  };
+  BellTimer.prototype.getCorrection = function() {
+    return this.bellCompensation;
   };
   BellTimer.prototype.enableDevMode = function(startDate, scale) {
     this.devMode = true;
@@ -93,9 +121,11 @@ var self;
     this.timeScale = scale;
   }
   BellTimer.prototype.getDate = function() {
-    if (this.devMode)
-      return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
-    return new Date(Date.now() + this.bellCompensation + this.synchronizationCorrection);
+    return new Date(this.ts.now() + this.bellCompensation);
+
+    // if (this.devMode)
+    //   return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
+    // return new Date(Date.now() + this.bellCompensation + this.synchronizationCorrection);
   };
   BellTimer.prototype.getTimeRemainingNumber = function() {
     var date = this.getDate();

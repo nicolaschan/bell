@@ -21,6 +21,7 @@
     "redis": "^2.6.3",
     "shortid": "^2.2.6",
     "sniffr": "^1.1.4",
+    "timesync": "^0.3.1",
     "visibilityjs": "^1.2.4"
   },
   "devDependencies": {
