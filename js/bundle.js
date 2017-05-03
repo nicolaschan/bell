@@ -354,7 +354,7 @@ var self;
 
     var ts = timesync.create({
       server: '/timesync',
-      interval: 10000
+      interval: 4 * 60 * 1000
     });
 
     ts.on('change', function(offset) {
@@ -1259,7 +1259,7 @@ var intervals = {
     },
     func: function() {
       logger.info('Loading data and synchronizing...');
-      bellTimer.initialize(10, function() {
+      bellTimer.reloadData(function() {
         logger.success('Bell timer reloaded');
         logger.info('Synchronization correction: ' + bellTimer.synchronizationCorrection);
         intervalManager.restart('oneSecond');

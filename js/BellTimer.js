@@ -95,7 +95,7 @@ var self;
 
     var ts = timesync.create({
       server: '/timesync',
-      interval: 10000
+      interval: 4 * 60 * 1000
     });
 
     ts.on('change', function(offset) {

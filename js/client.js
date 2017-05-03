@@ -54,7 +54,7 @@ var intervals = {
     },
     func: function() {
       logger.info('Loading data and synchronizing...');
-      bellTimer.initialize(10, function() {
+      bellTimer.reloadData(function() {
         logger.success('Bell timer reloaded');
         logger.info('Synchronization correction: ' + bellTimer.synchronizationCorrection);
         intervalManager.restart('oneSecond');
