@@ -288,6 +288,9 @@ const $ = require('jquery');
 
     $('#countdown').css('opacity', 1);
   };
+  /**
+   * Redraws everything.
+   */
   UIManager.prototype.updateGraphics = function() {
     var c = $('#circle')[0];
     var ctx = c.getContext('2d');
