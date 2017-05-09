@@ -1,0 +1,17 @@
+{
+	"manifest_version": 2,
+	"name": "bell.lahs.club Extension",
+	"version": "0",
+	"browser_action": {
+		"default_icon": "chrome_extension/icon.png",
+		"default_popup": "chrome_extension/popup.html",
+		"default_title": "Bell"
+	},
+	"permissions": [
+		"activeTab",
+		"cookies",
+		"https://bell.lahs.club/*",
+		"https://ajax.googleapis.com/"
+	]
+
+}
