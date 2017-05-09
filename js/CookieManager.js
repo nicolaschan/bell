@@ -1,3 +1,6 @@
+/**
+  *A module that does what it sounds like: it manages cookies.
+  */
 (function() {
 
   var CookieManager = function(Cookies) {
