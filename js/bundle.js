@@ -613,7 +613,7 @@ var self;
 
   CookieManager.prototype.set = function(key, value, expires) {
     return this.Cookies.set(key, value, {
-      expires: (expires) ? 365 : null
+      expires: (expires) ? expires : 365
     });
   };
   CookieManager.prototype.get = function(key) {
