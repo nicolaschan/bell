@@ -12,8 +12,8 @@ const _ = require('lodash');
   /**
    * Given a string of the form hh:mm:ss, i.e. 10:30:21 (at least that's what Nicolas
    * promised me it does), returns an array of 3 integers specifying the time.
-   * @param a string representing the time.
-   * @return an array containing integers [hh, mm, ss].
+   * @param {String} time a string representing the time.
+   * @return {int[]} an array containing integers [hh, mm, ss].
    */
   var parseTimeRemainingString = function(time) {
     var parts = _.map(time.split(':'), _.parseInt);
@@ -25,10 +25,10 @@ const _ = require('lodash');
   };
   /**
    * Given
-   * @param a partially applied function that returns 4 arrays of color strings (which is
+   * @param {String -> String[]} colors a partially applied function that returns 4 arrays of color strings (which is
    * how themes are stored),
-   * @param the current time string,
-   * @return the appropriate array of 3 color strings.
+   * @param {String} time the current time string,
+   * @return {String[]} the appropriate array of 3 color strings.
    */
   var getCurrentColorDefaultTiming = function(colors, time) {
     var parts = parseTimeRemainingString(time);
@@ -45,7 +45,7 @@ const _ = require('lodash');
   };
   /**
     * Stores color schemes for each theme.
-    * @return a partially applied function that takes a time as an argument, and returns
+    * @return {String -> String[]} a partially applied function that takes a time as an argument, and returns
     * an array x of 3 colors where x[0] is the color of the time text, x[1] is the color
     * of the period description, and x[2] is the background color.
     */
@@ -136,7 +136,7 @@ const _ = require('lodash');
 
   /**
    * Initializes a new ThemeManager object.
-   * @param the appropriate CookieManager to find the theme cookie.
+   * @param {CookieManager} cookieManager the appropriate CookieManager to find the theme cookie.
    */
   var ThemeManager = function(cookieManager) {
     this.cookieManager = cookieManager;
@@ -146,13 +146,13 @@ const _ = require('lodash');
    * Gets the current theme. If the current theme were to somehow not to be in the 
    * themes object, it would throw a nullpointerexception, but that should hopefully
    * never happen.
-   * @return the partially applied function representing the current theme.
+   * @return {String -> String[]} the partially applied function representing the current theme.
    */
   ThemeManager.prototype.getCurrentTheme = function() {
     return themes[this.getCurrentThemeName()];
   };
   /**
-   * @return the name of the current theme. Duh.
+   * @return {String} the name of the current theme. Duh.
    */
   ThemeManager.prototype.getCurrentThemeName = function() {
     if (!this.cookieManager.get(cookieName))
@@ -161,13 +161,13 @@ const _ = require('lodash');
   };
   /**
    * Sets the current theme by changing the value stored in the cookie.
-   * @param the name of the new theme to be set.
+   * @param {String} themeName the name of the new theme to be set.
    */
   ThemeManager.prototype.setCurrentTheme = function(themeName) {
     return this.cookieManager.set(cookieName, themeName);
   };
   /**
-   * @return the object/map of partially applied functions representing themes.
+   * @return {Object} the object/map of partially applied functions representing themes.
    */
   ThemeManager.prototype.getAvailableThemes = function() {
     return themes;

@@ -4,7 +4,23 @@ const async = require('async');
 
 var self;
 
+/**
+ * Runs a bell timer. Note that the timesync library must have been imported from somewhere
+ * else (since require('timesync') seems to complain). For the bell.lahs.club site, it can
+ * be found at /timesync/timesync.js. For external applications, it can be found at
+ * https://bell.lahs.club/timesync/timesync.js.
+ * Note that for usage in Chrome extensions, the following line must be added to manifest.json:
+ * "content_security_policy": "script-src 'self' https://bell.lahs.club; object-src 'self'",
+ * to allow the use of external libraries.
+ * Finally, the name of the host website can be changed as needed, provided that there is a
+ * /timsync/timesync.js somewhere.
+ */
 (function() {
+  /**
+   * Creates a new instance of BellTimer, with a ClassesManager object. The ClassesManager is
+   * necessary to store the current class period.
+   * @param {ClassesManager} classesManager
+   */
   var BellTimer = function(classesManager) {
     self = this;
 
@@ -29,9 +45,15 @@ var self;
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
-  BellTimer.prototype.reloadData = function(callback) {
+  /**
+   * Reloads schedule data from the host website.
+   * @param {String} host The URI string giving the location of the api. For LAHS,
+   * it should be "https://bell.lahs.club".
+   * @param {Function} callback The callback to be executed. Can be undefined.
+   */
+  BellTimer.prototype.reloadDataFromHost = function(host, callback) {
     $.ajax({
-      url: '/api/data?v=' + Date.now(),
+      url: (host + '/api/data?v=') + Date.now(),
       type: 'GET'
     }).done(function(data) {
       var rawSchedules = data.schedules;
@@ -77,24 +99,34 @@ var self;
         callback();
     });
   };
+  BellTimer.prototype.reloadData = function(callback) {
+    self.reloadDataFromHost("", callback);
+  }; //_.partial(self.reloadDataFromHost, "");
+  BellTimer.prototype.initializeFromHost = function(host, callback) {
+    async.series([
+      _.partial(self.reloadDataFromHost, host),
+      _.partial(self.initializeTimesyncFromHost, host)
+    ], callback);
+  };
   BellTimer.prototype.initialize = function(callback) {
-
     async.series([
       self.reloadData,
       _.partial(self.initializeTimesync)
       //_.partial(self.synchronize, n)
     ], callback);
   };
-  BellTimer.prototype.initializeTimesync = function(callback) {
+  BellTimer.prototype.initiailizeTimesync = function(callback) {
+    self.initializeTimesyncFromHost("", callback);
+  };
+  BellTimer.prototype.initializeTimesyncFromHost = function(host, callback) {
     var callback = _.once(callback);
 
     if (typeof timesync == 'undefined') {
       self.ts = Date;
-      callback();
+      return callback();
     }
-
     var ts = timesync.create({
-      server: '/timesync',
+      server: (host + '/timesync'),
       interval: 4 * 60 * 1000
     });
 
@@ -105,7 +137,6 @@ var self;
     ts.on('sync', _.once(function() {
       callback();
     }));
-
     self.ts = ts;
   };
   BellTimer.prototype.setCorrection = function(correction) {
@@ -133,6 +164,10 @@ var self;
       console.log(this.getNextPeriod());
     return this.getNextPeriod().timestamp.getTime() - (Math.floor(date.getTime() / 1000) * 1000);
   };
+  /**
+   * Returns the time remaining in this period as a String of form hh:mm:ss.
+   * @return the string specified above.
+   */
   BellTimer.prototype.getTimeRemainingString = function() {
     var date = this.getDate();
     var displayTimeNumber = function(time) {
