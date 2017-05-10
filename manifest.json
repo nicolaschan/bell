@@ -4,13 +4,15 @@
 	"version": "0",
 	"content_security_policy": "script-src 'self' https://bell.lahs.club; object-src 'self'",
 	"browser_action": {
-		"default_icon": "chrome_extension/icon.png",
+		"default_icon": "favicons/lime.png",
 		"default_popup": "chrome_extension/popup.html",
 		"default_title": "Bell"
 	},
 	"permissions": [
 		"cookies",
-		"https://bell.lahs.club/*"
+		"tabs",
+		"https://bell.lahs.club/*",
+		"http://bell.lahs.club/*"
 	]
 
 }

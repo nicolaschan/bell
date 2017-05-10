@@ -1,76 +1,263 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
+/**
+ * Acts as an intermediary between Chrome's cookie API and the extension.
+ * The exposed interface is the same as CookieManager, because duck typing is
+ * a useful thing.
+ *
+ * To use this, manifest.json must have "cookies" in its permissions.
+ */
+
+const $ = require("jquery");
+
+/**
+ * Creates a new instance of this pseudo-cookiemanager.
+ * Instead of actually asking the browser for a cookie every time the get method
+ * is invoked, all cookies are gotten upon initialization and stored in an object.
+ * The get method of this manager performs a lookup on the object.
+ *
+ * @param {String} url
+ * @param {Function} callback the setup function to be run after cookie initalization completes.
+ */
+var ChromeCookieManager = function(url, callback) {
+	self = this;
+	self.url = url;
+	self.storedCookies = {};
+	chrome.cookies.getAll({
+		url: self.url
+	}, function(cookies) {
+		for(cookie of cookies) {
+			// shoot me
+			self.storedCookies[cookie.name] = JSON.parse("\"" + lint(cookie.value) + "\"");
+		}
+		callback();
+	});
+}
+
+ChromeCookieManager.prototype.set = function(key, value, expires) {
+	chrome.cookies.set(
+		{
+			url: this.url,
+			name: key,
+			value: JSON.stringify(value),
+			expirationDate: expires ? (daysToSeconds(expires)) : (daysToSeconds(365))
+		}, (cookie) => this.storedCookies[cookie.name] = cookie.value);
+	return value;
+};
+
+ChromeCookieManager.prototype.get = function(key) {
+	return this.storedCookies[key];
+};
+
+ChromeCookieManager.prototype.getJSON = function(key) {
+	try {
+		return JSON.parse(this.get(key));
+	}
+	catch(e) {
+		return undefined;
+	}
+};
+
+/**
+ * Because the CookieManager class was written to take days until expiration
+ * as an argument of set, and chrome.cookies sets an expiration date in terms
+ * of seconds elapsed since the unix epoch, this is necessary.
+ *
+ * @param {int} days the number of days until expiration.
+ * @return {double} the date of expiration, in terms of number of seconds since
+ * the unix epoch.
+ */
+var daysToSeconds = function(days) {
+	var d = new Date();
+	d.setDate(days);
+	return d.getTime() / 1000;
+};
+
+var lint = function(str) {
+	str = decodeURI(str);
+	str = str.replace(/\"/g,"\\\"");
+	return str; 
+}
+
+module.exports = ChromeCookieManager;
+},{"jquery":8}],2:[function(require,module,exports){
+
 // Local dependencies
-const UI = require("../js/UIManager.js");
-const CookieManager = require("../js/CookieManager.js");
+// Note that CookieManager.js cannot be used because the chrome.cookies API is needed
+// to access cookies from this extension.
+const ChromeCookieManager = require("./ChromeCookieManager.js");
 const ClassesManager = require("../js/ClassesManager.js");
 const BellTimer = require("../js/BellTimer.js");
 const SimpleLogger = require("../js/SimpleLogger.js");
 const ThemeManager = require("../js/ThemeManager.js");
-const Interval = require("../js/IntervalManager.js");
 // Modules
 const $ = require("jquery"); // forgive my inconsitent usage of jquery
-const Cookies = require('js-cookie');
+const _ = require("lodash"); // must use this instead of js-cookie because this isn't the website
 
 var logger = new (require("../js/SimpleLogger.js"))();
 logger.setLevel('warn');
-var cookman = new CookieManager(Cookies);
-var thememan = new ThemeManager(cookman);
-var classes = new ClassesManager(cookman);
-var bellTimer = new BellTimer(classes);
 
-var c = document.getElementById("circle");
-var ctx = c.getContext('2d');
+var cookman;
+var thememan;
+var classes;
+var bellTimer;
+var handle;
 
-var side = document.body.clientHeight - 40;
+var updateColors;
+var updateAll;
+var dynamicallySetFontSize;
 
-c.height = c.width = side;
+var setup = function() {
+    var c = document.getElementById("circle");
+    var ctx = c.getContext('2d');
 
-/**
- * A slightly optimized version of the same method found in UIManager.js, accounting for the fact that
- * as a Chrome extension popup, the canvas should never be resized.
- */
-var updateGraphics = function() {
-    var time = bellTimer.getTimeRemainingString();
-    var color = thememan.getCurrentTheme()(time)[1];
-    var proportion = bellTimer.getProportionElapsed();
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.lineWidth = side / 15;
+    var side = document.body.clientHeight - 40;
 
-    var radius = (side / 2) * 0.95;
-    var posX = side / 2;
-    var posY = side / 2;
+    c.height = c.width = side;
 
-    ctx.beginPath();
-    ctx.arc(posX, posY, radius, (Math.PI / -2), (Math.PI / -2) + (-2 * Math.PI) * (1 - proportion), true);
-    ctx.lineTo(posX, posY);
-    ctx.closePath();
-    ctx.fill();
+    var offline = typeof timesync == 'undefined'; // returns false if timesync is not initialized
 
-    handle = window.requestAnimationFrame(updateGraphics);
-};
+    // Most of the below code is modified from UIManager.js
+    var helpers = {
+        updateTitle: _.throttle(function(text) {
+            $('head title').text(text);
+        }, 500, {
+          leading: true
+        })
+    };
 
-var handle; // apparently not supported by jquery
-/*
-http://stackoverflow.com/questions/8894461/updating-an-extension-button-dynamically-inspiration-required
-*/
+    var update = function() {
+        var time = bellTimer.getTimeRemainingString();
+        var name = bellTimer.getCurrentPeriod().name;
+        var schedule = bellTimer.getCurrentSchedule();
+        var proportionElapsed = bellTimer.getProportionElapsed();
+        $('#time').text(time);
+        helpers.updateTitle(time);
+        $('#subtitle').text(name);
+        $('#scheduleName').text(schedule.displayName);
+        var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
+        if (time.split(':').length > 2)
+            min = 60;
+        if (min < 2) {
+            $('#favicon').attr('href', '../favicons/red.png?v=1');
+        } else if (min < 5) {
+            $('#favicon').attr('href', '../favicons/orange.png?v=1');
+        } else if (min < 15) {
+            $('#favicon').attr('href', '../favicons/yellow.png?v=1');
+        } else {
+            $('#favicon').attr('href', '../favicons/lime.png?v=1');
+        }
+        $('#countdown').css('opacity', 1);
+    };
+
+    /**
+     * Updates the colors of the extension. Should only be called once upon initialization, since unlike
+     * the full web version, the theme cookie should not change while the extension is open.
+     */
+    updateColors = function() {
+        var time = bellTimer.getTimeRemainingString();
+        var schedule = bellTimer.getCurrentSchedule();
+        var color = schedule.color;
+        var theme = thememan.getCurrentTheme();
+        $('#time').css('color', theme(time)[0]);
+        $('.subtitle').css('color', theme(time)[1]);
+        $('#page1').css('background-color', theme(time)[2]);
+        if (color) {
+            if (currentTheme == 'Default - Dark')
+                $('#time').css('color', color);
+            if (currentTheme == 'Default - Light')
+                $('#page1').css('background-color', color);
+        }
+    };
+
+    /**
+     * A slightly optimized version of the same method found in UIManager.js, accounting for the fact that
+     * as a Chrome extension popup, the canvas should never be resized.
+     */
+    var updateGraphics = function() {
+        var time = bellTimer.getTimeRemainingString();
+        var color = thememan.getCurrentTheme()(time)[1];
+        var proportion = bellTimer.getProportionElapsed();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = side / 15;
+
+        var radius = (side / 2) * 0.95;
+        var posX = side / 2;
+        var posY = side / 2;
+
+        ctx.beginPath();
+        ctx.arc(posX, posY, radius, (Math.PI / -2), (Math.PI / -2) + (-2 * Math.PI) * (1 - proportion), true);
+        ctx.lineTo(posX, posY);
+        ctx.closePath();
+        ctx.fill();
+    };
+
+    updateAll = function() {
+        update();
+        updateGraphics();
+        handle = window.requestAnimationFrame(updateAll);
+    }
+
+    dynamicallySetFontSize = function() {
+        $('#time').css('font-size', (Math.min($(window).innerHeight() * 0.3, $(window).innerWidth() * 0.2)) + 'px');
+        $('.subtitle').css('font-size', (Math.min($(window).innerHeight() * 0.07, $(window).innerWidth() * 0.07)) + 'px');
+    };
+
+    /*
+    http://stackoverflow.com/questions/8894461/updating-an-extension-button-dynamically-inspiration-required
+    */
+    $(window).on('load resize', dynamicallySetFontSize);
+    dynamicallySetFontSize();
+    updateColors();
+    handle = window.requestAnimationFrame(updateAll);
+}
 
 var initializePopup = function() {
-	handle = window.requestAnimationFrame(updateGraphics);
+    thememan = new ThemeManager(cookman);
+    classes = new ClassesManager(cookman);
+    bellTimer = new BellTimer(classes);
+    bellTimer.initializeFromHost("https://bell.lahs.club", setup);
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-	bellTimer.initializeFromHost("https://bell.lahs.club", initializePopup);
+    try {
+                                            // yes, http not https
+        cookman = new ChromeCookieManager("http://bell.lahs.club/", initializePopup);
+    }
+    catch(e) {
+        var c = document.getElementById("circle");
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = "red";
+        ctx.font = "12px Roboto";
+        ctx.fillText("Something went really wrong.", 0, 0);
+        ctx.fillText("Whoops.", 0, 15);
+    }
 }, false);
-},{"../js/BellTimer.js":2,"../js/ClassesManager.js":3,"../js/CookieManager.js":4,"../js/IntervalManager.js":5,"../js/SimpleLogger.js":6,"../js/ThemeManager.js":7,"../js/UIManager.js":8,"jquery":10,"js-cookie":11}],2:[function(require,module,exports){
+},{"../js/BellTimer.js":3,"../js/ClassesManager.js":4,"../js/SimpleLogger.js":5,"../js/ThemeManager.js":6,"./ChromeCookieManager.js":1,"jquery":8,"lodash":9}],3:[function(require,module,exports){
 const _ = require('lodash');
 const $ = require('jquery');
 const async = require('async');
 
 var self;
 
+/**
+ * Runs a bell timer. Note that the timesync library must have been imported from somewhere
+ * else (since require('timesync') seems to complain). For the bell.lahs.club site, it can
+ * be found at /timesync/timesync.js. For external applications, it can be found at
+ * https://bell.lahs.club/timesync/timesync.js.
+ * Note that for usage in Chrome extensions, the following line must be added to manifest.json:
+ * "content_security_policy": "script-src 'self' https://bell.lahs.club; object-src 'self'",
+ * to allow the use of external libraries.
+ * Finally, the name of the host website can be changed as needed, provided that there is a
+ * /timsync/timesync.js somewhere.
+ */
 (function() {
+  /**
+   * Creates a new instance of BellTimer, with a ClassesManager object. The ClassesManager is
+   * necessary to store the current class period.
+   * @param {ClassesManager} classesManager
+   */
   var BellTimer = function(classesManager) {
     self = this;
 
@@ -95,9 +282,15 @@ var self;
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
+  /**
+   * Reloads schedule data from the host website.
+   * @param {String} host The URI string giving the location of the api. For LAHS,
+   * it should be "https://bell.lahs.club".
+   * @param {Function} callback The callback to be executed. Can be undefined.
+   */
   BellTimer.prototype.reloadDataFromHost = function(host, callback) {
     $.ajax({
-      url: host + '/api/data?v=' + Date.now(),
+      url: (host + '/api/data?v=') + Date.now(),
       type: 'GET'
     }).done(function(data) {
       var rawSchedules = data.schedules;
@@ -167,9 +360,8 @@ var self;
 
     if (typeof timesync == 'undefined') {
       self.ts = Date;
-      callback();
+      return callback();
     }
-
     var ts = timesync.create({
       server: (host + '/timesync'),
       interval: 4 * 60 * 1000
@@ -182,7 +374,6 @@ var self;
     ts.on('sync', _.once(function() {
       callback();
     }));
-
     self.ts = ts;
   };
   BellTimer.prototype.setCorrection = function(correction) {
@@ -405,7 +596,7 @@ var self;
   module.exports = BellTimer;
   //window.BellTimer = BellTimer;
 })();
-},{"async":9,"jquery":10,"lodash":12}],3:[function(require,module,exports){
+},{"async":7,"jquery":8,"lodash":9}],4:[function(require,module,exports){
 (function() {
 
   const cookieName = 'classes';
@@ -426,63 +617,7 @@ var self;
   module.exports = ClassesManager;
   //window.ClassesManager = ClassesManager;
 })();
-},{}],4:[function(require,module,exports){
-/**
-  *A module that does what it sounds like: it manages cookies.
-  */
-(function() {
-
-  var CookieManager = function(Cookies) {
-    this.Cookies = Cookies;
-  };
-
-  CookieManager.prototype.set = function(key, value, expires) {
-    return this.Cookies.set(key, value, {
-      expires: (expires) ? expires : 365
-    });
-  };
-  CookieManager.prototype.get = function(key) {
-    return this.Cookies.get(key);
-  };
-  CookieManager.prototype.getJSON = function(key) {
-    return this.Cookies.getJSON(key);
-  };
-
-  module.exports = CookieManager;
-  //window.CookieManager = CookieManager;
-})();
 },{}],5:[function(require,module,exports){
-(function() {
-
-  var self;
-
-  var IntervalManager = function(intervals) {
-    self = this;
-
-    this.intervals = intervals;
-  };
-
-  IntervalManager.prototype.start = function(name) {
-    var interval = this.intervals[name];
-
-    clearInterval(interval.interval);
-    interval.interval = null;
-
-    interval.start(interval.func, function(newInterval) {
-      interval.interval = newInterval;
-    });
-  };
-  IntervalManager.prototype.restart = IntervalManager.prototype.start;
-
-  IntervalManager.prototype.startAll = function() {
-    for (var name in this.intervals)
-      self.start(name);
-  };
-
-  module.exports = IntervalManager;
-  //window.IntervalManager = IntervalManager;
-})();
-},{}],6:[function(require,module,exports){
 (function() {
   var Logger = function(level) {
     this.level = (level) ? level : 0;
@@ -548,7 +683,7 @@ var self;
   module.exports = Logger;
   //window.SimpleLogger = Logger;
 })();
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 const _ = require('lodash');
 
 /**
@@ -563,8 +698,8 @@ const _ = require('lodash');
   /**
    * Given a string of the form hh:mm:ss, i.e. 10:30:21 (at least that's what Nicolas
    * promised me it does), returns an array of 3 integers specifying the time.
-   * @param a string representing the time.
-   * @return an array containing integers [hh, mm, ss].
+   * @param {String} time a string representing the time.
+   * @return {int[]} an array containing integers [hh, mm, ss].
    */
   var parseTimeRemainingString = function(time) {
     var parts = _.map(time.split(':'), _.parseInt);
@@ -576,10 +711,10 @@ const _ = require('lodash');
   };
   /**
    * Given
-   * @param a partially applied function that returns 4 arrays of color strings (which is
+   * @param {String -> String[]} colors a partially applied function that returns 4 arrays of color strings (which is
    * how themes are stored),
-   * @param the current time string,
-   * @return the appropriate array of 3 color strings.
+   * @param {String} time the current time string,
+   * @return {String[]} the appropriate array of 3 color strings.
    */
   var getCurrentColorDefaultTiming = function(colors, time) {
     var parts = parseTimeRemainingString(time);
@@ -596,7 +731,7 @@ const _ = require('lodash');
   };
   /**
     * Stores color schemes for each theme.
-    * @return a partially applied function that takes a time as an argument, and returns
+    * @return {String -> String[]} a partially applied function that takes a time as an argument, and returns
     * an array x of 3 colors where x[0] is the color of the time text, x[1] is the color
     * of the period description, and x[2] is the background color.
     */
@@ -687,7 +822,7 @@ const _ = require('lodash');
 
   /**
    * Initializes a new ThemeManager object.
-   * @param the appropriate CookieManager to find the theme cookie.
+   * @param {CookieManager} cookieManager the appropriate CookieManager to find the theme cookie.
    */
   var ThemeManager = function(cookieManager) {
     this.cookieManager = cookieManager;
@@ -697,13 +832,13 @@ const _ = require('lodash');
    * Gets the current theme. If the current theme were to somehow not to be in the 
    * themes object, it would throw a nullpointerexception, but that should hopefully
    * never happen.
-   * @return the partially applied function representing the current theme.
+   * @return {String -> String[]} the partially applied function representing the current theme.
    */
   ThemeManager.prototype.getCurrentTheme = function() {
     return themes[this.getCurrentThemeName()];
   };
   /**
-   * @return the name of the current theme. Duh.
+   * @return {String} the name of the current theme. Duh.
    */
   ThemeManager.prototype.getCurrentThemeName = function() {
     if (!this.cookieManager.get(cookieName))
@@ -712,13 +847,13 @@ const _ = require('lodash');
   };
   /**
    * Sets the current theme by changing the value stored in the cookie.
-   * @param the name of the new theme to be set.
+   * @param {String} themeName the name of the new theme to be set.
    */
   ThemeManager.prototype.setCurrentTheme = function(themeName) {
     return this.cookieManager.set(cookieName, themeName);
   };
   /**
-   * @return the object/map of partially applied functions representing themes.
+   * @return {Object} the object/map of partially applied functions representing themes.
    */
   ThemeManager.prototype.getAvailableThemes = function() {
     return themes;
@@ -727,352 +862,7 @@ const _ = require('lodash');
   module.exports = ThemeManager;
   //window.ThemeManager = ThemeManager;
 })();
-},{"lodash":12}],8:[function(require,module,exports){
-const _ = require('lodash');
-const $ = require('jquery');
-
-(function() {
-
-  var helpers = {
-    updateTitle: _.throttle(function(text) {
-      $('head title').text(text);
-    }, 500, {
-      leading: true
-    })
-  };
-
-  var self;
-
-  var UIManager = function(bellTimer, cookieManager, themeManager, classesManager, analyticsManager) {
-    self = this;
-
-    this.bellTimer = bellTimer;
-    this.cookieManager = cookieManager;
-    this.themeManager = themeManager;
-    this.classesManager = classesManager;
-    this.analyticsManager = analyticsManager;
-  };
-  UIManager.prototype.initialize = function() {
-    // themes
-    var loadThemes = function() {
-      var refreshTheme = function() {
-        var theme = self.themeManager.getCurrentThemeName();
-        currentTheme = theme;
-        $('#themeSelect').val(theme);
-      };
-      $('#themeSelect').empty();
-      for (var i in self.themeManager.getAvailableThemes()) {
-        $('#themeSelect').append($('<option></option>').text(i));
-      }
-      $('#themeSelect').on('change', function(e) {
-        var theme = this.value;
-        self.themeManager.setCurrentTheme(theme);
-        self.analyticsManager.reportAnalytics();
-        refreshTheme();
-      });
-      refreshTheme();
-    };
-    // show scroll indicator if they've never scrolled down before
-    var showScrollIndicator = function() {
-      if (!self.cookieManager.getJSON('has scrolled')) {
-        $('.downArrow').show();
-        $('#downIcon').click(function(e) {
-          $('body, html').animate({
-            scrollTop: $('#page2').offset().top
-          }, 1500);
-        });
-        $(window).on('scroll', function(e) {
-          if ($(window).scrollTop() > 250) {
-            $(window).off('scroll');
-            $('.downArrow').css('opacity', 0);
-            self.cookieManager.set('has scrolled', true);
-            setTimeout(function() {
-              $('.downArrow').hide();
-            }, 1000);
-            setTimeout(function() {
-              $('#downIcon').hide();
-            }, 1000);
-          }
-        });
-      }
-    };
-    // set state of icons/settings panel
-    var setSettingsState = function() {
-      $('#icons').hide();
-      $('#doneIcon').hide();
-      $('#scheduleEntry').hide();
-      $('#icons').show();
-      $('#icons').css('visibility', 'visible');
-
-      var classes = self.classesManager.getClasses();
-
-      var settingsMode = false;
-      var enterSettingsMode = function() {
-        $('#settingsIcon').hide();
-        $('#scheduleDisplay').hide();
-        $('#doneIcon').css('opacity', 0);
-        $('#doneIcon').show();
-        $('#doneIcon').css('opacity', 1);
-        $('#scheduleEntry').css('opacity', 0);
-        $('#scheduleEntry').show();
-        $('#scheduleEntry').css('opacity', 1);
-        $('#period0').select();
-        settingsMode = true;
-      };
-      var exitSettingsMode = function() {
-        $('#doneIcon').hide();
-        $('#scheduleEntry').hide();
-        $('#settingsIcon').css('opacity', 0);
-        $('#settingsIcon').show();
-        $('#settingsIcon').css('opacity', 1);
-        $('#scheduleDisplay').css('opacity', 0);
-        $('#scheduleDisplay').show();
-        $('#scheduleDisplay').css('opacity', 1);
-        settingsMode = false;
-      };
-
-      var classesTexts = [];
-      var checkboxes = [];
-      $('#scheduleEntryTable').empty();
-      for (var i = 0; i < classes.length; i++) {
-        var input = $('<input type="text" class="inputBox" name="period' +
-          i + '" id="period' +
-          i + '" maxlength="20" placeholder="Period ' +
-          i + '" value="' + classes[i] + '">');
-        var checkbox = $('<input type="checkbox" name="checkbox' + i + '" id="checkbox' + i + '" class="checkbox" checked>');
-        var checkboxLabel = $('<label class="control control--checkbox"></label>').append(checkbox).append($('<div class="control__indicator"></div>'));
-        var checkboxColumn = $('<td class="tableCheckbox"></td>').append(checkboxLabel);
-        var row = $('<tr></tr>').append($('<td class="tableLabel"></td>').text('Period ' + i)).append($('<td class="tableInput"></td>').append(input)).append(checkboxColumn);
-        $('#scheduleEntryTable').append(row);
-        classesTexts.push(input);
-        checkboxes.push(checkbox);
-        var setToFree = function(index) {
-          checkboxes[index].prop('checked', false);
-          classesTexts[index].prop('disabled', true);
-          classesTexts[index].val('Free');
-
-          if (index == 7)
-            $('#period0').select();
-          else
-            $('#period' + (index + 1)).select();
-        };
-        if (classes[i].toLowerCase() == 'free') {
-          setToFree(i);
-        }
-        checkbox.change(function(e) {
-          var index = parseInt(this.name.substring(8));
-          if (this.checked) {
-            classesTexts[index].val('Period ' + index);
-            classesTexts[index].prop('disabled', false);
-            $('#period' + (index)).select();
-          } else {
-            setToFree(index);
-          }
-        });
-        input.on('keydown', function(e) {
-          var currentPeriod = parseInt(this.id.substring(6));
-          if (e.keyCode == 13) {
-            if (currentPeriod == 7)
-              $('#period0').select();
-            else
-              $('#period' + (currentPeriod + 1)).select();
-          }
-        });
-        input.on('keyup', function(e) {
-          var currentPeriod = parseInt(this.id.substring(6));
-          if (this.value.toLowerCase() == 'free') {
-            setToFree(currentPeriod);
-          }
-        });
-      }
-      var readClasses = function() {
-        var out = [];
-        for (var i in classesTexts) {
-          out.push(classesTexts[i].val().trim());
-        }
-        return out;
-      };
-
-      $('#settingsIcon').click(function() {
-        enterSettingsMode();
-      });
-      $('#doneIcon').click(function() {
-        exitSettingsMode();
-        self.classesManager.setClasses(readClasses());
-        self.bellTimer.reloadData();
-      });
-    };
-    // set font size on load and resize
-    var dynamicallySetFontSize = function() {
-      $('#time').css('font-size', (Math.min($(window).innerHeight() * 0.3, $(window).innerWidth() * 0.2)) + 'px');
-      $('.subtitle').css('font-size', (Math.min($(window).innerHeight() * 0.07, $(window).innerWidth() * 0.07)) + 'px');
-
-      $('.period').css('font-size', (Math.min($(window).innerHeight() * 0.03)) + 'px');
-      $('.current').css('font-size', (Math.min($(window).innerHeight() * 0.05)) + 'px');
-
-      // entry table size
-      var padding = ((Math.min($(window).innerHeight() * 0.015))) + 'px';
-      $('.tableLabel').css('font-size', ((Math.min($(window).innerHeight() * 0.025))) + 'px');
-      $('.tableLabel').css('padding', padding);
-      $('.tableCheckbox').css('padding', padding);
-      $('.tableInput').css('padding', padding);
-      $('#themeSelectColumn').css('padding', padding);
-      $('.inputBox').css('font-size', ((Math.min($(window).innerHeight() * 0.03))) + 'px');
-      $('.inputBox').css('padding', padding);
-      $('#themeSelect').css('font-size', ((Math.min($(window).innerHeight() * 0.03))) + 'px');
-      $('#themeSelect').css('padding', padding);
-
-    };
-
-    $(window).on('load resize', dynamicallySetFontSize);
-
-    loadThemes();
-    showScrollIndicator();
-    setSettingsState();
-    dynamicallySetFontSize();
-  };
-  UIManager.prototype.update = function() {
-    var time = self.bellTimer.getTimeRemainingString();
-    var name = self.bellTimer.getCurrentPeriod().name;
-    var schedule = self.bellTimer.getCurrentSchedule();
-    var color = schedule.color;
-
-    var completed = self.bellTimer.getCompletedPeriods();
-    var current = self.bellTimer.getCurrentPeriod();
-    var future = self.bellTimer.getFuturePeriods();
-
-    var proportionElapsed = self.bellTimer.getProportionElapsed();
-
-    $('#time').text(time);
-    helpers.updateTitle(time);
-    $('#subtitle').text(name);
-    $('#scheduleName').text(schedule.displayName);
-    var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
-    if (time.split(':').length > 2)
-      min = 60;
-    if (min < 2) {
-      $('#favicon').attr('href', 'favicons/red.png?v=1');
-    } else if (min < 5) {
-      $('#favicon').attr('href', 'favicons/orange.png?v=1');
-    } else if (min < 15) {
-      $('#favicon').attr('href', 'favicons/yellow.png?v=1');
-    } else {
-      $('#favicon').attr('href', 'favicons/lime.png?v=1');
-    }
-
-    var theme = self.themeManager.getCurrentTheme();
-
-    $('#time').css('color', theme(time)[0]);
-    $('.subtitle').css('color', theme(time)[1]);
-    $('#page1').css('background-color', theme(time)[2]);
-
-    if (color) {
-      if (currentTheme == 'Default - Dark')
-        $('#time').css('color', color);
-      if (currentTheme == 'Default - Light')
-        $('#page1').css('background-color', color);
-    }
-
-
-    var displayTimeArray = function(timeArray) {
-      var hours = ((timeArray[0] == 0) ? 12 : (timeArray[0] > 12) ? timeArray[0] % 12 : timeArray[0]).toString();
-      var minutes = timeArray[1].toString();
-      if (minutes.length < 2)
-        minutes = '0' + minutes;
-      return hours + ':' + minutes;
-    };
-
-    var numberOfCompletedPeriods = 2;
-    var numberOfFuturePeriods = 5;
-    var totalPeriods = numberOfCompletedPeriods + numberOfFuturePeriods;
-
-    if (future.length < numberOfFuturePeriods) {
-      numberOfFuturePeriods = future.length;
-      numberOfCompletedPeriods = totalPeriods - numberOfFuturePeriods;
-    }
-    if (completed.length < numberOfCompletedPeriods) {
-      numberOfCompletedPeriods = completed.length;
-      numberOfFuturePeriods = totalPeriods - numberOfCompletedPeriods;
-    }
-
-    completed = _.takeRight(completed, numberOfCompletedPeriods);
-    future = _.take(future, numberOfFuturePeriods);
-
-    $('#scheduleTable').empty();
-    for (var i in completed) {
-      if (completed[i].name != 'None')
-        $('#scheduleTable').append($('<tr class="period completed"></tr>').append($('<td class="time"></td>').text(displayTimeArray(completed[i].time))).append($('<td></td>').text(completed[i].name)));
-    }
-    if (current && current.name != 'None')
-      $('#scheduleTable').append($('<tr class="period current"></tr>').append($('<td class="time"></td>').text(displayTimeArray([self.bellTimer.getDate().getHours(), self.bellTimer.getDate().getMinutes()]))).append($('<td></td>').text(current.name)));
-    for (var i in future) {
-      $('#scheduleTable').append($('<tr class="period"></tr>').append($('<td class="time"></td>').text(displayTimeArray(future[i].time))).append($('<td></td>').text(future[i].name)));
-    }
-    if ($('#scheduleTable').children().length == 0)
-      $('#noClasses').text('No classes today');
-    else
-      $('#noClasses').text('');
-
-    $('.period').css('font-size', (Math.min($(window).innerHeight() * 0.03)) + 'px');
-    $('.current').css('font-size', (Math.min($(window).innerHeight() * 0.05)) + 'px');
-
-    $('#countdown').css('opacity', 1);
-  };
-  /**
-   * Redraws everything.
-   */
-  UIManager.prototype.updateGraphics = function() {
-    var c = $('#circle')[0];
-    var ctx = c.getContext('2d');
-
-    var side = Math.floor(Math.min($(window).height(), $(window).width()));
-    var width = side;
-    var height = side;
-
-    c.width = width;
-    c.height = height;
-
-    var time = self.bellTimer.getTimeRemainingString();
-    var color = self.themeManager.getCurrentTheme()(time)[1];
-    var proportion = self.bellTimer.getProportionElapsed();
-
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.lineWidth = side / 15;
-
-    var radius = (Math.min(width, height) / 2) * 0.95;
-    var posX = width / 2;
-    var posY = height / 2;
-
-    ctx.beginPath();
-    ctx.arc(posX, posY, radius, (Math.PI / -2), (Math.PI / -2) + (-2 * Math.PI) * (1 - proportion), true);
-    ctx.lineTo(posX, posY);
-    ctx.closePath();
-    ctx.fill();
-  };
-  UIManager.prototype.setLoadingMessage = function(message) {
-    $('.loading').show();
-    $('#loadingMessage').text(message);
-  };
-  UIManager.prototype.hideLoading = function() {
-    $('.loading').hide();
-  };
-  UIManager.prototype.showAlert = function(message, time) {
-    time = (time) ? time : 3000;
-
-    $('#alert-container').css('opacity', 0);
-    $('#alert').text(message);
-    $('#alert-container').css('opacity', 0.4);
-
-    setTimeout(function() {
-      $('#alert-container').css('opacity', 0);
-    }, time);
-  };
-
-  module.exports = UIManager;
-  //window.UIManager = UIManager;
-})();
-},{"jquery":10,"lodash":12}],9:[function(require,module,exports){
+},{"lodash":9}],7:[function(require,module,exports){
 (function (process,global){
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -6626,7 +6416,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":13}],10:[function(require,module,exports){
+},{"_process":10}],8:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -16881,174 +16671,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],11:[function(require,module,exports){
-/*!
- * JavaScript Cookie v2.1.4
- * https://github.com/js-cookie/js-cookie
- *
- * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
- * Released under the MIT license
- */
-;(function (factory) {
-	var registeredInModuleLoader = false;
-	if (typeof define === 'function' && define.amd) {
-		define(factory);
-		registeredInModuleLoader = true;
-	}
-	if (typeof exports === 'object') {
-		module.exports = factory();
-		registeredInModuleLoader = true;
-	}
-	if (!registeredInModuleLoader) {
-		var OldCookies = window.Cookies;
-		var api = window.Cookies = factory();
-		api.noConflict = function () {
-			window.Cookies = OldCookies;
-			return api;
-		};
-	}
-}(function () {
-	function extend () {
-		var i = 0;
-		var result = {};
-		for (; i < arguments.length; i++) {
-			var attributes = arguments[ i ];
-			for (var key in attributes) {
-				result[key] = attributes[key];
-			}
-		}
-		return result;
-	}
-
-	function init (converter) {
-		function api (key, value, attributes) {
-			var result;
-			if (typeof document === 'undefined') {
-				return;
-			}
-
-			// Write
-
-			if (arguments.length > 1) {
-				attributes = extend({
-					path: '/'
-				}, api.defaults, attributes);
-
-				if (typeof attributes.expires === 'number') {
-					var expires = new Date();
-					expires.setMilliseconds(expires.getMilliseconds() + attributes.expires * 864e+5);
-					attributes.expires = expires;
-				}
-
-				// We're using "expires" because "max-age" is not supported by IE
-				attributes.expires = attributes.expires ? attributes.expires.toUTCString() : '';
-
-				try {
-					result = JSON.stringify(value);
-					if (/^[\{\[]/.test(result)) {
-						value = result;
-					}
-				} catch (e) {}
-
-				if (!converter.write) {
-					value = encodeURIComponent(String(value))
-						.replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);
-				} else {
-					value = converter.write(value, key);
-				}
-
-				key = encodeURIComponent(String(key));
-				key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
-				key = key.replace(/[\(\)]/g, escape);
-
-				var stringifiedAttributes = '';
-
-				for (var attributeName in attributes) {
-					if (!attributes[attributeName]) {
-						continue;
-					}
-					stringifiedAttributes += '; ' + attributeName;
-					if (attributes[attributeName] === true) {
-						continue;
-					}
-					stringifiedAttributes += '=' + attributes[attributeName];
-				}
-				return (document.cookie = key + '=' + value + stringifiedAttributes);
-			}
-
-			// Read
-
-			if (!key) {
-				result = {};
-			}
-
-			// To prevent the for loop in the first place assign an empty array
-			// in case there are no cookies at all. Also prevents odd result when
-			// calling "get()"
-			var cookies = document.cookie ? document.cookie.split('; ') : [];
-			var rdecode = /(%[0-9A-Z]{2})+/g;
-			var i = 0;
-
-			for (; i < cookies.length; i++) {
-				var parts = cookies[i].split('=');
-				var cookie = parts.slice(1).join('=');
-
-				if (cookie.charAt(0) === '"') {
-					cookie = cookie.slice(1, -1);
-				}
-
-				try {
-					var name = parts[0].replace(rdecode, decodeURIComponent);
-					cookie = converter.read ?
-						converter.read(cookie, name) : converter(cookie, name) ||
-						cookie.replace(rdecode, decodeURIComponent);
-
-					if (this.json) {
-						try {
-							cookie = JSON.parse(cookie);
-						} catch (e) {}
-					}
-
-					if (key === name) {
-						result = cookie;
-						break;
-					}
-
-					if (!key) {
-						result[name] = cookie;
-					}
-				} catch (e) {}
-			}
-
-			return result;
-		}
-
-		api.set = api;
-		api.get = function (key) {
-			return api.call(api, key);
-		};
-		api.getJSON = function () {
-			return api.apply({
-				json: true
-			}, [].slice.call(arguments));
-		};
-		api.defaults = {};
-
-		api.remove = function (key, attributes) {
-			api(key, '', extend(attributes, {
-				expires: -1
-			}));
-		};
-
-		api.withConverter = init;
-
-		return api;
-	}
-
-	return init(function () {});
-}));
-
-},{}],12:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -34136,7 +33759,7 @@ return jQuery;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],13:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -34318,4 +33941,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[1]);
+},{}]},{},[2]);

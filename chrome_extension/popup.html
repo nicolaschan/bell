@@ -10,7 +10,7 @@ Most stuff taken from the Google example page
 <html>
   <head>
     <title>Bell Popup</title>
-    <link rel="shortcut icon" type="image/pug" href="/favicons/empty.png" id="favicon">
+    <link rel="shortcut icon" type="image/pug" href="../favicons/empty.png" id="favicon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" type="text/css" href="/css/style.css?v=undefined">
@@ -22,14 +22,26 @@ Most stuff taken from the Google example page
      -->
   </head>
   <body>
+    <div id="page1" class="container">
+      <div id="countdown" class="centered">
+        <span id="time">
+        </span>
+        <br>
+        <span class="subtitle">
+          <span id="subtitle">
+          </span>
+          <br>
+          <span id="scheduleName" class="subtitle">
+          </span>
+        </span>
+      </div>
+    </div>
     <div id="icons" class="footer-right"><i id="settingsIcon" class="material-icons">settings</i><i id="doneIcon" class="material-icons">done</i></div>
     <div class="centered loading"><i id="loadingIcon" class="material-icons">sync</i><br><span id="loadingMessage">Loading</span></div>
-    <div class="downArrow"><i id="downIcon" class="material-icons">keyboard_arrow_down</i></div>
-    <canvas id="circle" background="black" class="centered">
+    <canvas id="circle" class="centered">
       Could not load canvas.
     </canvas>
     <script type="text/javascript" src="https://bell.lahs.club/timesync/timesync.js"></script>
     <script src="bundle2.js?v=undefined"></script>
   </body>
 </html>
-
