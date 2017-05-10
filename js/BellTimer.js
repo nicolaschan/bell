@@ -5,10 +5,11 @@ const async = require('async');
 var self;
 
 (function() {
-  var BellTimer = function(classesManager) {
+  var BellTimer = function(classesManager, cookieManager) {
     self = this;
 
     this.classesManager = classesManager;
+    this.cookieManager = cookieManager;
 
     this.debug = function() {};
     this.devMode = false;
@@ -30,10 +31,7 @@ var self;
     this.debug = logger;
   };
   BellTimer.prototype.reloadData = function(callback) {
-    $.ajax({
-      url: '/api/data?v=' + Date.now(),
-      type: 'GET'
-    }).done(function(data) {
+    var parseData = function(data) {
       var rawSchedules = data.schedules;
       for (var key in rawSchedules) {
         var schedule = rawSchedules[key];
@@ -75,10 +73,23 @@ var self;
 
       if (callback)
         callback();
+    };
+    $.ajax({
+      url: '/api/data?v=' + Date.now(),
+      type: 'GET'
+    }).done(function(data) {
+      // Cache the data in a cookie in case we go offline
+      self.cookieManager.setLong('data', data);
+      parseData(data);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      // Now offline. Using cached data
+      var cachedData = self.cookieManager.getLongJSON('data');
+      if (!cachedData)
+        return;
+      parseData(cachedData);
     });
   };
   BellTimer.prototype.initialize = function(callback) {
-
     async.series([
       self.reloadData,
       _.partial(self.initializeTimesync)
@@ -90,7 +101,7 @@ var self;
 
     if (typeof timesync == 'undefined') {
       self.ts = Date;
-      callback();
+      return callback();
     }
 
     var ts = timesync.create({

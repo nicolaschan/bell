@@ -264,10 +264,11 @@ const async = require('async');
 var self;
 
 (function() {
-  var BellTimer = function(classesManager) {
+  var BellTimer = function(classesManager, cookieManager) {
     self = this;
 
     this.classesManager = classesManager;
+    this.cookieManager = cookieManager;
 
     this.debug = function() {};
     this.devMode = false;
@@ -289,10 +290,7 @@ var self;
     this.debug = logger;
   };
   BellTimer.prototype.reloadData = function(callback) {
-    $.ajax({
-      url: '/api/data?v=' + Date.now(),
-      type: 'GET'
-    }).done(function(data) {
+    var parseData = function(data) {
       var rawSchedules = data.schedules;
       for (var key in rawSchedules) {
         var schedule = rawSchedules[key];
@@ -334,10 +332,23 @@ var self;
 
       if (callback)
         callback();
+    };
+    $.ajax({
+      url: '/api/data?v=' + Date.now(),
+      type: 'GET'
+    }).done(function(data) {
+      // Cache the data in a cookie in case we go offline
+      self.cookieManager.setLong('data', data);
+      parseData(data);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      // Now offline. Using cached data
+      var cachedData = self.cookieManager.getLongJSON('data');
+      if (!cachedData)
+        return;
+      parseData(cachedData);
     });
   };
   BellTimer.prototype.initialize = function(callback) {
-
     async.series([
       self.reloadData,
       _.partial(self.initializeTimesync)
@@ -349,7 +360,7 @@ var self;
 
     if (typeof timesync == 'undefined') {
       self.ts = Date;
-      callback();
+      return callback();
     }
 
     var ts = timesync.create({
@@ -621,6 +632,32 @@ var self;
   };
   CookieManager.prototype.getJSON = function(key) {
     return this.Cookies.getJSON(key);
+  };
+
+  var splitString = function(str, length) {
+    var parts = [];
+    for (var i = 0; i < str.length; i += length) {
+      parts.push(str.substring(i, i + length));
+    }
+    return parts;
+  };
+  CookieManager.prototype.getLong = function(key) {
+    var longValue = '';
+    for (var i = 0; this.get(key + '_' + i); i++) {
+      longValue += this.get(key + '_' + i);
+    }
+    return longValue;
+  };
+  CookieManager.prototype.getLongJSON = function(key) {
+    return JSON.parse(this.getLong(key));
+  };
+  CookieManager.prototype.setLong = function(key, longValue, expires) {
+    if (typeof longValue != 'string')
+      longValue = JSON.stringify(longValue);
+    var parts = splitString(longValue, 2000);
+    for (var i = 0; i < parts.length; i++) {
+      this.set(key + '_' + i, parts[i], expires);
+    }
   };
 
   module.exports = CookieManager;
@@ -1223,7 +1260,7 @@ var cookieManager = new CookieManager(Cookies);
 var themeManager = new ThemeManager(cookieManager);
 var classesManager = new ClassesManager(cookieManager);
 var analyticsManager = new AnalyticsManager(cookieManager, themeManager, logger);
-var bellTimer = new BellTimer(classesManager);
+var bellTimer = new BellTimer(classesManager, cookieManager);
 var uiManager = new UIManager(bellTimer, cookieManager, themeManager, classesManager, analyticsManager);
 
 var intervals = {
@@ -1273,6 +1310,7 @@ bellTimer.setDebugLogFunction(logger.debug);
 
 global.bellTimer = bellTimer;
 global.logger = logger;
+global.cookieManager = cookieManager;
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
 $(window).on('load', function() {
@@ -1296,10 +1334,10 @@ $(window).on('load', function() {
     // Start intervals
     //async.asyncify(),
 
-    // Report analytics
-    analyticsManager.reportAnalytics
-
   ], function(err) {
+
+    // Report analytics
+    analyticsManager.reportAnalytics();
 
     intervalManager.startAll();
     logger.success('Ready!');
