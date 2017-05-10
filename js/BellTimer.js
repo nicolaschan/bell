@@ -16,15 +16,20 @@ var self;
  * /timsync/timesync.js somewhere.
  */
 (function() {
+<<<<<<< HEAD
   /**
    * Creates a new instance of BellTimer, with a ClassesManager object. The ClassesManager is
    * necessary to store the current class period.
    * @param {ClassesManager} classesManager
    */
   var BellTimer = function(classesManager) {
+=======
+  var BellTimer = function(classesManager, cookieManager) {
+>>>>>>> 49a5f80ac9f6cdd4f4fed0b423a1325ae3cd5cc3
     self = this;
 
     this.classesManager = classesManager;
+    this.cookieManager = cookieManager;
 
     this.debug = function() {};
     this.devMode = false;
@@ -45,6 +50,7 @@ var self;
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
+<<<<<<< HEAD
   /**
    * Reloads schedule data from the host website.
    * @param {String} host The URI string giving the location of the api. For LAHS,
@@ -56,6 +62,10 @@ var self;
       url: (host + '/api/data?v=') + Date.now(),
       type: 'GET'
     }).done(function(data) {
+=======
+  BellTimer.prototype.reloadData = function(callback) {
+    var parseData = function(data) {
+>>>>>>> 49a5f80ac9f6cdd4f4fed0b423a1325ae3cd5cc3
       var rawSchedules = data.schedules;
       for (var key in rawSchedules) {
         var schedule = rawSchedules[key];
@@ -97,6 +107,20 @@ var self;
 
       if (callback)
         callback();
+    };
+    $.ajax({
+      url: '/api/data?v=' + Date.now(),
+      type: 'GET'
+    }).done(function(data) {
+      // Cache the data in a cookie in case we go offline
+      self.cookieManager.setLong('data', data);
+      parseData(data);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      // Now offline. Using cached data
+      var cachedData = self.cookieManager.getLongJSON('data');
+      if (!cachedData)
+        return;
+      parseData(cachedData);
     });
   };
   BellTimer.prototype.reloadData = function(callback) {

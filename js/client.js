@@ -18,7 +18,7 @@ var cookieManager = new CookieManager(Cookies);
 var themeManager = new ThemeManager(cookieManager);
 var classesManager = new ClassesManager(cookieManager);
 var analyticsManager = new AnalyticsManager(cookieManager, themeManager, logger);
-var bellTimer = new BellTimer(classesManager);
+var bellTimer = new BellTimer(classesManager, cookieManager);
 var uiManager = new UIManager(bellTimer, cookieManager, themeManager, classesManager, analyticsManager);
 
 var intervals = {
@@ -68,6 +68,7 @@ bellTimer.setDebugLogFunction(logger.debug);
 
 global.bellTimer = bellTimer;
 global.logger = logger;
+global.cookieManager = cookieManager;
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
 $(window).on('load', function() {
@@ -91,10 +92,10 @@ $(window).on('load', function() {
     // Start intervals
     //async.asyncify(),
 
-    // Report analytics
-    analyticsManager.reportAnalytics
-
   ], function(err) {
+
+    // Report analytics
+    analyticsManager.reportAnalytics();
 
     intervalManager.startAll();
     logger.success('Ready!');

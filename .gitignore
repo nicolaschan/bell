@@ -1,6 +1,3 @@
-# Chrome modules before they're ready
-chrome_extension
-
 # Logs
 logs
 *.log
