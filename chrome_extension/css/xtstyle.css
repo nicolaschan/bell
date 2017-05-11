@@ -1,0 +1,139 @@
+/*
+ * Very similar to that of the main program, but with some changes.
+ */
+
+body {
+	font-family: 'Roboto', sans-serif;
+	margin: 0;
+	min-width: 400px; /* Used only for the Chrome extension */
+	min-height: 400px;
+	cursor: default;
+	user-select: none;
+}
+
+#circle {
+	opacity: 0.1;
+}
+
+#icons {
+	visibility: hidden;
+}
+
+.bottom {
+	bottom: 0px;
+	position: absolute;
+}
+
+.alert-message {
+	opacity: 0;
+	background-color: white;
+	width: 100%;
+	text-align: center;
+	font-size: 24px;
+}
+.alert-text {
+	margin: 10px;
+}
+
+.container {
+	padding: 0;
+	margin: 0;
+	height: 100vh;
+	position: relative;
+	-webkit-backface-visibility: hidden;
+}
+.centered {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.center-inside {
+	text-align: center;
+}
+.top-right {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+#countdown {
+	opacity: 0;
+	z-index: 1;
+}
+#time {
+	text-align: center;
+}
+.subtitle {
+	text-align: center;
+}
+#scheduleName {
+	opacity: 0.3;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+td {
+	padding: 10px;
+}
+.period {
+	list-style: none;
+	transition: background-color 0.5s ease;
+}
+.time {
+	color: #999999;
+}
+.completed {
+	color: #999999;
+	text-decoration: line-through;
+}
+.current {
+	background-color: #eeeeee;
+}
+#noClasses {
+	color: #999999;
+	font-style: italic;
+}
+
+.footer-right {
+	position: absolute;
+	right: 20px;
+	bottom: 10px;
+}
+.footer-left {
+	position: absolute;
+	left: 20px;
+	bottom: 20px;
+}
+.cyan {
+	background-color: cyan;
+}
+.login {
+	height: 500px;
+	width: 500px;
+	background-color: white;
+}
+
+#settingsIcon {
+	font-size: 50px;
+	color: #aaaaaa;
+	cursor: pointer;
+	transition: opacity 2s ease, transform 1s ease, color 1s ease;
+}
+#settingsIcon:hover {
+	color: #000000;
+	transform: rotate(2rad);
+}
+
+.loading {
+	text-align: center;
+	font-size: 18px;
+	position: fixed;
+	display: none;
+	opacity: 0.3;
+}
+#loadingIcon {
+	font-size: 120px;
+	animation: spin 1s linear infinite;
+}

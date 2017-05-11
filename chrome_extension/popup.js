@@ -28,7 +28,7 @@ var setup = function() {
     var c = document.getElementById("circle");
     var ctx = c.getContext('2d');
 
-    var side = document.body.clientHeight - 40;
+    var side = 400;
 
     c.height = c.width = side;
 
@@ -133,7 +133,7 @@ var setup = function() {
 var initializePopup = function() {
     thememan = new ThemeManager(cookman);
     classes = new ClassesManager(cookman);
-    bellTimer = new BellTimer(classes);
+    bellTimer = new BellTimer(classes, cookman);
     bellTimer.initializeFromHost("https://bell.lahs.club", setup);
 };
 

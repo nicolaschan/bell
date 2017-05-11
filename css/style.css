@@ -4,8 +4,6 @@ body {
 	margin: 0;
 	cursor: default;
 	user-select: none;
-	min-width: 400px; /* Used only for the Chrome extension */
-	min-height: 400px;
 }
 
 #circle {

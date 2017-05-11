@@ -16,16 +16,13 @@ var self;
  * /timsync/timesync.js somewhere.
  */
 (function() {
-<<<<<<< HEAD
   /**
    * Creates a new instance of BellTimer, with a ClassesManager object. The ClassesManager is
    * necessary to store the current class period.
    * @param {ClassesManager} classesManager
+   * @param {CookieManager} cookieManager
    */
-  var BellTimer = function(classesManager) {
-=======
   var BellTimer = function(classesManager, cookieManager) {
->>>>>>> 49a5f80ac9f6cdd4f4fed0b423a1325ae3cd5cc3
     self = this;
 
     this.classesManager = classesManager;
@@ -50,7 +47,7 @@ var self;
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
-<<<<<<< HEAD
+
   /**
    * Reloads schedule data from the host website.
    * @param {String} host The URI string giving the location of the api. For LAHS,
@@ -58,14 +55,7 @@ var self;
    * @param {Function} callback The callback to be executed. Can be undefined.
    */
   BellTimer.prototype.reloadDataFromHost = function(host, callback) {
-    $.ajax({
-      url: (host + '/api/data?v=') + Date.now(),
-      type: 'GET'
-    }).done(function(data) {
-=======
-  BellTimer.prototype.reloadData = function(callback) {
     var parseData = function(data) {
->>>>>>> 49a5f80ac9f6cdd4f4fed0b423a1325ae3cd5cc3
       var rawSchedules = data.schedules;
       for (var key in rawSchedules) {
         var schedule = rawSchedules[key];
@@ -94,7 +84,7 @@ var self;
             i--;
           }
         }
-      }
+      };
 
       self.schedules = rawSchedules;
       self.calendar = data.calendar;
@@ -109,7 +99,7 @@ var self;
         callback();
     };
     $.ajax({
-      url: '/api/data?v=' + Date.now(),
+      url: host + '/api/data?v=' + Date.now(),
       type: 'GET'
     }).done(function(data) {
       // Cache the data in a cookie in case we go offline

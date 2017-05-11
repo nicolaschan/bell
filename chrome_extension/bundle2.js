@@ -10,6 +10,8 @@
 
 const $ = require("jquery");
 
+var self;
+
 /**
  * Creates a new instance of this pseudo-cookiemanager.
  * Instead of actually asking the browser for a cookie every time the get method
@@ -35,26 +37,73 @@ var ChromeCookieManager = function(url, callback) {
 }
 
 ChromeCookieManager.prototype.set = function(key, value, expires) {
+	console.log("in set:");
+	console.log("\tkey:", key);
+	console.log("\tval:", (typeof value == 'string') ? value : JSON.stringify(value));
 	chrome.cookies.set(
 		{
-			url: this.url,
+			url: self.url,
 			name: key,
-			value: JSON.stringify(value),
+			value: (typeof value == 'string') ? value : JSON.stringify(value),
 			expirationDate: expires ? (daysToSeconds(expires)) : (daysToSeconds(365))
-		}, (cookie) => this.storedCookies[cookie.name] = cookie.value);
+		}, function(cookie) {
+			if(!cookie) {
+				console.log(cookie);
+				throw new Error("AAAHAHAHSHDH");
+			}
+			self.storedCookies[key] = cookie.value;
+		});
 	return value;
 };
 
 ChromeCookieManager.prototype.get = function(key) {
-	return this.storedCookies[key];
+	return self.storedCookies[key];
 };
 
 ChromeCookieManager.prototype.getJSON = function(key) {
 	try {
-		return JSON.parse(this.get(key));
+		return JSON.parse(self.get(key));
 	}
 	catch(e) {
 		return undefined;
+	}
+};
+
+var splitString = function(str, length) {
+    var parts = [];
+    for (var i = 0; i < str.length; i += length) {
+     	parts.push(str.substring(i, i + length));
+    }
+    return parts;
+};
+ChromeCookieManager.prototype.getLong = function(key) {
+	var longValue = '';
+	for (var i = 0; self.get(key + '_' + i); i++) {
+		longValue += self.get(key + '_' + i);
+	}
+	console.log(longValue);
+	console.log(i);
+	return longValue;
+};
+ChromeCookieManager.prototype.getLongJSON = function(key) {
+	return JSON.parse(self.getLong(key));
+};
+ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
+	if (typeof longValue != 'string')
+		longValue = JSON.stringify(longValue);
+	var parts = splitString(longValue, 1500);
+	for (var i = 0; i < parts.length; i++) {
+		// console.log("in setlong:", parts[i]);
+		self.set(key + '_' + i, parts[i], expires);
+	}
+	// clears unused cookies
+	for(j = i; j < self.get(key + "_" + j); j++) {
+		chrome.cookies.remove({
+			url: self.url,
+			name: key + "_" + j
+		}, function(cookie) {
+			delete self.storedCookies[cookie.name];
+		});
 	}
 };
 
@@ -111,7 +160,7 @@ var setup = function() {
     var c = document.getElementById("circle");
     var ctx = c.getContext('2d');
 
-    var side = document.body.clientHeight - 40;
+    var side = 400;
 
     c.height = c.width = side;
 
@@ -216,7 +265,7 @@ var setup = function() {
 var initializePopup = function() {
     thememan = new ThemeManager(cookman);
     classes = new ClassesManager(cookman);
-    bellTimer = new BellTimer(classes);
+    bellTimer = new BellTimer(classes, cookman);
     bellTimer.initializeFromHost("https://bell.lahs.club", setup);
 };
 
@@ -257,11 +306,13 @@ var self;
    * Creates a new instance of BellTimer, with a ClassesManager object. The ClassesManager is
    * necessary to store the current class period.
    * @param {ClassesManager} classesManager
+   * @param {CookieManager} cookieManager
    */
-  var BellTimer = function(classesManager) {
+  var BellTimer = function(classesManager, cookieManager) {
     self = this;
 
     this.classesManager = classesManager;
+    this.cookieManager = cookieManager;
 
     this.debug = function() {};
     this.devMode = false;
@@ -282,6 +333,7 @@ var self;
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
+
   /**
    * Reloads schedule data from the host website.
    * @param {String} host The URI string giving the location of the api. For LAHS,
@@ -289,10 +341,7 @@ var self;
    * @param {Function} callback The callback to be executed. Can be undefined.
    */
   BellTimer.prototype.reloadDataFromHost = function(host, callback) {
-    $.ajax({
-      url: (host + '/api/data?v=') + Date.now(),
-      type: 'GET'
-    }).done(function(data) {
+    var parseData = function(data) {
       var rawSchedules = data.schedules;
       for (var key in rawSchedules) {
         var schedule = rawSchedules[key];
@@ -321,7 +370,7 @@ var self;
             i--;
           }
         }
-      }
+      };
 
       self.schedules = rawSchedules;
       self.calendar = data.calendar;
@@ -334,6 +383,20 @@ var self;
 
       if (callback)
         callback();
+    };
+    $.ajax({
+      url: host + '/api/data?v=' + Date.now(),
+      type: 'GET'
+    }).done(function(data) {
+      // Cache the data in a cookie in case we go offline
+      self.cookieManager.setLong('data', data);
+      parseData(data);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      // Now offline. Using cached data
+      var cachedData = self.cookieManager.getLongJSON('data');
+      if (!cachedData)
+        return;
+      parseData(cachedData);
     });
   };
   BellTimer.prototype.reloadData = function(callback) {
