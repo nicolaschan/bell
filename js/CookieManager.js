@@ -2,19 +2,44 @@
 
   var CookieManager = function(Cookies) {
     this.Cookies = Cookies;
+    this.lengthThreshold = 4000;
   };
 
   CookieManager.prototype.set = function(key, value, expires) {
     this.Cookies.remove(key);
-    return this.Cookies.set(key, value, {
+
+    if (typeof value != 'string')
+      value = JSON.stringify(value);
+    var valueBase64 = btoa(value);
+    if (valueBase64.length > this.lengthThreshold)
+      return this.setLong(key, value, expires);
+
+    return this.setRaw(key, valueBase64, expires);
+  };
+  CookieManager.prototype.setRaw = function(key, rawValue, expires) {
+    this.Cookies.remove(key);
+
+    return this.Cookies.set(key, rawValue, {
       expires: (expires) ? expires : 365
     });
   };
   CookieManager.prototype.get = function(key) {
+    var valueBase64 = this.getRaw(key);
+    try {
+      return atob(valueBase64);
+    } catch (e) {
+      return undefined;
+    }
+  };
+  CookieManager.prototype.getRaw = function(key) {
     return this.Cookies.get(key);
   };
   CookieManager.prototype.getJSON = function(key) {
-    return this.Cookies.getJSON(key);
+    try {
+      return JSON.parse(this.get(key));
+    } catch (e) {
+      return undefined;
+    }
   };
 
   var splitString = function(str, length) {
@@ -25,11 +50,15 @@
     return parts;
   };
   CookieManager.prototype.getLong = function(key) {
-    var longValue = '';
-    for (var i = 0; this.get(key + '_' + i); i++) {
-      longValue += this.get(key + '_' + i);
+    var longValueBase64 = '';
+    for (var i = 0; this.getRaw(key + '_' + i); i++) {
+      longValueBase64 += this.getRaw(key + '_' + i);
     }
-    return longValue;
+    try {
+      return atob(longValueBase64);
+    } catch (e) {
+      return undefined;
+    }
   };
   CookieManager.prototype.getLongJSON = function(key) {
     return JSON.parse(this.getLong(key));
@@ -39,9 +68,11 @@
       this.Cookies.remove(key + '_' + i);
     if (typeof longValue != 'string')
       longValue = JSON.stringify(longValue);
-    var parts = splitString(longValue, 2000);
+
+    var longValueBase64 = btoa(longValue);
+    var parts = splitString(longValueBase64, this.lengthThreshold);
     for (var i = 0; i < parts.length; i++) {
-      this.set(key + '_' + i, parts[i], expires);
+      this.setRaw(key + '_' + i, parts[i], expires);
     }
   };
 
