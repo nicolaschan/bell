@@ -749,6 +749,7 @@ var self;
   };
 
   CookieManager.prototype.set = function(key, value, expires) {
+    this.Cookies.remove(key);
     return this.Cookies.set(key, value, {
       expires: (expires) ? expires : 365
     });
