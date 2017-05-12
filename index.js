@@ -33,98 +33,6 @@ var connectToRedis = function(callback) {
   });
 };
 var startWebServer = function(callback) {
-  var parseSchedules = function(text) {
-    var outputSchedules = {};
-
-    var lines = text.split('\n');
-
-    var currentScheduleName;
-    var currentSchedule;
-    for (var i in lines) {
-      var line = lines[i];
-      if (line[0] == '*') {
-        if (currentSchedule)
-          outputSchedules[currentScheduleName] = currentSchedule;
-        currentScheduleName = line.substring(2).split(' (')[0];
-        currentSchedule = {
-          displayName: line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')),
-          periods: []
-        };
-        if (line.indexOf('[') > -1)
-          currentSchedule.color = line.split('[')[1].substring(0, line.split('[')[1].indexOf(']'));
-      } else {
-        if (!line)
-          continue;
-        var time = line.substring(0, line.indexOf(' '));
-        var hour = time.split(':')[0];
-        var minute = time.split(':')[1];
-        var periodName = line.substring(line.indexOf(' ') + 1);
-
-        currentSchedule.periods.push({
-          name: periodName,
-          time: [parseInt(hour), parseInt(minute)]
-        });
-      }
-    }
-
-    if (currentSchedule) {
-      outputSchedules[currentScheduleName] = currentSchedule;
-    }
-
-    return outputSchedules;
-  };
-  var parseCalendar = function(text, schedules) {
-    var calendar = {
-      defaultWeek: [],
-      specialDays: {}
-    };
-
-    var lines = text.split('\n');
-
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i];
-      if (line == '* Default Week') {
-        line = lines[++i];
-        while (line && line[0] != '*') {
-          calendar.defaultWeek.push(line.substring(2));
-          line = lines[++i];
-        }
-      }
-      if (line == '* Special Days') {
-        line = lines[++i];
-
-        while (line && line[0] != '*') {
-          if (line.split(' ')[0].indexOf('-') > -1) {
-            // is a range
-            var date = new Date(line.split(' ')[0].split('-')[0]);
-            var endDate = new Date(line.split(' ')[0].split('-')[1]);
-            var scheduleName = line.split(' ')[1];
-            var schedule = {
-              scheduleName: scheduleName,
-              customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
-            };
-            while (date.toISOString().substring(0, 10) != endDate.toISOString().substring(0, 10)) {
-              calendar.specialDays[date.toISOString().substring(0, 10)] = schedule;
-              date.setDate(date.getDate() + 1);
-            }
-            calendar.specialDays[endDate.toISOString().substring(0, 10)] = schedule;
-          } else {
-            // is not a range
-            var date = new Date(line.split(' ')[0]);
-            var scheduleName = line.split(' ')[1];
-            calendar.specialDays[date.toISOString().substring(0, 10)] = {
-              scheduleName: scheduleName,
-              customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
-            };
-          }
-          line = lines[++i];
-        }
-      }
-    }
-
-    return calendar;
-  };
-
   var previousCheck = 0;
   var currentVersion;
   var getVersion = function() {
@@ -143,19 +51,6 @@ var startWebServer = function(callback) {
   };
   var getCalendar = function() {
     return fs.readFileSync('data/calendar.txt').toString();
-  };
-  var getData = function() {
-    var schedules = parseSchedules(getSchedules());
-    var calendar = parseCalendar(getCalendar(), schedules);
-    var correction = getCorrection();
-    var version = getVersion();
-
-    return {
-      schedules: schedules,
-      calendar: calendar,
-      correction: correction,
-      version: version
-    };
   };
 
   app.get('/', (req, res) => {
@@ -220,10 +115,6 @@ var startWebServer = function(callback) {
         res.json(out);
       });
     });
-  app.get('/api/data', (req, res) => {
-    res.set('Content-Type', 'text/json');
-    res.send(getData());
-  });
   app.get('/api/correction', (req, res) => {
     res.set('Content-Type', 'text/plain');
     res.send(getCorrection().toString());
