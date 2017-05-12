@@ -20,6 +20,8 @@ var updateColors;
 var updateAll;
 var dynamicallySetFontSize;
 
+var beta = false;
+
 var setup = function() {
     var c = document.getElementById("circle");
     var ctx = c.getContext('2d');
@@ -131,7 +133,7 @@ var initializePopup = function() {
     thememan = new ThemeManager(cookman);
     classes = new ClassesManager(cookman);
     bellTimer = new BellTimer(classes, cookman);
-    bellTimer.initializeFromHost("https://bell-beta.lahs.club", setup);
+    bellTimer.initializeFromHost("https://bell" + (dev ? "-beta" : "") + ".lahs.club", setup);
 };
 
 var somethingWentWrong = function(err) {
