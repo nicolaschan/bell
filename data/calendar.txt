@@ -33,3 +33,16 @@
 05/31/2017 finals-wed
 06/01/2017 finals-thu
 06/02/2017 finals-fri
+06/03/2017-08/13/2017 holiday (Summer Recess)
+09/04/2017 recess (Labor Day)
+09/20/2017 modified-even
+09/21/2017 modified-odd
+11/10/2017 holiday (Veteran's Day)
+11/22/2017 holiday (Teacher Service Day)
+11/23/2017 holiday (Thanksgiving Day)
+11/24/2017 holiday
+12/13/2017 finals-wed
+12/14/2017 finals-thu
+12/15/2017 finals-fri
+12/18/2017-01/01/2018 holiday (Holiday Recess)
+01/02/2018 holiday (Teacher Service Day)

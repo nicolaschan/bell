@@ -134,7 +134,7 @@ var initializePopup = function() {
     thememan = new ThemeManager(cookman);
     classes = new ClassesManager(cookman);
     bellTimer = new BellTimer(classes, cookman);
-    bellTimer.initializeFromHost("https://bell.lahs.club", setup);
+    bellTimer.initializeFromHost("https://bell-beta.lahs.club", setup);
 };
 
 document.addEventListener('DOMContentLoaded', function() {

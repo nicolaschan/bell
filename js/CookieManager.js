@@ -18,6 +18,7 @@
    * specified, it defaults to 365.
    */
   CookieManager.prototype.set = function(key, value, expires) {
+    this.Cookies.remove(key);
     return this.Cookies.set(key, value, {
       expires: (expires) ? expires : 365
     });
@@ -47,6 +48,8 @@
     return JSON.parse(this.getLong(key));
   };
   CookieManager.prototype.setLong = function(key, longValue, expires) {
+    for (var i = 0; this.get(key + '_' + i); i++)
+      this.Cookies.remove(key + '_' + i);
     if (typeof longValue != 'string')
       longValue = JSON.stringify(longValue);
     var parts = splitString(longValue, 2000);
