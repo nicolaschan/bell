@@ -195,14 +195,20 @@ const $ = require('jquery');
     // slide in extension ad
     var slideExtension = function() {
       if (self.cookieManager.get('popup') == $('#extension-text').text())
-        return;
+        return $('.extension').hide();
 
-      $('#extension').css('transition', 'transform 2s ease-out,  background-color 1s ease');
-      $('#extension').css('transform', 'translateX(0)');
+      // $('#extension').css('transition', 'transform 2s ease-out,  background-color 1s ease');
+      // $('#extension').css('transform', 'translateX(0)');
+      $('.extension').css('visibility', 'visible');
+      $('.extension').css('opacity', '1');
       $('#dismiss').click(function(e) {
         self.cookieManager.set('popup', $('#extension-text').text());
-        $('#extension').css('transition', 'transform 0.7s ease-in,  background-color 1s ease');
-        $('#extension').css('transform', 'translateX(120%)');
+        $('.extension').css('opacity', '0');
+        setTimeout(function() {
+          $('.extension').hide();
+        }, 1050);
+        // $('#extension').css('transition', 'transform 0.7s ease-in,  background-color 1s ease');
+        // $('#extension').css('transform', 'translateX(120%)');
       });
     };
 

@@ -1257,11 +1257,13 @@ const $ = require('jquery');
       if (self.cookieManager.get('popup') == $('#extension-text').text())
         return;
 
-      $('#extension').css('transition', 'transform 2s ease-out,  background-color 1s ease');
-      $('#extension').css('transform', 'translateX(0)');
+      // $('#extension').css('transition', 'transform 2s ease-out,  background-color 1s ease');
+      // $('#extension').css('transform', 'translateX(0)');
+      $('#extension').css('opacity', 1);
       $('#dismiss').click(function(e) {
         self.cookieManager.set('popup', $('#extension-text').text());
-        $('#extension').css('transition', 'transform 0.7s ease-in,  background-color 1s ease');
+        $('#extension').css('opacity', 0);
+        // $('#extension').css('transition', 'transform 0.7s ease-in,  background-color 1s ease');
         $('#extension').css('transform', 'translateX(120%)');
       });
     };
