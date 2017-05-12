@@ -31,6 +31,7 @@ var ChromeCookieManager = function(url, callback) {
 			self.storedCookies[cookie.name] = cookie.value;
 		}
 		callback();
+		console.log("All cookies", cookies);
 	});
 }
 
@@ -54,7 +55,7 @@ ChromeCookieManager.prototype.set = function(key, value, expires) {
 };
 
 ChromeCookieManager.prototype.get = function(key) {
-	return decodeURI(self.storedCookies[key]);
+	return decodeURI(self.storedCookies[key]).replace(/%5D/g,"]").replace(/%5B/g,"[").replace(/%2C/g,",");
 };
 
 ChromeCookieManager.prototype.getJSON = function(key) {
