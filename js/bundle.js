@@ -772,11 +772,15 @@ var self;
     try {
       return atob(valueBase64);
     } catch (e) {
-      return undefined;
+      this.convertCookieToBase64(key); // for backwards compatibility
+      return valueBase64;
     }
   };
   CookieManager.prototype.getRaw = function(key) {
     return this.Cookies.get(key);
+  };
+  CookieManager.prototype.convertCookieToBase64 = function(key) {
+    this.set(key, this.getRaw(key));
   };
   CookieManager.prototype.getJSON = function(key) {
     try {
@@ -1255,16 +1259,20 @@ const $ = require('jquery');
     // slide in extension ad
     var slideExtension = function() {
       if (self.cookieManager.get('popup') == $('#extension-text').text())
-        return;
+        return $('.extension').hide();
 
       // $('#extension').css('transition', 'transform 2s ease-out,  background-color 1s ease');
       // $('#extension').css('transform', 'translateX(0)');
-      $('#extension').css('opacity', 1);
+      $('.extension').css('visibility', 'visible');
+      $('.extension').css('opacity', '1');
       $('#dismiss').click(function(e) {
         self.cookieManager.set('popup', $('#extension-text').text());
-        $('#extension').css('opacity', 0);
+        $('.extension').css('opacity', '0');
+        setTimeout(function() {
+          $('.extension').hide();
+        }, 1050);
         // $('#extension').css('transition', 'transform 0.7s ease-in,  background-color 1s ease');
-        $('#extension').css('transform', 'translateX(120%)');
+        // $('#extension').css('transform', 'translateX(120%)');
       });
     };
 

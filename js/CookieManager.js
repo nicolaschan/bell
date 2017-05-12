@@ -28,11 +28,15 @@
     try {
       return atob(valueBase64);
     } catch (e) {
-      return undefined;
+      this.convertCookieToBase64(key); // for backwards compatibility
+      return valueBase64;
     }
   };
   CookieManager.prototype.getRaw = function(key) {
     return this.Cookies.get(key);
+  };
+  CookieManager.prototype.convertCookieToBase64 = function(key) {
+    this.set(key, this.getRaw(key));
   };
   CookieManager.prototype.getJSON = function(key) {
     try {
