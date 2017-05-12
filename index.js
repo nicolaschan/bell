@@ -103,16 +103,16 @@ var startWebServer = function(callback) {
               scheduleName: scheduleName,
               customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
             };
-            while (date.toDateString() != endDate.toDateString()) {
-              calendar.specialDays[date.toDateString()] = schedule;
+            while (date.toISOString().substring(0, 10) != endDate.toISOString().substring(0, 10)) {
+              calendar.specialDays[date.toISOString().substring(0, 10)] = schedule;
               date.setDate(date.getDate() + 1);
             }
-            calendar.specialDays[endDate.toDateString()] = schedule;
+            calendar.specialDays[endDate.toISOString().substring(0, 10)] = schedule;
           } else {
             // is not a range
             var date = new Date(line.split(' ')[0]);
             var scheduleName = line.split(' ')[1];
-            calendar.specialDays[date.toDateString()] = {
+            calendar.specialDays[date.toISOString().substring(0, 10)] = {
               scheduleName: scheduleName,
               customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
             };
@@ -135,10 +135,19 @@ var startWebServer = function(callback) {
     currentVersion = hash.update(fs.readFileSync('data/version.txt').toString()).digest('hex');
     return currentVersion;
   };
+  var getCorrection = function() {
+    return _.parseInt(fs.readFileSync('data/correction.txt').toString());
+  };
+  var getSchedules = function() {
+    return fs.readFileSync('data/schedules.txt').toString();
+  };
+  var getCalendar = function() {
+    return fs.readFileSync('data/calendar.txt').toString();
+  };
   var getData = function() {
-    var schedules = parseSchedules(fs.readFileSync('data/schedules.txt').toString());
-    var calendar = parseCalendar(fs.readFileSync('data/calendar.txt').toString(), schedules);
-    var correction = _.parseInt(fs.readFileSync('data/correction.txt').toString());
+    var schedules = parseSchedules(getSchedules());
+    var calendar = parseCalendar(getCalendar(), schedules);
+    var correction = getCorrection();
     var version = getVersion();
 
     return {
@@ -214,6 +223,22 @@ var startWebServer = function(callback) {
   app.get('/api/data', (req, res) => {
     res.set('Content-Type', 'text/json');
     res.send(getData());
+  });
+  app.get('/api/correction', (req, res) => {
+    res.set('Content-Type', 'text/plain');
+    res.send(getCorrection().toString());
+  });
+  app.get('/api/calendar', (req, res) => {
+    res.set('Content-Type', 'text/plain');
+    res.send(getCalendar());
+  });
+  app.get('/api/schedules', (req, res) => {
+    res.set('Content-Type', 'text/plain');
+    res.send(getSchedules());
+  });
+  app.get('/api/version', (req, res) => {
+    res.set('Content-Type', 'text/plain');
+    res.send(getVersion());
   });
   app.get('/api/uuid', (req, res) => {
     res.set('Content-Type', 'text/json');
