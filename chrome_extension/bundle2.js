@@ -8,8 +8,6 @@
  * To use this, manifest.json must have "cookies" in its permissions.
  */
 
-const $ = require("jquery");
-
 var self;
 
 /**
@@ -30,25 +28,25 @@ var ChromeCookieManager = function(url, callback) {
 	}, function(cookies) {
 		for(cookie of cookies) {
 			// shoot me
-			self.storedCookies[cookie.name] = JSON.parse("\"" + lint(cookie.value) + "\"");
-			console.log(self.storedCookies[cookie.name]);
+			self.storedCookies[cookie.name] = cookie.value;
 		}
 		callback();
 	});
 }
 
 ChromeCookieManager.prototype.set = function(key, value, expires) {
+	val = encodeURI((typeof value == 'string') ? value : JSON.stringify(value));
 	chrome.cookies.set(
 		{
 			url: self.url,
 			name: key,
-			value: encodeURI((typeof value == 'string') ? value : JSON.stringify(value)),
+			value: val,
 			expirationDate: expires ? (daysToSeconds(expires)) : (daysToSeconds(365))
 		}, function(cookie) {
 			if(!cookie) {
 				console.log(key);
 				console.log(value);
-				throw new Error("AAAHAHAHSHDH");
+				throw new Error("Who took the cookie from the cookie jar?");
 			}
 			self.storedCookies[key] = cookie.value;
 		});
@@ -56,7 +54,7 @@ ChromeCookieManager.prototype.set = function(key, value, expires) {
 };
 
 ChromeCookieManager.prototype.get = function(key) {
-	return self.storedCookies[key];
+	return decodeURI(self.storedCookies[key]);
 };
 
 ChromeCookieManager.prototype.getJSON = function(key) {
@@ -80,8 +78,6 @@ ChromeCookieManager.prototype.getLong = function(key) {
 	for (var i = 0; self.get(key + '_' + i); i++) {
 		longValue += self.get(key + '_' + i);
 	}
-	console.log(longValue);
-	console.log(i);
 	return longValue;
 };
 ChromeCookieManager.prototype.getLongJSON = function(key) {
@@ -90,11 +86,8 @@ ChromeCookieManager.prototype.getLongJSON = function(key) {
 ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 	if (typeof longValue != 'string')
 		longValue = JSON.stringify(longValue);
-	console.log("asString:")
-	console.log(longValue);
 	var parts = splitString(longValue, 2000);
 	for (var i = 0; i < parts.length; i++) {
-		console.log("in setlong:", parts[i]);
 		self.set(key + '_' + i, parts[i], expires);
 	}
 	// clears unused cookies
@@ -106,7 +99,6 @@ ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 			delete self.storedCookies[cookie.name];
 		});
 	}
-	console.log(self.storedCookies);
 };
 
 /**
@@ -129,6 +121,7 @@ var daysToSeconds = function(days) {
  * any instances of "%2C" with a comma, and any other weird character that might
  * need replacing with whatever it's supposed to be. Oh, and it escapes quotes.
  * BECAUSE REASONS.
+ * If decodeURI starts to fail for some unknown reason, use this.
  */
 var lint = function(str) {
 	str = decodeURI(str);
@@ -142,7 +135,7 @@ var escapeAllQuotes = function(str) {
 }
 
 module.exports = ChromeCookieManager;
-},{"jquery":8}],2:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 
 // Local dependencies
 // Note that CookieManager.js cannot be used because the chrome.cookies API is needed
@@ -150,14 +143,10 @@ module.exports = ChromeCookieManager;
 const ChromeCookieManager = require("./ChromeCookieManager.js");
 const ClassesManager = require("../js/ClassesManager.js");
 const BellTimer = require("../js/BellTimer.js");
-const SimpleLogger = require("../js/SimpleLogger.js");
 const ThemeManager = require("../js/ThemeManager.js");
 // Modules
 const $ = require("jquery"); // forgive my inconsitent usage of jquery
 const _ = require("lodash"); // must use this instead of js-cookie because this isn't the website
-
-var logger = new (require("../js/SimpleLogger.js"))();
-logger.setLevel('warn');
 
 var cookman;
 var thememan;
@@ -213,8 +202,7 @@ var setup = function() {
     };
 
     /**
-     * Updates the colors of the extension. Should only be called once upon initialization, since unlike
-     * the full web version, the theme cookie should not change while the extension is open.
+     * Updates the colors of the extension.
      */
     updateColors = function() {
         var time = bellTimer.getTimeRemainingString();
@@ -233,6 +221,7 @@ var setup = function() {
     };
 
     /**
+     * Redraws the circle.
      * A slightly optimized version of the same method found in UIManager.js, accounting for the fact that
      * as a Chrome extension popup, the canvas should never be resized.
      */
@@ -258,6 +247,7 @@ var setup = function() {
     updateAll = function() {
         update();
         updateGraphics();
+        updateColors();
         handle = window.requestAnimationFrame(updateAll);
     }
 
@@ -282,21 +272,61 @@ var initializePopup = function() {
     bellTimer.initializeFromHost("https://bell-beta.lahs.club", setup);
 };
 
+var somethingWentWrong = function(err) {
+    var c = document.getElementById("circle");
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = "red";
+    ctx.font = "12px Roboto";
+    ctx.fillText("Something went really wrong.", 0, 0);
+    ctx.fillText("Whoops.", 0, 15);
+}
+
+var setLoadingMessage = function(message) {
+    $('.loading').show();
+    $('#loadingMessage').text(message);
+};
+
+/**
+ * Some janky animation thing.
+ */
+var hideLoading = function() {
+    var ld = document.getElementsByClassName("loading")[0];
+    var op = window.getComputedStyle(ld).getPropertyValue("opacity");
+    ld.style.opacity = op;
+    var inc = op / 8;
+    var fade = function() {
+        if(ld.style.opacity == 0) {
+            $(".loading").hide();
+            return;
+        }
+        ld.style.opacity -= inc;
+        smallHandle = requestAnimationFrame(fade);
+    };
+    var smallHandle = requestAnimationFrame(fade);
+};
+
+window.onload = function() {
+    setLoadingMessage("Loading...");
+    var ld = document.getElementById("countdown");
+    // Apparently this depends on the browser?
+    // Mozilla says Chrome uses "transitioned", but apparently mine doesn't.
+    ld.addEventListener("webkitTransitionEnd", function(event) {
+        hideLoading();
+    });
+    ld.addEventListener("transitioned", function(event) {
+        hideLoading();
+    });
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     try {
-                                            // yes, http not https
         cookman = new ChromeCookieManager("http://bell.lahs.club/", initializePopup);
     }
     catch(e) {
-        var c = document.getElementById("circle");
-        var ctx = c.getContext('2d');
-        ctx.fillStyle = "red";
-        ctx.font = "12px Roboto";
-        ctx.fillText("Something went really wrong.", 0, 0);
-        ctx.fillText("Whoops.", 0, 15);
+        somethingWentWrong();
     }
 }, false);
-},{"../js/BellTimer.js":3,"../js/ClassesManager.js":4,"../js/SimpleLogger.js":5,"../js/ThemeManager.js":6,"./ChromeCookieManager.js":1,"jquery":8,"lodash":9}],3:[function(require,module,exports){
+},{"../js/BellTimer.js":3,"../js/ClassesManager.js":4,"../js/ThemeManager.js":5,"./ChromeCookieManager.js":1,"jquery":7,"lodash":8}],3:[function(require,module,exports){
 const _ = require('lodash');
 const $ = require('jquery');
 const async = require('async');
@@ -801,7 +831,7 @@ var self;
   module.exports = BellTimer;
   //window.BellTimer = BellTimer;
 })();
-},{"async":7,"jquery":8,"lodash":9}],4:[function(require,module,exports){
+},{"async":6,"jquery":7,"lodash":8}],4:[function(require,module,exports){
 (function() {
 
   const cookieName = 'classes';
@@ -816,79 +846,14 @@ var self;
   ClassesManager.prototype.getClasses = function() {
     if (!this.cookieManager.getJSON(cookieName))
       this.setClasses(['Period 0', 'Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7']);
-    return this.cookieManager.getJSON(cookieName);
+    return this.cookieManager.getJSON(cookieName)
+      || ['Period 0', 'Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7'];
   };
 
   module.exports = ClassesManager;
   //window.ClassesManager = ClassesManager;
 })();
 },{}],5:[function(require,module,exports){
-(function() {
-  var Logger = function(level) {
-    this.level = (level) ? level : 0;
-  };
-
-  Logger.prototype.log = function(message, prefix, color) {
-    console.log('%c' + getTimestamp() + ' %c' + prefix + '%c: %c' + message, 'color:gray;', 'color:' + color + ';font-weight:600;', 'color:#aaaaaa;', 'color:black;');
-  };
-
-  var getTimestamp = function() {
-    return new Date().toTimeString().substring(0, 8);
-  };
-  var toFunction = function(name, color) {
-    return function(message) {
-      Logger.prototype.log(message, name, color);
-    };
-  };
-
-  var levels = [{
-    level: -2,
-    name: 'trace',
-    func: toFunction('TRACE', 'cyan')
-  }, {
-    level: -1,
-    name: 'debug',
-    func: toFunction('DEBUG', 'gray')
-  }, {
-    level: 0,
-    name: 'success',
-    func: toFunction('SUCCESS', 'green')
-  }, {
-    level: 0,
-    name: 'info',
-    func: toFunction('INFO', 'blue')
-  }, {
-    level: 1,
-    name: 'warn',
-    func: console.warn
-  }, {
-    level: 2,
-    name: 'error',
-    func: console.error
-  }];
-
-  levels.reduce(function(acc, level) {
-    Logger.prototype[level.name] = function(message) {
-      if (level.level >= this.level)
-        level.func(message);
-    };
-  });
-
-  Logger.prototype.setLevel = function(level) {
-    level = level.toLowerCase();
-    if (level == 'all')
-      return (this.level = -1000);
-    if (level == 'none')
-      return (this.level = 1000);
-    for (var i in levels)
-      if (levels[i].name == level)
-        return (this.level = levels[i].level);
-  };
-
-  module.exports = Logger;
-  //window.SimpleLogger = Logger;
-})();
-},{}],6:[function(require,module,exports){
 const _ = require('lodash');
 
 /**
@@ -992,36 +957,38 @@ const _ = require('lodash');
     'Rainbow - Light': function(time) {
       var time = parseTimeRemainingString(time);
       var sec = time[2] % 12;
-
-      if (sec > 10)
-        return ['black', 'black', 'red'];
-      if (sec > 8)
-        return ['black', 'black', 'orange'];
-      if (sec > 6)
-        return ['black', 'black', 'yellow'];
-      if (sec > 4)
-        return ['black', 'black', 'lime'];
-      if (sec > 2)
-        return ['black', 'black', 'cyan'];
+      var lastColor;
+      if(sec > 10)
+        lastColor = "red";
+      else if(sec > 8)
+        lastColor = "orange";
+      else if(sec > 6)
+        lastColor = "yellow";
+      else if(sec > 4)
+        lastColor = "lime";
+      else if(sec > 2)
+        lastColor = "cyan";
       else
-        return ['black', 'black', 'magenta'];
+        lastColor = "magenta";
+      return ["black", "black", lastColor];
     },
     'Rainbow - Dark': function(time) {
       var time = parseTimeRemainingString(time);
       var sec = time[2] % 12;
-
-      if (sec > 10)
-        return ['red', 'white', 'black'];
-      if (sec > 8)
-        return ['orange', 'white', 'black'];
-      if (sec > 6)
-        return ['yellow', 'white', 'black'];
-      if (sec > 4)
-        return ['lime', 'white', 'black'];
-      if (sec > 2)
-        return ['cyan', 'white', 'black'];
+      var lastColor;
+      if(sec > 10)
+        lastColor = "red";
+      else if(sec > 8)
+        lastColor = "orange";
+      else if(sec > 6)
+        lastColor = "yellow";
+      else if(sec > 4)
+        lastColor = "lime";
+      else if(sec > 2)
+        lastColor = "cyan";
       else
-        return ['magenta', 'white', 'black'];
+        lastColor = "magenta";
+      return [lastColor, "white", "black"];
     }
   };
 
@@ -1048,7 +1015,7 @@ const _ = require('lodash');
   ThemeManager.prototype.getCurrentThemeName = function() {
     if (!this.cookieManager.get(cookieName))
       this.cookieManager.set(cookieName, defaultTheme);
-    return this.cookieManager.get(cookieName);
+    return this.cookieManager.get(cookieName) || defaultTheme;
   };
   /**
    * Sets the current theme by changing the value stored in the cookie.
@@ -1067,7 +1034,7 @@ const _ = require('lodash');
   module.exports = ThemeManager;
   //window.ThemeManager = ThemeManager;
 })();
-},{"lodash":9}],7:[function(require,module,exports){
+},{"lodash":8}],6:[function(require,module,exports){
 (function (process,global){
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -6621,7 +6588,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":10}],8:[function(require,module,exports){
+},{"_process":9}],7:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -16876,7 +16843,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -33964,7 +33931,7 @@ return jQuery;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 

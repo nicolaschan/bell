@@ -4,6 +4,7 @@
 
 body {
 	font-family: 'Roboto', sans-serif;
+	transition: background-color 0.25s ease;
 	margin: 0;
 	min-width: 400px; /* Used only for the Chrome extension */
 	min-height: 400px;
@@ -41,6 +42,7 @@ body {
 	height: 100vh;
 	position: relative;
 	-webkit-backface-visibility: hidden;
+	transition: background-color 3s ease;
 }
 .centered {
 	position: absolute;
@@ -60,12 +62,15 @@ body {
 #countdown {
 	opacity: 0;
 	z-index: 1;
+	transition: opacity 0.25s ease;
 }
 #time {
 	text-align: center;
+	transition: color 0.25s ease;
 }
 .subtitle {
 	text-align: center;
+	transition: color 0.25s ease;
 }
 #scheduleName {
 	opacity: 0.3;
@@ -79,7 +84,7 @@ td {
 }
 .period {
 	list-style: none;
-	transition: background-color 0.5s ease;
+	transition: background-color 0.25s ease;
 }
 .time {
 	color: #999999;
@@ -130,10 +135,12 @@ td {
 	text-align: center;
 	font-size: 18px;
 	position: fixed;
-	display: none;
 	opacity: 0.3;
 }
 #loadingIcon {
 	font-size: 120px;
 	animation: spin 1s linear infinite;
 }
+
+@keyframes spin { 100% { transform:rotate(-360deg); } }
+

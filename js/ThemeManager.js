@@ -101,36 +101,38 @@ const _ = require('lodash');
     'Rainbow - Light': function(time) {
       var time = parseTimeRemainingString(time);
       var sec = time[2] % 12;
-
-      if (sec > 10)
-        return ['black', 'black', 'red'];
-      if (sec > 8)
-        return ['black', 'black', 'orange'];
-      if (sec > 6)
-        return ['black', 'black', 'yellow'];
-      if (sec > 4)
-        return ['black', 'black', 'lime'];
-      if (sec > 2)
-        return ['black', 'black', 'cyan'];
+      var lastColor;
+      if(sec > 10)
+        lastColor = "red";
+      else if(sec > 8)
+        lastColor = "orange";
+      else if(sec > 6)
+        lastColor = "yellow";
+      else if(sec > 4)
+        lastColor = "lime";
+      else if(sec > 2)
+        lastColor = "cyan";
       else
-        return ['black', 'black', 'magenta'];
+        lastColor = "magenta";
+      return ["black", "black", lastColor];
     },
     'Rainbow - Dark': function(time) {
       var time = parseTimeRemainingString(time);
       var sec = time[2] % 12;
-
-      if (sec > 10)
-        return ['red', 'white', 'black'];
-      if (sec > 8)
-        return ['orange', 'white', 'black'];
-      if (sec > 6)
-        return ['yellow', 'white', 'black'];
-      if (sec > 4)
-        return ['lime', 'white', 'black'];
-      if (sec > 2)
-        return ['cyan', 'white', 'black'];
+      var lastColor;
+      if(sec > 10)
+        lastColor = "red";
+      else if(sec > 8)
+        lastColor = "orange";
+      else if(sec > 6)
+        lastColor = "yellow";
+      else if(sec > 4)
+        lastColor = "lime";
+      else if(sec > 2)
+        lastColor = "cyan";
       else
-        return ['magenta', 'white', 'black'];
+        lastColor = "magenta";
+      return [lastColor, "white", "black"];
     }
   };
 
@@ -157,7 +159,7 @@ const _ = require('lodash');
   ThemeManager.prototype.getCurrentThemeName = function() {
     if (!this.cookieManager.get(cookieName))
       this.cookieManager.set(cookieName, defaultTheme);
-    return this.cookieManager.get(cookieName);
+    return this.cookieManager.get(cookieName) || defaultTheme;
   };
   /**
    * Sets the current theme by changing the value stored in the cookie.

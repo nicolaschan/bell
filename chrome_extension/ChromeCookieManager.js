@@ -7,8 +7,6 @@
  * To use this, manifest.json must have "cookies" in its permissions.
  */
 
-const $ = require("jquery");
-
 var self;
 
 /**
@@ -29,25 +27,25 @@ var ChromeCookieManager = function(url, callback) {
 	}, function(cookies) {
 		for(cookie of cookies) {
 			// shoot me
-			self.storedCookies[cookie.name] = JSON.parse("\"" + lint(cookie.value) + "\"");
-			console.log(self.storedCookies[cookie.name]);
+			self.storedCookies[cookie.name] = cookie.value;
 		}
 		callback();
 	});
 }
 
 ChromeCookieManager.prototype.set = function(key, value, expires) {
+	val = encodeURI((typeof value == 'string') ? value : JSON.stringify(value));
 	chrome.cookies.set(
 		{
 			url: self.url,
 			name: key,
-			value: encodeURI((typeof value == 'string') ? value : JSON.stringify(value)),
+			value: val,
 			expirationDate: expires ? (daysToSeconds(expires)) : (daysToSeconds(365))
 		}, function(cookie) {
 			if(!cookie) {
 				console.log(key);
 				console.log(value);
-				throw new Error("AAAHAHAHSHDH");
+				throw new Error("Who took the cookie from the cookie jar?");
 			}
 			self.storedCookies[key] = cookie.value;
 		});
@@ -55,7 +53,7 @@ ChromeCookieManager.prototype.set = function(key, value, expires) {
 };
 
 ChromeCookieManager.prototype.get = function(key) {
-	return self.storedCookies[key];
+	return decodeURI(self.storedCookies[key]);
 };
 
 ChromeCookieManager.prototype.getJSON = function(key) {
@@ -79,8 +77,6 @@ ChromeCookieManager.prototype.getLong = function(key) {
 	for (var i = 0; self.get(key + '_' + i); i++) {
 		longValue += self.get(key + '_' + i);
 	}
-	console.log(longValue);
-	console.log(i);
 	return longValue;
 };
 ChromeCookieManager.prototype.getLongJSON = function(key) {
@@ -89,11 +85,8 @@ ChromeCookieManager.prototype.getLongJSON = function(key) {
 ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 	if (typeof longValue != 'string')
 		longValue = JSON.stringify(longValue);
-	console.log("asString:")
-	console.log(longValue);
 	var parts = splitString(longValue, 2000);
 	for (var i = 0; i < parts.length; i++) {
-		console.log("in setlong:", parts[i]);
 		self.set(key + '_' + i, parts[i], expires);
 	}
 	// clears unused cookies
@@ -105,7 +98,6 @@ ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 			delete self.storedCookies[cookie.name];
 		});
 	}
-	console.log(self.storedCookies);
 };
 
 /**
@@ -128,6 +120,7 @@ var daysToSeconds = function(days) {
  * any instances of "%2C" with a comma, and any other weird character that might
  * need replacing with whatever it's supposed to be. Oh, and it escapes quotes.
  * BECAUSE REASONS.
+ * If decodeURI starts to fail for some unknown reason, use this.
  */
 var lint = function(str) {
 	str = decodeURI(str);

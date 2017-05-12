@@ -5,14 +5,10 @@
 const ChromeCookieManager = require("./ChromeCookieManager.js");
 const ClassesManager = require("../js/ClassesManager.js");
 const BellTimer = require("../js/BellTimer.js");
-const SimpleLogger = require("../js/SimpleLogger.js");
 const ThemeManager = require("../js/ThemeManager.js");
 // Modules
 const $ = require("jquery"); // forgive my inconsitent usage of jquery
 const _ = require("lodash"); // must use this instead of js-cookie because this isn't the website
-
-var logger = new (require("../js/SimpleLogger.js"))();
-logger.setLevel('warn');
 
 var cookman;
 var thememan;
@@ -68,8 +64,7 @@ var setup = function() {
     };
 
     /**
-     * Updates the colors of the extension. Should only be called once upon initialization, since unlike
-     * the full web version, the theme cookie should not change while the extension is open.
+     * Updates the colors of the extension.
      */
     updateColors = function() {
         var time = bellTimer.getTimeRemainingString();
@@ -88,6 +83,7 @@ var setup = function() {
     };
 
     /**
+     * Redraws the circle.
      * A slightly optimized version of the same method found in UIManager.js, accounting for the fact that
      * as a Chrome extension popup, the canvas should never be resized.
      */
@@ -113,6 +109,7 @@ var setup = function() {
     updateAll = function() {
         update();
         updateGraphics();
+        updateColors();
         handle = window.requestAnimationFrame(updateAll);
     }
 
@@ -137,17 +134,57 @@ var initializePopup = function() {
     bellTimer.initializeFromHost("https://bell-beta.lahs.club", setup);
 };
 
+var somethingWentWrong = function(err) {
+    var c = document.getElementById("circle");
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = "red";
+    ctx.font = "12px Roboto";
+    ctx.fillText("Something went really wrong.", 0, 0);
+    ctx.fillText("Whoops.", 0, 15);
+}
+
+var setLoadingMessage = function(message) {
+    $('.loading').show();
+    $('#loadingMessage').text(message);
+};
+
+/**
+ * Some janky animation thing.
+ */
+var hideLoading = function() {
+    var ld = document.getElementsByClassName("loading")[0];
+    var op = window.getComputedStyle(ld).getPropertyValue("opacity");
+    ld.style.opacity = op;
+    var inc = op / 8;
+    var fade = function() {
+        if(ld.style.opacity == 0) {
+            $(".loading").hide();
+            return;
+        }
+        ld.style.opacity -= inc;
+        smallHandle = requestAnimationFrame(fade);
+    };
+    var smallHandle = requestAnimationFrame(fade);
+};
+
+window.onload = function() {
+    setLoadingMessage("Loading...");
+    var ld = document.getElementById("countdown");
+    // Apparently this depends on the browser?
+    // Mozilla says Chrome uses "transitioned", but apparently mine doesn't.
+    ld.addEventListener("webkitTransitionEnd", function(event) {
+        hideLoading();
+    });
+    ld.addEventListener("transitioned", function(event) {
+        hideLoading();
+    });
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     try {
-                                            // yes, http not https
         cookman = new ChromeCookieManager("http://bell.lahs.club/", initializePopup);
     }
     catch(e) {
-        var c = document.getElementById("circle");
-        var ctx = c.getContext('2d');
-        ctx.fillStyle = "red";
-        ctx.font = "12px Roboto";
-        ctx.fillText("Something went really wrong.", 0, 0);
-        ctx.fillText("Whoops.", 0, 15);
+        somethingWentWrong();
     }
 }, false);
