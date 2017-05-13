@@ -5,6 +5,11 @@
  * The exposed interface is the same as CookieManager, because duck typing is
  * a useful thing.
  *
+ * As of 5/12, all cookies stored by bell.lahs.club are now encoded in base 64,
+ * and so will all the cookies encoded here. To that end, the get/set functions
+ * will convert plaintext to base 64 or vice versa, and getRaw and setRaw will 
+ * return the raw values set in the cookies.
+ *
  * To use this, manifest.json must have "cookies" in its permissions.
  */
 
@@ -330,6 +335,7 @@ var setLoadingMessage = function(message) {
  * Some janky animation thing.
  */
 var hideLoading = function() {
+    console.log("starting hideloading at", Date.now());
     var ld = document.getElementsByClassName("loading")[0];
     var op = window.getComputedStyle(ld).getPropertyValue("opacity");
     ld.style.opacity = op;
@@ -366,6 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 $("#settingsIcon").toggle();
         });
         console.log(gear);*/              // not supposed to be https
+        console.log("initializing cookman at", Date.now());
         cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club", initializePopup);
     }
     catch(e) {

@@ -154,6 +154,7 @@ var setLoadingMessage = function(message) {
  * Some janky animation thing.
  */
 var hideLoading = function() {
+    console.log("starting hideloading at", Date.now());
     var ld = document.getElementsByClassName("loading")[0];
     var op = window.getComputedStyle(ld).getPropertyValue("opacity");
     ld.style.opacity = op;
@@ -190,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 $("#settingsIcon").toggle();
         });
         console.log(gear);*/              // not supposed to be https
+        console.log("initializing cookman at", Date.now());
         cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club", initializePopup);
     }
     catch(e) {

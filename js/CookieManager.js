@@ -37,6 +37,8 @@
   };
   CookieManager.prototype.get = function(key) {
     var valueBase64 = this.getRaw(key);
+    if (valueBase64 == undefined)
+      return valueBase64;
     try {
       return atob(valueBase64);
     } catch (e) {
@@ -80,7 +82,7 @@
     return JSON.parse(this.getLong(key));
   };
   CookieManager.prototype.setLong = function(key, longValue, expires) {
-    for (var i = 0; this.get(key + '_' + i); i++)
+    for (var i = 0; this.getRaw(key + '_' + i); i++)
       this.Cookies.remove(key + '_' + i);
     if (typeof longValue != 'string')
       longValue = JSON.stringify(longValue);

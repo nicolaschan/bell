@@ -4,6 +4,11 @@
  * The exposed interface is the same as CookieManager, because duck typing is
  * a useful thing.
  *
+ * As of 5/12, all cookies stored by bell.lahs.club are now encoded in base 64,
+ * and so will all the cookies encoded here. To that end, the get/set functions
+ * will convert plaintext to base 64 or vice versa, and getRaw and setRaw will 
+ * return the raw values set in the cookies.
+ *
  * To use this, manifest.json must have "cookies" in its permissions.
  */
 
