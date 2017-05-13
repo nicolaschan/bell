@@ -46,8 +46,8 @@ const _ = require('lodash');
   /**
     * Stores color schemes for each theme.
     * @return {String -> String[]} a partially applied function that takes a time as an argument, and returns
-    * an array x of 3 colors where x[0] is the color of the time text, x[1] is the color
-    * of the period description, and x[2] is the background color.
+    * an array x of 4 colors where x[0] is the color of the time text, x[1] is the color of the period 
+    * description, x[2] is the background color, and x[3] is the color of the extension ad popup.
     */
   var themes = {
     // [text, subtitle, background, popup background]
@@ -147,8 +147,7 @@ const _ = require('lodash');
 
   /**
    * Gets the current theme. If the current theme were to somehow not to be in the 
-   * themes object, it would throw a nullpointerexception, but that should hopefully
-   * never happen.
+   * themes object, it would return undefined, but that should hopefully never happen.
    * @return {String -> String[]} the partially applied function representing the current theme.
    */
   ThemeManager.prototype.getCurrentTheme = function() {

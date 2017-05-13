@@ -15,8 +15,9 @@ var nextAlarm;
 var correction;
 
 var initializeAlarm = function() {
-    bellTimer.initializeFromHost(host);
-    refresh();
+	bellTimer.initializeFromHost(host);
+	// bellTimer.enableDevMode(new Date('2017-05-12 8:00'), 60);
+	refresh();
 }
 
 var cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club",  function() {

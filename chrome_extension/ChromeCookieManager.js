@@ -133,6 +133,7 @@ ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 		longValue = JSON.stringify(longValue);
 	longValue = btoa(longValue);
 	var parts = splitString(longValue, 2000);
+	console.log(parts);
 	for (var i = 0; i < parts.length; i++) {
 		self.set(key + '_' + i, parts[i], expires);
 	}

@@ -200,8 +200,9 @@ var nextAlarm;
 var correction;
 
 var initializeAlarm = function() {
-    bellTimer.initializeFromHost(host);
-    refresh();
+	bellTimer.initializeFromHost(host);
+	// bellTimer.enableDevMode(new Date('2017-05-12 8:00'), 60);
+	refresh();
 }
 
 var cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club",  function() {
@@ -557,6 +558,7 @@ var self;
     this.startTime = startDate.getTime();
     this.devModeStartTime = Date.now();
     this.timeScale = scale;
+    console.log("Dev mode enabled, with startDate=", startDate, "scale=", scale);
   }
   BellTimer.prototype.getDate = function() {
     return new Date(this.ts.now() + this.bellCompensation);

@@ -294,6 +294,7 @@ var self;
     this.startTime = startDate.getTime();
     this.devModeStartTime = Date.now();
     this.timeScale = scale;
+    console.log("Dev mode enabled, with startDate=", startDate, "scale=", scale);
   }
   BellTimer.prototype.getDate = function() {
     return new Date(this.ts.now() + this.bellCompensation);

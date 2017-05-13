@@ -16,10 +16,6 @@ body {
 	opacity: 0.1;
 }
 
-#icons {
-	visibility: hidden;
-}
-
 .bottom {
 	bottom: 0px;
 	position: absolute;
