@@ -36,7 +36,12 @@ var ChromeCookieManager = function(url, callback) {
 	}, function(cookies) {
 		for(cookie of cookies) {
 			// shoot me
-			self.storedCookies[cookie.name] = atob(cookie.value);
+			try {
+				self.storedCookies[cookie.name] = atob(cookie.value);
+			}
+			catch(e) {
+				self.storedCookies[cookie.name] = cookie.value;
+			}
 		}
 		console.log("Cookies on load:", cookies);
 		callback();
