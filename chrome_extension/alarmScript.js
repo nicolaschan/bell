@@ -5,7 +5,7 @@ const ClassesManager = require("../js/ClassesManager.js");
 
 var alarms = chrome.alarms;
 
-var beta = true;
+const beta = false;
 
 const host = "https://bell" + (beta ? "-beta" : "") + ".lahs.club";
 

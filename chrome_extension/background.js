@@ -134,6 +134,7 @@ ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 		longValue = JSON.stringify(longValue);
 	longValue = btoa(longValue);
 	var parts = splitString(longValue, 2000);
+	console.log(parts);
 	for (var i = 0; i < parts.length; i++) {
 		self.set(key + '_' + i, parts[i], expires);
 	}
@@ -190,7 +191,7 @@ const ClassesManager = require("../js/ClassesManager.js");
 
 var alarms = chrome.alarms;
 
-var beta = true;
+const beta = false;
 
 const host = "https://bell" + (beta ? "-beta" : "") + ".lahs.club";
 

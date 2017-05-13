@@ -20,7 +20,7 @@ var updateColors;
 var updateAll;
 var dynamicallySetFontSize;
 
-var beta = true;
+const beta = false;
 
 var setup = function() {
     // bellTimer.enableDevMode(new Date('2017-05-12 8:00'), 60);
