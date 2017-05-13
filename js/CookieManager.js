@@ -68,7 +68,7 @@
     return JSON.parse(this.getLong(key));
   };
   CookieManager.prototype.setLong = function(key, longValue, expires) {
-    for (var i = 0; this.get(key + '_' + i); i++)
+    for (var i = 0; this.getRaw(key + '_' + i); i++)
       this.Cookies.remove(key + '_' + i);
     if (typeof longValue != 'string')
       longValue = JSON.stringify(longValue);
