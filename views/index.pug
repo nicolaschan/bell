@@ -26,6 +26,15 @@ html
       canvas.centered#circle
       .bottom.alert-message#alert-container
         .alert-text#alert
+      .top.right.extension#extension
+        table
+          tr
+            td
+              a.link.center-vertical(href="#", target="_blank")
+                span#extension-text Install the Chrome Extension
+            td
+              a.dismiss.center-vertical#dismiss(href="#")
+                i.material-icons cancel
     .container#page2
       .centered
         span#scheduleDisplay
@@ -49,6 +58,5 @@ html
       i.material-icons#loadingIcon sync
       br
       span#loadingMessage Loading
-    
     .downArrow
       i.material-icons#downIcon keyboard_arrow_down

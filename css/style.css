@@ -4,6 +4,7 @@ body {
 	margin: 0;
 	cursor: default;
 	user-select: none;
+	// overflow-x: hidden;
 }
 
 #circle {
@@ -17,6 +18,46 @@ body {
 .bottom {
 	bottom: 0px;
 	position: absolute;
+}
+
+.top {
+	top: 0px;
+}
+.right {
+	right: 0px;
+}
+
+.extension {
+	opacity: 0;
+	visibility: hidden;
+	position: absolute;
+	margin: 10px;
+	background-color: white;
+	padding: 0px;
+	transition: opacity 0.5s ease, background-color 1s ease;
+}
+.extension a i {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.link:link, .link:visited {
+	color: black;
+	text-decoration: none;
+}
+.link:hover {
+	text-decoration: underline;
+}
+
+.dismiss i {
+	font-size: 16px;
+}
+.dismiss:link, .dismiss:visited {
+	color: #aaaaaa;
+	transition: color 0.5s ease;
+}
+.dismiss:hover {
+	color: red;
 }
 
 .alert-message {
@@ -38,6 +79,7 @@ body {
 	position: relative;
 	-webkit-backface-visibility: hidden;
 	transition: background-color 3s ease;
+	overflow-x: hidden;
 }
 .centered {
 	position: absolute;

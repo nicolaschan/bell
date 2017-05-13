@@ -13,7 +13,8 @@
 		"tabs",
 		"https://bell.lahs.club/*",
 		"https://bell-beta.lahs.club/*",
-		"http://bell.lahs.club/*"
+		"http://bell.lahs.club/*",
+		"http://bell-beta.lahs.club/*"
 	]
 
 }

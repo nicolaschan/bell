@@ -93,16 +93,13 @@ var self;
  * /timsync/timesync.js somewhere.
  */
 (function() {
-<<<<<<< HEAD
   /**
    * Creates a new instance of BellTimer, with a ClassesManager object. The ClassesManager is
    * necessary to store the current class period.
    * @param {ClassesManager} classesManager
+   * @param {CookieManager} cookieManager
    */
-  var BellTimer = function(classesManager) {
-=======
   var BellTimer = function(classesManager, cookieManager) {
->>>>>>> 49a5f80ac9f6cdd4f4fed0b423a1325ae3cd5cc3
     self = this;
 
     this.classesManager = classesManager;
@@ -127,7 +124,7 @@ var self;
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
-<<<<<<< HEAD
+
   /**
    * Reloads schedule data from the host website.
    * @param {String} host The URI string giving the location of the api. For LAHS,
@@ -135,14 +132,7 @@ var self;
    * @param {Function} callback The callback to be executed. Can be undefined.
    */
   BellTimer.prototype.reloadDataFromHost = function(host, callback) {
-    $.ajax({
-      url: (host + '/api/data?v=') + Date.now(),
-      type: 'GET'
-    }).done(function(data) {
-=======
-  BellTimer.prototype.reloadData = function(callback) {
     var parseData = function(data) {
->>>>>>> 49a5f80ac9f6cdd4f4fed0b423a1325ae3cd5cc3
       var rawSchedules = data.schedules;
       for (var key in rawSchedules) {
         var schedule = rawSchedules[key];
@@ -171,7 +161,7 @@ var self;
             i--;
           }
         }
-      }
+      };
 
       self.schedules = rawSchedules;
       self.calendar = data.calendar;
@@ -271,7 +261,7 @@ var self;
       return calendar;
     };
 
-    $.get('/api/version?v=' + Date.now())
+    $.get(host + '/api/version?v=' + Date.now())
       .done(function(version) {
         if (self.version && self.version != version)
           $(window)[0].location.reload();
@@ -280,7 +270,7 @@ var self;
       });
 
     var getSchedules = function(callback) {
-      $.get('/api/schedules?v=' + Date.now())
+      $.get(host + '/api/schedules?v=' + Date.now())
         .done(function(schedules) {
           self.cookieManager.setLong('schedules', schedules);
           var schedules = parseSchedules(schedules);
@@ -292,7 +282,7 @@ var self;
         });
     };
     var getCalendar = function(schedules, callback) {
-      $.get('/api/calendar?v=' + Date.now())
+      $.get(host + '/api/calendar?v=' + Date.now())
         .done(function(calendar) {
           self.cookieManager.setLong('calendar', calendar);
           var calendar = parseCalendar(calendar, schedules);
@@ -304,7 +294,7 @@ var self;
         });
     };
     var getCorrection = function(callback) {
-      $.get('/api/correction?v=' + Date.now())
+      $.get(host + '/api/correction?v=' + Date.now())
         .done(function(correction) {
           correction = parseInt(correction);
           self.bellCompensation = correction;
@@ -519,9 +509,12 @@ var self;
     return schedule;
   };
   BellTimer.prototype.synchronize = function(n, callback) {
+    synchronizeFromHost("", n, callback);
+  }
+  BellTimer.prototype.synchronizeFromHost = function(host, n, callback) {
     var getTimeCorrection = function(callback) {
       var sentTime = Date.now();
-      $.get('/api/time', function(data) {
+      $.get(host + '/api/time', function(data) {
         var serverTime = data.time;
         var currentTime = Date.now();
 
@@ -601,7 +594,8 @@ var self;
   ClassesManager.prototype.getClasses = function() {
     if (!this.cookieManager.getJSON(cookieName))
       this.setClasses(['Period 0', 'Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7']);
-    return this.cookieManager.getJSON(cookieName);
+    return this.cookieManager.getJSON(cookieName)
+      || ['Period 0', 'Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7'];
   };
 
   module.exports = ClassesManager;
@@ -609,25 +603,64 @@ var self;
 })();
 },{}],4:[function(require,module,exports){
 /**
-  *A module that does what it sounds like: it manages cookies.
+  * A module that does what it sounds like: it manages cookies.
+  * Should be used with some other API that does real cookie stuff, like
+  * https://www.npmjs.com/package/js-cookie.
   */
 (function() {
 
   var CookieManager = function(Cookies) {
     this.Cookies = Cookies;
+    this.lengthThreshold = 4000;
   };
 
+  /**
+   * Sets a cookie by its name and the value to set it to.
+   * 
+   * @param {String} key the name of the cookie to be set. It hopefully exists.
+   * @param value the new value of the cookie.
+   * @param {int} (optional) the number of days until expiration. If this is not 
+   * specified, it defaults to 365.
+   */
   CookieManager.prototype.set = function(key, value, expires) {
     this.Cookies.remove(key);
-    return this.Cookies.set(key, value, {
+
+    if (typeof value != 'string')
+      value = JSON.stringify(value);
+    var valueBase64 = btoa(value);
+    if (valueBase64.length > this.lengthThreshold)
+      return this.setLong(key, value, expires);
+
+    return this.setRaw(key, valueBase64, expires);
+  };
+  CookieManager.prototype.setRaw = function(key, rawValue, expires) {
+    this.Cookies.remove(key);
+
+    return this.Cookies.set(key, rawValue, {
       expires: (expires) ? expires : 365
     });
   };
   CookieManager.prototype.get = function(key) {
+    var valueBase64 = this.getRaw(key);
+    try {
+      return atob(valueBase64);
+    } catch (e) {
+      this.convertCookieToBase64(key); // for backwards compatibility
+      return valueBase64;
+    }
+  };
+  CookieManager.prototype.getRaw = function(key) {
     return this.Cookies.get(key);
   };
+  CookieManager.prototype.convertCookieToBase64 = function(key) {
+    this.set(key, this.getRaw(key));
+  };
   CookieManager.prototype.getJSON = function(key) {
-    return this.Cookies.getJSON(key);
+    try {
+      return JSON.parse(this.get(key));
+    } catch (e) {
+      return undefined;
+    }
   };
 
   var splitString = function(str, length) {
@@ -638,11 +671,15 @@ var self;
     return parts;
   };
   CookieManager.prototype.getLong = function(key) {
-    var longValue = '';
-    for (var i = 0; this.get(key + '_' + i); i++) {
-      longValue += this.get(key + '_' + i);
+    var longValueBase64 = '';
+    for (var i = 0; this.getRaw(key + '_' + i); i++) {
+      longValueBase64 += this.getRaw(key + '_' + i);
     }
-    return longValue;
+    try {
+      return atob(longValueBase64);
+    } catch (e) {
+      return undefined;
+    }
   };
   CookieManager.prototype.getLongJSON = function(key) {
     return JSON.parse(this.getLong(key));
@@ -652,9 +689,11 @@ var self;
       this.Cookies.remove(key + '_' + i);
     if (typeof longValue != 'string')
       longValue = JSON.stringify(longValue);
-    var parts = splitString(longValue, 2000);
+
+    var longValueBase64 = btoa(longValue);
+    var parts = splitString(longValueBase64, this.lengthThreshold);
     for (var i = 0; i < parts.length; i++) {
-      this.set(key + '_' + i, parts[i], expires);
+      this.setRaw(key + '_' + i, parts[i], expires);
     }
   };
 
@@ -811,87 +850,90 @@ const _ = require('lodash');
     * of the period description, and x[2] is the background color.
     */
   var themes = {
+    // [text, subtitle, background, popup background]
     'Default - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', 'lime'],
-      ['black', 'black', 'yellow'],
-      ['black', 'black', 'orange'],
-      ['black', 'black', 'red']
+      ['black', 'black', 'lime', 'white'],
+      ['black', 'black', 'yellow', 'white'],
+      ['black', 'black', 'orange', 'white'],
+      ['black', 'black', 'red', 'white']
     ]),
     'Default - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['lime', 'white', 'black'],
-      ['yellow', 'white', 'black'],
-      ['orange', 'white', 'black'],
-      ['red', 'white', 'black']
+      ['lime', 'white', 'black', '#555555'],
+      ['yellow', 'white', 'black', '#555555'],
+      ['orange', 'white', 'black', '#555555'],
+      ['red', 'white', 'black', '#555555']
     ]),
     'Grays - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', 'darkgray'],
-      ['black', 'black', 'silver'],
-      ['black', 'black', 'lightgray'],
-      ['black', 'black', 'white']
+      ['black', 'black', 'darkgray', 'white'],
+      ['black', 'black', 'silver', 'white'],
+      ['black', 'black', 'lightgray', 'white'],
+      ['black', 'black', 'white', 'white']
     ]),
     'Grays - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['darkgray', 'white', 'black'],
-      ['silver', 'white', 'black'],
-      ['lightgray', 'white', 'black'],
-      ['white', 'white', 'black']
+      ['darkgray', 'white', 'black', '#555555'],
+      ['silver', 'white', 'black', '#555555'],
+      ['lightgray', 'white', 'black', '#555555'],
+      ['white', 'white', 'black', '#555555']
     ]),
     'Pastel - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', '#bcffae'],
-      ['black', 'black', '#fff9b0'],
-      ['black', 'black', '#ffcfa5'],
-      ['black', 'black', '#ffbfd1']
+      ['black', 'black', '#bcffae', 'white'],
+      ['black', 'black', '#fff9b0', 'white'],
+      ['black', 'black', '#ffcfa5', 'white'],
+      ['black', 'black', '#ffbfd1', 'white']
     ]),
     'Pastel - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['#bcffae', 'white', 'black'],
-      ['#fff9b0', 'white', 'black'],
-      ['#ffcfa5', 'white', 'black'],
-      ['#ffbfd1', 'white', 'black']
+      ['#bcffae', 'white', 'black', '#555555'],
+      ['#fff9b0', 'white', 'black', '#555555'],
+      ['#ffcfa5', 'white', 'black', '#555555'],
+      ['#ffbfd1', 'white', 'black', '#555555']
     ]),
     'Blues - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', '#ccffff'],
-      ['black', 'black', '#33ccff'],
-      ['black', 'black', '#0066ff'],
-      ['black', 'black', '#002db3']
+      ['black', 'black', '#ccffff', 'white'],
+      ['black', 'black', '#33ccff', 'white'],
+      ['black', 'black', '#0066ff', 'white'],
+      ['black', 'black', '#002db3', 'white']
     ]),
     'Blues - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['#ccffff', 'white', 'black'],
-      ['#33ccff', 'white', 'black'],
-      ['#0066ff', 'white', 'black'],
-      ['#002db3', 'white', 'black']
+      ['#ccffff', 'white', 'black', '#555555'],
+      ['#33ccff', 'white', 'black', '#555555'],
+      ['#0066ff', 'white', 'black', '#555555'],
+      ['#002db3', 'white', 'black', '#555555']
     ]),
     'Rainbow - Light': function(time) {
       var time = parseTimeRemainingString(time);
       var sec = time[2] % 12;
-
-      if (sec > 10)
-        return ['black', 'black', 'red'];
-      if (sec > 8)
-        return ['black', 'black', 'orange'];
-      if (sec > 6)
-        return ['black', 'black', 'yellow'];
-      if (sec > 4)
-        return ['black', 'black', 'lime'];
-      if (sec > 2)
-        return ['black', 'black', 'cyan'];
+      var lastColor;
+      if(sec > 10)
+        lastColor = "red";
+      else if(sec > 8)
+        lastColor = "orange";
+      else if(sec > 6)
+        lastColor = "yellow";
+      else if(sec > 4)
+        lastColor = "lime";
+      else if(sec > 2)
+        lastColor = "cyan";
       else
-        return ['black', 'black', 'magenta'];
+        lastColor = "magenta";
+      return ["black", "black", lastColor];
     },
     'Rainbow - Dark': function(time) {
       var time = parseTimeRemainingString(time);
       var sec = time[2] % 12;
-
-      if (sec > 10)
-        return ['red', 'white', 'black'];
-      if (sec > 8)
-        return ['orange', 'white', 'black'];
-      if (sec > 6)
-        return ['yellow', 'white', 'black'];
-      if (sec > 4)
-        return ['lime', 'white', 'black'];
-      if (sec > 2)
-        return ['cyan', 'white', 'black'];
+      var lastColor;
+      if(sec > 10)
+        lastColor = "red";
+      else if(sec > 8)
+        lastColor = "orange";
+      else if(sec > 6)
+        lastColor = "yellow";
+      else if(sec > 4)
+        lastColor = "lime";
+      else if(sec > 2)
+        lastColor = "cyan";
       else
-        return ['magenta', 'white', 'black'];
+        lastColor = "magenta";
+      return [lastColor, "white", "black"];
     }
   };
 
@@ -918,7 +960,7 @@ const _ = require('lodash');
   ThemeManager.prototype.getCurrentThemeName = function() {
     if (!this.cookieManager.get(cookieName))
       this.cookieManager.set(cookieName, defaultTheme);
-    return this.cookieManager.get(cookieName);
+    return this.cookieManager.get(cookieName) || defaultTheme;
   };
   /**
    * Sets the current theme by changing the value stored in the cookie.
@@ -984,7 +1026,7 @@ const $ = require('jquery');
     };
     // show scroll indicator if they've never scrolled down before
     var showScrollIndicator = function() {
-      if (!self.cookieManager.getJSON('has scrolled')) {
+      if (!self.cookieManager.getJSON('has_scrolled')) {
         $('.downArrow').show();
         $('#downIcon').click(function(e) {
           $('body, html').animate({
@@ -995,7 +1037,7 @@ const $ = require('jquery');
           if ($(window).scrollTop() > 250) {
             $(window).off('scroll');
             $('.downArrow').css('opacity', 0);
-            self.cookieManager.set('has scrolled', true);
+            self.cookieManager.set('has_scrolled', true);
             setTimeout(function() {
               $('.downArrow').hide();
             }, 1000);
@@ -1131,7 +1173,25 @@ const $ = require('jquery');
       $('.inputBox').css('padding', padding);
       $('#themeSelect').css('font-size', ((Math.min($(window).innerHeight() * 0.03))) + 'px');
       $('#themeSelect').css('padding', padding);
+    };
+    // slide in extension ad
+    var slideExtension = function() {
+      if (self.cookieManager.get('popup') == $('#extension-text').text())
+        return $('.extension').hide();
 
+      // $('#extension').css('transition', 'transform 2s ease-out,  background-color 1s ease');
+      // $('#extension').css('transform', 'translateX(0)');
+      $('.extension').css('visibility', 'visible');
+      $('.extension').css('opacity', '1');
+      $('#dismiss').click(function(e) {
+        self.cookieManager.set('popup', $('#extension-text').text());
+        $('.extension').css('opacity', '0');
+        setTimeout(function() {
+          $('.extension').hide();
+        }, 1050);
+        // $('#extension').css('transition', 'transform 0.7s ease-in,  background-color 1s ease');
+        // $('#extension').css('transform', 'translateX(120%)');
+      });
     };
 
     $(window).on('load resize', dynamicallySetFontSize);
@@ -1140,6 +1200,7 @@ const $ = require('jquery');
     showScrollIndicator();
     setSettingsState();
     dynamicallySetFontSize();
+    slideExtension();
   };
   UIManager.prototype.update = function() {
     var time = self.bellTimer.getTimeRemainingString();
@@ -1175,6 +1236,10 @@ const $ = require('jquery');
     $('#time').css('color', theme(time)[0]);
     $('.subtitle').css('color', theme(time)[1]);
     $('#page1').css('background-color', theme(time)[2]);
+
+    // popup stuff
+    $('.extension').css('background-color', theme(time)[3]);
+    $('.link').css('color', theme(time)[1]);
 
     if (color) {
       if (currentTheme == 'Default - Dark')
@@ -1229,7 +1294,9 @@ const $ = require('jquery');
     $('#countdown').css('opacity', 1);
   };
   /**
-   * Redraws everything.
+   * Redraws the circle on the page (does not affect the background or text colors).
+   * The radius of the newly drawn circle is dependent on the smaller of the canvas object's
+   * two dimensions.
    */
   UIManager.prototype.updateGraphics = function() {
     var c = $('#circle')[0];

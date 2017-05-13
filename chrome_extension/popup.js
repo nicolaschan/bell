@@ -20,7 +20,7 @@ var updateColors;
 var updateAll;
 var dynamicallySetFontSize;
 
-var beta = false;
+var beta = true;
 
 var setup = function() {
     var c = document.getElementById("circle");
@@ -133,16 +133,16 @@ var initializePopup = function() {
     thememan = new ThemeManager(cookman);
     classes = new ClassesManager(cookman);
     bellTimer = new BellTimer(classes, cookman);
-    bellTimer.initializeFromHost("https://bell" + (dev ? "-beta" : "") + ".lahs.club", setup);
+    bellTimer.initializeFromHost("https://bell" + (beta ? "-beta" : "") + ".lahs.club", setup);
 };
 
 var somethingWentWrong = function(err) {
     var c = document.getElementById("circle");
     var ctx = c.getContext('2d');
     ctx.fillStyle = "red";
-    ctx.font = "12px Roboto";
-    ctx.fillText("Something went really wrong.", 0, 0);
-    ctx.fillText("Whoops.", 0, 15);
+    ctx.font = "18px Roboto";
+    ctx.fillText("Something went really wrong.", 0, 20);
+    ctx.fillText("Whoops.", 0, 40);
 }
 
 var setLoadingMessage = function(message) {
@@ -159,7 +159,7 @@ var hideLoading = function() {
     ld.style.opacity = op;
     var inc = op / 8;
     var fade = function() {
-        if(ld.style.opacity == 0) {
+        if(ld.style.opacity <= 0) {
             $(".loading").hide();
             return;
         }
@@ -184,9 +184,16 @@ window.onload = function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        cookman = new ChromeCookieManager("http://bell.lahs.club/", initializePopup);
+        /*$("#icons").on("mouseenter",
+            function(ev) {
+                console.log("hi");
+                $("#settingsIcon").toggle();
+        });
+        console.log(gear);*/              // not supposed to be https
+        cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club", initializePopup);
     }
     catch(e) {
         somethingWentWrong();
+        console.log(e.stack);
     }
 }, false);

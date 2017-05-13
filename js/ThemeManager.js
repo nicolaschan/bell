@@ -50,53 +50,54 @@ const _ = require('lodash');
     * of the period description, and x[2] is the background color.
     */
   var themes = {
+    // [text, subtitle, background, popup background]
     'Default - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', 'lime'],
-      ['black', 'black', 'yellow'],
-      ['black', 'black', 'orange'],
-      ['black', 'black', 'red']
+      ['black', 'black', 'lime', 'white'],
+      ['black', 'black', 'yellow', 'white'],
+      ['black', 'black', 'orange', 'white'],
+      ['black', 'black', 'red', 'white']
     ]),
     'Default - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['lime', 'white', 'black'],
-      ['yellow', 'white', 'black'],
-      ['orange', 'white', 'black'],
-      ['red', 'white', 'black']
+      ['lime', 'white', 'black', '#555555'],
+      ['yellow', 'white', 'black', '#555555'],
+      ['orange', 'white', 'black', '#555555'],
+      ['red', 'white', 'black', '#555555']
     ]),
     'Grays - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', 'darkgray'],
-      ['black', 'black', 'silver'],
-      ['black', 'black', 'lightgray'],
-      ['black', 'black', 'white']
+      ['black', 'black', 'darkgray', 'white'],
+      ['black', 'black', 'silver', 'white'],
+      ['black', 'black', 'lightgray', 'white'],
+      ['black', 'black', 'white', 'white']
     ]),
     'Grays - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['darkgray', 'white', 'black'],
-      ['silver', 'white', 'black'],
-      ['lightgray', 'white', 'black'],
-      ['white', 'white', 'black']
+      ['darkgray', 'white', 'black', '#555555'],
+      ['silver', 'white', 'black', '#555555'],
+      ['lightgray', 'white', 'black', '#555555'],
+      ['white', 'white', 'black', '#555555']
     ]),
     'Pastel - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', '#bcffae'],
-      ['black', 'black', '#fff9b0'],
-      ['black', 'black', '#ffcfa5'],
-      ['black', 'black', '#ffbfd1']
+      ['black', 'black', '#bcffae', 'white'],
+      ['black', 'black', '#fff9b0', 'white'],
+      ['black', 'black', '#ffcfa5', 'white'],
+      ['black', 'black', '#ffbfd1', 'white']
     ]),
     'Pastel - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['#bcffae', 'white', 'black'],
-      ['#fff9b0', 'white', 'black'],
-      ['#ffcfa5', 'white', 'black'],
-      ['#ffbfd1', 'white', 'black']
+      ['#bcffae', 'white', 'black', '#555555'],
+      ['#fff9b0', 'white', 'black', '#555555'],
+      ['#ffcfa5', 'white', 'black', '#555555'],
+      ['#ffbfd1', 'white', 'black', '#555555']
     ]),
     'Blues - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', '#ccffff'],
-      ['black', 'black', '#33ccff'],
-      ['black', 'black', '#0066ff'],
-      ['black', 'black', '#002db3']
+      ['black', 'black', '#ccffff', 'white'],
+      ['black', 'black', '#33ccff', 'white'],
+      ['black', 'black', '#0066ff', 'white'],
+      ['black', 'black', '#002db3', 'white']
     ]),
     'Blues - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['#ccffff', 'white', 'black'],
-      ['#33ccff', 'white', 'black'],
-      ['#0066ff', 'white', 'black'],
-      ['#002db3', 'white', 'black']
+      ['#ccffff', 'white', 'black', '#555555'],
+      ['#33ccff', 'white', 'black', '#555555'],
+      ['#0066ff', 'white', 'black', '#555555'],
+      ['#002db3', 'white', 'black', '#555555']
     ]),
     'Rainbow - Light': function(time) {
       var time = parseTimeRemainingString(time);

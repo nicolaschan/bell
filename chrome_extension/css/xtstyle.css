@@ -62,15 +62,15 @@ body {
 #countdown {
 	opacity: 0;
 	z-index: 1;
-	transition: opacity 0.25s ease;
+	transition: opacity 3s ease;
 }
 #time {
 	text-align: center;
-	transition: color 0.25s ease;
+	transition: color 3s ease;
 }
 .subtitle {
 	text-align: center;
-	transition: color 0.25s ease;
+	transition: color 3s ease;
 }
 #scheduleName {
 	opacity: 0.3;

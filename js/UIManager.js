@@ -44,7 +44,7 @@ const $ = require('jquery');
     };
     // show scroll indicator if they've never scrolled down before
     var showScrollIndicator = function() {
-      if (!self.cookieManager.getJSON('has scrolled')) {
+      if (!self.cookieManager.getJSON('has_scrolled')) {
         $('.downArrow').show();
         $('#downIcon').click(function(e) {
           $('body, html').animate({
@@ -55,7 +55,7 @@ const $ = require('jquery');
           if ($(window).scrollTop() > 250) {
             $(window).off('scroll');
             $('.downArrow').css('opacity', 0);
-            self.cookieManager.set('has scrolled', true);
+            self.cookieManager.set('has_scrolled', true);
             setTimeout(function() {
               $('.downArrow').hide();
             }, 1000);
@@ -191,7 +191,25 @@ const $ = require('jquery');
       $('.inputBox').css('padding', padding);
       $('#themeSelect').css('font-size', ((Math.min($(window).innerHeight() * 0.03))) + 'px');
       $('#themeSelect').css('padding', padding);
+    };
+    // slide in extension ad
+    var slideExtension = function() {
+      if (self.cookieManager.get('popup') == $('#extension-text').text())
+        return $('.extension').hide();
 
+      // $('#extension').css('transition', 'transform 2s ease-out,  background-color 1s ease');
+      // $('#extension').css('transform', 'translateX(0)');
+      $('.extension').css('visibility', 'visible');
+      $('.extension').css('opacity', '1');
+      $('#dismiss').click(function(e) {
+        self.cookieManager.set('popup', $('#extension-text').text());
+        $('.extension').css('opacity', '0');
+        setTimeout(function() {
+          $('.extension').hide();
+        }, 1050);
+        // $('#extension').css('transition', 'transform 0.7s ease-in,  background-color 1s ease');
+        // $('#extension').css('transform', 'translateX(120%)');
+      });
     };
 
     $(window).on('load resize', dynamicallySetFontSize);
@@ -200,6 +218,7 @@ const $ = require('jquery');
     showScrollIndicator();
     setSettingsState();
     dynamicallySetFontSize();
+    slideExtension();
   };
   UIManager.prototype.update = function() {
     var time = self.bellTimer.getTimeRemainingString();
@@ -235,6 +254,10 @@ const $ = require('jquery');
     $('#time').css('color', theme(time)[0]);
     $('.subtitle').css('color', theme(time)[1]);
     $('#page1').css('background-color', theme(time)[2]);
+
+    // popup stuff
+    $('.extension').css('background-color', theme(time)[3]);
+    $('.link').css('color', theme(time)[1]);
 
     if (color) {
       if (currentTheme == 'Default - Dark')

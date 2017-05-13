@@ -9,6 +9,10 @@
 
 var self;
 
+const lengthThreshold = 4000;
+var btoa = window.btoa;
+var atob = window.atob;
+
 /**
  * Creates a new instance of this pseudo-cookiemanager.
  * Instead of actually asking the browser for a cookie every time the get method
@@ -27,7 +31,7 @@ var ChromeCookieManager = function(url, callback) {
 	}, function(cookies) {
 		for(cookie of cookies) {
 			// shoot me
-			self.storedCookies[cookie.name] = cookie.value;
+			self.storedCookies[cookie.name] = atob(cookie.value);
 		}
 		callback();
 		console.log("All cookies", cookies);
@@ -35,6 +39,16 @@ var ChromeCookieManager = function(url, callback) {
 }
 
 ChromeCookieManager.prototype.set = function(key, value, expires) {
+	return null;
+	var val = encodeURI((typeof value == 'string') ? value : JSON.stringify(value));
+	var valBase64 = btoa(val);
+	if(valBase64.length > lengthThreshold)
+		return this.setLong(key, value, expires);
+	else
+		return this.setRaw(key, valBase64, expires);
+}
+
+ChromeCookieManager.prototype.setRaw = function(key, value, expires) {
 	val = encodeURI((typeof value == 'string') ? value : JSON.stringify(value));
 	chrome.cookies.set(
 		{
@@ -54,8 +68,26 @@ ChromeCookieManager.prototype.set = function(key, value, expires) {
 };
 
 ChromeCookieManager.prototype.get = function(key) {
-	return decodeURI(self.storedCookies[key]).replace(/%5D/g,"]").replace(/%5B/g,"[").replace(/%2C/g,",");
+	var valBase64 = this.getRaw(key);
+	try {
+		if(valBase64)
+			return atob(valBase64);
+		else
+			return undefined;
+	} catch (e) {
+		self.convertCookieToBase64(key);
+		return valBase64;
+	}
+}
+
+ChromeCookieManager.prototype.getRaw = function(key) {
+	if(self.storedCookies[key])
+		return decodeURI(self.storedCookies[key]).replace(/%5D/g,"]").replace(/%5B/g,"[").replace(/%2C/g,",");
 };
+
+ChromeCookieManager.prototype.convertCookieToBase64 = function(key) {
+	self.set(key, self.getRaw(key));
+}
 
 ChromeCookieManager.prototype.getJSON = function(key) {
 	try {
@@ -75,10 +107,14 @@ var splitString = function(str, length) {
 };
 ChromeCookieManager.prototype.getLong = function(key) {
 	var longValue = '';
-	for (var i = 0; self.get(key + '_' + i); i++) {
-		longValue += self.get(key + '_' + i);
+	for (var i = 0; self.getRaw(key + '_' + i); i++) {
+		longValue += self.getRaw(key + '_' + i);
 	}
-	return longValue;
+	try {
+		return atob(longValue)
+	} catch(e) {
+		return undefined;
+	}
 };
 ChromeCookieManager.prototype.getLongJSON = function(key) {
 	return JSON.parse(self.getLong(key));
@@ -86,6 +122,7 @@ ChromeCookieManager.prototype.getLongJSON = function(key) {
 ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 	if (typeof longValue != 'string')
 		longValue = JSON.stringify(longValue);
+	longValue = btoa(longValue);
 	var parts = splitString(longValue, 2000);
 	for (var i = 0; i < parts.length; i++) {
 		self.set(key + '_' + i, parts[i], expires);
@@ -96,7 +133,7 @@ ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 			url: self.url,
 			name: key + "_" + j
 		}, function(cookie) {
-			delete self.storedCookies[cookie.name];
+			self.storedCookies[cookie.name] = undefined;
 		});
 	}
 };

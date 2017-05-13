@@ -10,6 +10,10 @@
 
 var self;
 
+const lengthThreshold = 4000;
+var btoa = window.btoa;
+var atob = window.atob;
+
 /**
  * Creates a new instance of this pseudo-cookiemanager.
  * Instead of actually asking the browser for a cookie every time the get method
@@ -28,7 +32,7 @@ var ChromeCookieManager = function(url, callback) {
 	}, function(cookies) {
 		for(cookie of cookies) {
 			// shoot me
-			self.storedCookies[cookie.name] = cookie.value;
+			self.storedCookies[cookie.name] = atob(cookie.value);
 		}
 		callback();
 		console.log("All cookies", cookies);
@@ -36,6 +40,16 @@ var ChromeCookieManager = function(url, callback) {
 }
 
 ChromeCookieManager.prototype.set = function(key, value, expires) {
+	return null;
+	var val = encodeURI((typeof value == 'string') ? value : JSON.stringify(value));
+	var valBase64 = btoa(val);
+	if(valBase64.length > lengthThreshold)
+		return this.setLong(key, value, expires);
+	else
+		return this.setRaw(key, valBase64, expires);
+}
+
+ChromeCookieManager.prototype.setRaw = function(key, value, expires) {
 	val = encodeURI((typeof value == 'string') ? value : JSON.stringify(value));
 	chrome.cookies.set(
 		{
@@ -55,8 +69,26 @@ ChromeCookieManager.prototype.set = function(key, value, expires) {
 };
 
 ChromeCookieManager.prototype.get = function(key) {
-	return decodeURI(self.storedCookies[key]).replace(/%5D/g,"]").replace(/%5B/g,"[").replace(/%2C/g,",");
+	var valBase64 = this.getRaw(key);
+	try {
+		if(valBase64)
+			return atob(valBase64);
+		else
+			return undefined;
+	} catch (e) {
+		self.convertCookieToBase64(key);
+		return valBase64;
+	}
+}
+
+ChromeCookieManager.prototype.getRaw = function(key) {
+	if(self.storedCookies[key])
+		return decodeURI(self.storedCookies[key]).replace(/%5D/g,"]").replace(/%5B/g,"[").replace(/%2C/g,",");
 };
+
+ChromeCookieManager.prototype.convertCookieToBase64 = function(key) {
+	self.set(key, self.getRaw(key));
+}
 
 ChromeCookieManager.prototype.getJSON = function(key) {
 	try {
@@ -76,10 +108,14 @@ var splitString = function(str, length) {
 };
 ChromeCookieManager.prototype.getLong = function(key) {
 	var longValue = '';
-	for (var i = 0; self.get(key + '_' + i); i++) {
-		longValue += self.get(key + '_' + i);
+	for (var i = 0; self.getRaw(key + '_' + i); i++) {
+		longValue += self.getRaw(key + '_' + i);
 	}
-	return longValue;
+	try {
+		return atob(longValue)
+	} catch(e) {
+		return undefined;
+	}
 };
 ChromeCookieManager.prototype.getLongJSON = function(key) {
 	return JSON.parse(self.getLong(key));
@@ -87,6 +123,7 @@ ChromeCookieManager.prototype.getLongJSON = function(key) {
 ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 	if (typeof longValue != 'string')
 		longValue = JSON.stringify(longValue);
+	longValue = btoa(longValue);
 	var parts = splitString(longValue, 2000);
 	for (var i = 0; i < parts.length; i++) {
 		self.set(key + '_' + i, parts[i], expires);
@@ -97,7 +134,7 @@ ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 			url: self.url,
 			name: key + "_" + j
 		}, function(cookie) {
-			delete self.storedCookies[cookie.name];
+			self.storedCookies[cookie.name] = undefined;
 		});
 	}
 };
@@ -159,7 +196,7 @@ var updateColors;
 var updateAll;
 var dynamicallySetFontSize;
 
-var beta = false;
+var beta = true;
 
 var setup = function() {
     var c = document.getElementById("circle");
@@ -272,16 +309,16 @@ var initializePopup = function() {
     thememan = new ThemeManager(cookman);
     classes = new ClassesManager(cookman);
     bellTimer = new BellTimer(classes, cookman);
-    bellTimer.initializeFromHost("https://bell" + (dev ? "-beta" : "") + ".lahs.club", setup);
+    bellTimer.initializeFromHost("https://bell" + (beta ? "-beta" : "") + ".lahs.club", setup);
 };
 
 var somethingWentWrong = function(err) {
     var c = document.getElementById("circle");
     var ctx = c.getContext('2d');
     ctx.fillStyle = "red";
-    ctx.font = "12px Roboto";
-    ctx.fillText("Something went really wrong.", 0, 0);
-    ctx.fillText("Whoops.", 0, 15);
+    ctx.font = "18px Roboto";
+    ctx.fillText("Something went really wrong.", 0, 20);
+    ctx.fillText("Whoops.", 0, 40);
 }
 
 var setLoadingMessage = function(message) {
@@ -298,7 +335,7 @@ var hideLoading = function() {
     ld.style.opacity = op;
     var inc = op / 8;
     var fade = function() {
-        if(ld.style.opacity == 0) {
+        if(ld.style.opacity <= 0) {
             $(".loading").hide();
             return;
         }
@@ -323,10 +360,17 @@ window.onload = function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        cookman = new ChromeCookieManager("http://bell.lahs.club/", initializePopup);
+        /*$("#icons").on("mouseenter",
+            function(ev) {
+                console.log("hi");
+                $("#settingsIcon").toggle();
+        });
+        console.log(gear);*/              // not supposed to be https
+        cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club", initializePopup);
     }
     catch(e) {
         somethingWentWrong();
+        console.log(e.stack);
     }
 }, false);
 },{"../js/BellTimer.js":3,"../js/ClassesManager.js":4,"../js/ThemeManager.js":5,"./ChromeCookieManager.js":1,"jquery":7,"lodash":8}],3:[function(require,module,exports){
@@ -909,53 +953,54 @@ const _ = require('lodash');
     * of the period description, and x[2] is the background color.
     */
   var themes = {
+    // [text, subtitle, background, popup background]
     'Default - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', 'lime'],
-      ['black', 'black', 'yellow'],
-      ['black', 'black', 'orange'],
-      ['black', 'black', 'red']
+      ['black', 'black', 'lime', 'white'],
+      ['black', 'black', 'yellow', 'white'],
+      ['black', 'black', 'orange', 'white'],
+      ['black', 'black', 'red', 'white']
     ]),
     'Default - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['lime', 'white', 'black'],
-      ['yellow', 'white', 'black'],
-      ['orange', 'white', 'black'],
-      ['red', 'white', 'black']
+      ['lime', 'white', 'black', '#555555'],
+      ['yellow', 'white', 'black', '#555555'],
+      ['orange', 'white', 'black', '#555555'],
+      ['red', 'white', 'black', '#555555']
     ]),
     'Grays - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', 'darkgray'],
-      ['black', 'black', 'silver'],
-      ['black', 'black', 'lightgray'],
-      ['black', 'black', 'white']
+      ['black', 'black', 'darkgray', 'white'],
+      ['black', 'black', 'silver', 'white'],
+      ['black', 'black', 'lightgray', 'white'],
+      ['black', 'black', 'white', 'white']
     ]),
     'Grays - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['darkgray', 'white', 'black'],
-      ['silver', 'white', 'black'],
-      ['lightgray', 'white', 'black'],
-      ['white', 'white', 'black']
+      ['darkgray', 'white', 'black', '#555555'],
+      ['silver', 'white', 'black', '#555555'],
+      ['lightgray', 'white', 'black', '#555555'],
+      ['white', 'white', 'black', '#555555']
     ]),
     'Pastel - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', '#bcffae'],
-      ['black', 'black', '#fff9b0'],
-      ['black', 'black', '#ffcfa5'],
-      ['black', 'black', '#ffbfd1']
+      ['black', 'black', '#bcffae', 'white'],
+      ['black', 'black', '#fff9b0', 'white'],
+      ['black', 'black', '#ffcfa5', 'white'],
+      ['black', 'black', '#ffbfd1', 'white']
     ]),
     'Pastel - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['#bcffae', 'white', 'black'],
-      ['#fff9b0', 'white', 'black'],
-      ['#ffcfa5', 'white', 'black'],
-      ['#ffbfd1', 'white', 'black']
+      ['#bcffae', 'white', 'black', '#555555'],
+      ['#fff9b0', 'white', 'black', '#555555'],
+      ['#ffcfa5', 'white', 'black', '#555555'],
+      ['#ffbfd1', 'white', 'black', '#555555']
     ]),
     'Blues - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', '#ccffff'],
-      ['black', 'black', '#33ccff'],
-      ['black', 'black', '#0066ff'],
-      ['black', 'black', '#002db3']
+      ['black', 'black', '#ccffff', 'white'],
+      ['black', 'black', '#33ccff', 'white'],
+      ['black', 'black', '#0066ff', 'white'],
+      ['black', 'black', '#002db3', 'white']
     ]),
     'Blues - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['#ccffff', 'white', 'black'],
-      ['#33ccff', 'white', 'black'],
-      ['#0066ff', 'white', 'black'],
-      ['#002db3', 'white', 'black']
+      ['#ccffff', 'white', 'black', '#555555'],
+      ['#33ccff', 'white', 'black', '#555555'],
+      ['#0066ff', 'white', 'black', '#555555'],
+      ['#002db3', 'white', 'black', '#555555']
     ]),
     'Rainbow - Light': function(time) {
       var time = parseTimeRemainingString(time);
