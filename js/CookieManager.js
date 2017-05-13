@@ -25,6 +25,8 @@
   };
   CookieManager.prototype.get = function(key) {
     var valueBase64 = this.getRaw(key);
+    if (valueBase64 == undefined)
+      return valueBase64;
     try {
       return atob(valueBase64);
     } catch (e) {
