@@ -38,8 +38,8 @@ var ChromeCookieManager = function(url, callback) {
 			// shoot me
 			self.storedCookies[cookie.name] = atob(cookie.value);
 		}
+		console.log("Cookies on load:", cookies);
 		callback();
-		console.log("All cookies", cookies);
 	});
 }
 
@@ -116,7 +116,11 @@ ChromeCookieManager.prototype.getLong = function(key) {
 		longValue += self.getRaw(key + '_' + i);
 	}
 	try {
-		return atob(longValue)
+		var txt = atob(longValue);
+		if(!txt)
+			return undefined;
+		else
+			return txt;
 	} catch(e) {
 		return undefined;
 	}

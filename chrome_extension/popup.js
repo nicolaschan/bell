@@ -50,18 +50,6 @@ var setup = function() {
         helpers.updateTitle(time);
         $('#subtitle').text(name);
         $('#scheduleName').text(schedule.displayName);
-        var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
-        if (time.split(':').length > 2)
-            min = 60;
-        if (min < 2) {
-            $('#favicon').attr('href', '../favicons/red.png?v=1');
-        } else if (min < 5) {
-            $('#favicon').attr('href', '../favicons/orange.png?v=1');
-        } else if (min < 15) {
-            $('#favicon').attr('href', '../favicons/yellow.png?v=1');
-        } else {
-            $('#favicon').attr('href', '../favicons/lime.png?v=1');
-        }
         $('#countdown').css('opacity', 1);
     };
 
@@ -154,7 +142,6 @@ var setLoadingMessage = function(message) {
  * Some janky animation thing.
  */
 var hideLoading = function() {
-    console.log("starting hideloading at", Date.now());
     var ld = document.getElementsByClassName("loading")[0];
     var op = window.getComputedStyle(ld).getPropertyValue("opacity");
     ld.style.opacity = op;
@@ -191,7 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 $("#settingsIcon").toggle();
         });
         console.log(gear);*/              // not supposed to be https
-        console.log("initializing cookman at", Date.now());
         cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club", initializePopup);
     }
     catch(e) {

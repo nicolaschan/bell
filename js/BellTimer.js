@@ -244,8 +244,8 @@ var self;
   }; //_.partial(self.reloadDataFromHost, "");
   BellTimer.prototype.initializeFromHost = function(host, callback) {
     async.series([
-      _.partial(self.reloadDataFromHost, host),
-      _.partial(self.initializeTimesyncFromHost, host)
+      _.partial(self.initializeTimesyncFromHost, host),
+      _.partial(self.reloadDataFromHost, host)
     ], callback);
   };
   BellTimer.prototype.initialize = function(callback) {
@@ -260,7 +260,6 @@ var self;
   };
   BellTimer.prototype.initializeTimesyncFromHost = function(host, callback) {
     var callback = _.once(callback);
-
     if (typeof timesync == 'undefined') {
       self.ts = Date;
       return callback();
@@ -282,6 +281,11 @@ var self;
   BellTimer.prototype.setCorrection = function(correction) {
     this.bellCompensation = correction;
   };
+  /**
+   * Returns the difference between the timesync server's time and the school's bell time.
+   * Note that this does not give the difference between timesync.now() and Date.now(), as
+   * that is handled by the server.
+   */
   BellTimer.prototype.getCorrection = function() {
     return this.bellCompensation;
   };

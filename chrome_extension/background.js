@@ -184,193 +184,83 @@ var escapeAllQuotes = function(str) {
 module.exports = ChromeCookieManager;
 },{}],2:[function(require,module,exports){
 
-// Local dependencies
-// Note that CookieManager.js cannot be used because the chrome.cookies API is needed
-// to access cookies from this extension.
+const BellTimer = require("../js/BellTimer.js");
 const ChromeCookieManager = require("./ChromeCookieManager.js");
 const ClassesManager = require("../js/ClassesManager.js");
-const BellTimer = require("../js/BellTimer.js");
-const ThemeManager = require("../js/ThemeManager.js");
-// Modules
-const $ = require("jquery"); // forgive my inconsitent usage of jquery
-const _ = require("lodash"); // must use this instead of js-cookie because this isn't the website
 
-var cookman;
-var thememan;
-var classes;
-var bellTimer;
-var handle;
-
-var updateColors;
-var updateAll;
-var dynamicallySetFontSize;
+var alarms = chrome.alarms;
 
 var beta = true;
 
-var setup = function() {
-    var c = document.getElementById("circle");
-    var ctx = c.getContext('2d');
+const host = "https://bell" + (beta ? "-beta" : "") + ".lahs.club";
 
-    var side = 400;
 
-    c.height = c.width = side;
+var nextAlarm;
 
-    var offline = typeof timesync == 'undefined'; // returns false if timesync is not initialized
+var correction;
 
-    // Most of the below code is modified from UIManager.js
-    var helpers = {
-        updateTitle: _.throttle(function(text) {
-            $('head title').text(text);
-        }, 500, {
-          leading: true
-        })
-    };
-
-    var update = function() {
-        var time = bellTimer.getTimeRemainingString();
-        var name = bellTimer.getCurrentPeriod().name;
-        var schedule = bellTimer.getCurrentSchedule();
-        var proportionElapsed = bellTimer.getProportionElapsed();
-        $('#time').text(time);
-        helpers.updateTitle(time);
-        $('#subtitle').text(name);
-        $('#scheduleName').text(schedule.displayName);
-        $('#countdown').css('opacity', 1);
-    };
-
-    /**
-     * Updates the colors of the extension.
-     */
-    updateColors = function() {
-        var time = bellTimer.getTimeRemainingString();
-        var schedule = bellTimer.getCurrentSchedule();
-        var color = schedule.color;
-        var theme = thememan.getCurrentTheme();
-        $('#time').css('color', theme(time)[0]);
-        $('.subtitle').css('color', theme(time)[1]);
-        $('#page1').css('background-color', theme(time)[2]);
-        if (color) {
-            if (currentTheme == 'Default - Dark')
-                $('#time').css('color', color);
-            if (currentTheme == 'Default - Light')
-                $('#page1').css('background-color', color);
-        }
-    };
-
-    /**
-     * Redraws the circle.
-     * A slightly optimized version of the same method found in UIManager.js, accounting for the fact that
-     * as a Chrome extension popup, the canvas should never be resized.
-     */
-    var updateGraphics = function() {
-        var time = bellTimer.getTimeRemainingString();
-        var color = thememan.getCurrentTheme()(time)[1];
-        var proportion = bellTimer.getProportionElapsed();
-        ctx.strokeStyle = color;
-        ctx.fillStyle = color;
-        ctx.lineWidth = side / 15;
-
-        var radius = (side / 2) * 0.95;
-        var posX = side / 2;
-        var posY = side / 2;
-
-        ctx.beginPath();
-        ctx.arc(posX, posY, radius, (Math.PI / -2), (Math.PI / -2) + (-2 * Math.PI) * (1 - proportion), true);
-        ctx.lineTo(posX, posY);
-        ctx.closePath();
-        ctx.fill();
-    };
-
-    updateAll = function() {
-        update();
-        updateGraphics();
-        updateColors();
-        handle = window.requestAnimationFrame(updateAll);
-    }
-
-    dynamicallySetFontSize = function() {
-        $('#time').css('font-size', (Math.min($(window).innerHeight() * 0.3, $(window).innerWidth() * 0.2)) + 'px');
-        $('.subtitle').css('font-size', (Math.min($(window).innerHeight() * 0.07, $(window).innerWidth() * 0.07)) + 'px');
-    };
-
-    /*
-    http://stackoverflow.com/questions/8894461/updating-an-extension-button-dynamically-inspiration-required
-    */
-    $(window).on('load resize', dynamicallySetFontSize);
-    dynamicallySetFontSize();
-    updateColors();
-    handle = window.requestAnimationFrame(updateAll);
+var initializeAlarm = function() {
+    bellTimer.initializeFromHost(host);
+    refresh();
 }
 
-var initializePopup = function() {
-    thememan = new ThemeManager(cookman);
-    classes = new ClassesManager(cookman);
-    bellTimer = new BellTimer(classes, cookman);
-    bellTimer.initializeFromHost("https://bell" + (beta ? "-beta" : "") + ".lahs.club", setup);
-};
+var cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club",  function() {
+	alarms.onAlarm.addListener(function(alarm) {
+		console.log("Next alarm:", alarm);
+		refresh();
+	});
+});
 
-var somethingWentWrong = function(err) {
-    var c = document.getElementById("circle");
-    var ctx = c.getContext('2d');
-    ctx.fillStyle = "red";
-    ctx.font = "18px Roboto";
-    ctx.fillText("Something went really wrong.", 0, 20);
-    ctx.fillText("Whoops.", 0, 40);
+var classes = new ClassesManager(cookman);
+var bellTimer = new BellTimer(classes, cookman);
+
+var nextIconColor = "lime";
+var nextIconPath = () => ("sizedicons/" + nextIconColor + ".png?v=1");
+
+var updateIconAndAlarm = function() {
+	var time = bellTimer.getTimeRemainingString();
+	var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
+	var msRemaining = bellTimer.getTimeRemainingNumber();
+	var nextAlarmTime;
+	if(time.split(':').length > 2)
+		min = 60;
+	chrome.browserAction.setIcon({path: {"16": nextIconPath()} });
+	if(min >= 15) { // Next icon is yellow
+		nextIconColor = "yellow";
+		nextAlarmTime = msRemaining - minToMS(15);
+	}
+	else if(min >= 5) { // Next icon is orange
+		nextIconColor = "orange";
+		nextAlarmTime = msRemaining - minToMS(5);
+	}
+	else if(min >= 2) { // Next icon is red
+		nextIconColor = "red";
+		nextAlarmTime = msRemaining - minToMS(2);
+	}
+	else { // Next icon is green
+		nextIconColor = "lime";
+		nextAlarmTime = msRemaining;
+	}
+	nextAlarm = alarms.create(nextIconColor, {when: Date.now() + nextAlarmTime});
 }
 
-var setLoadingMessage = function(message) {
-    $('.loading').show();
-    $('#loadingMessage').text(message);
-};
+var refresh = function() {
+	bellTimer.reloadDataFromHost(host, function() {
+		updateIconAndAlarm();
+	});
+}
 
-/**
- * Some janky animation thing.
- */
-var hideLoading = function() {
-    var ld = document.getElementsByClassName("loading")[0];
-    var op = window.getComputedStyle(ld).getPropertyValue("opacity");
-    ld.style.opacity = op;
-    var inc = op / 8;
-    var fade = function() {
-        if(ld.style.opacity <= 0) {
-            $(".loading").hide();
-            return;
-        }
-        ld.style.opacity -= inc;
-        smallHandle = requestAnimationFrame(fade);
-    };
-    var smallHandle = requestAnimationFrame(fade);
-};
+var minToMS = function(mins) {
+	return mins * 60 * 1000;
+}
 
-window.onload = function() {
-    setLoadingMessage("Loading...");
-    var ld = document.getElementById("countdown");
-    // Apparently this depends on the browser?
-    // Mozilla says Chrome uses "transitioned", but apparently mine doesn't.
-    ld.addEventListener("webkitTransitionEnd", function(event) {
-        hideLoading();
-    });
-    ld.addEventListener("transitioned", function(event) {
-        hideLoading();
-    });
-};
+initializeAlarm();
 
-document.addEventListener('DOMContentLoaded', function() {
-    try {
-        /*$("#icons").on("mouseenter",
-            function(ev) {
-                console.log("hi");
-                $("#settingsIcon").toggle();
-        });
-        console.log(gear);*/              // not supposed to be https
-        cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club", initializePopup);
-    }
-    catch(e) {
-        somethingWentWrong();
-        console.log(e.stack);
-    }
-}, false);
-},{"../js/BellTimer.js":3,"../js/ClassesManager.js":4,"../js/ThemeManager.js":5,"./ChromeCookieManager.js":1,"jquery":7,"lodash":8}],3:[function(require,module,exports){
+// uses https://developer.chrome.com/extensions/alarms
+// and http://stackoverflow.com/questions/8894461/updating-an-extension-button-dynamically-inspiration-required
+
+
+},{"../js/BellTimer.js":3,"../js/ClassesManager.js":4,"./ChromeCookieManager.js":1}],3:[function(require,module,exports){
 const _ = require('lodash');
 const $ = require('jquery');
 const async = require('async');
@@ -633,13 +523,10 @@ var self;
   };
   BellTimer.prototype.initializeTimesyncFromHost = function(host, callback) {
     var callback = _.once(callback);
-
     if (typeof timesync == 'undefined') {
-      console.log("where it be");
       self.ts = Date;
       return callback();
     }
-    console.log("here it");
     var ts = timesync.create({
       server: (host + '/timesync'),
       interval: 4 * 60 * 1000
@@ -882,7 +769,7 @@ var self;
   module.exports = BellTimer;
   //window.BellTimer = BellTimer;
 })();
-},{"async":6,"jquery":7,"lodash":8}],4:[function(require,module,exports){
+},{"async":5,"jquery":6,"lodash":7}],4:[function(require,module,exports){
 (function() {
 
   const cookieName = 'classes';
@@ -905,188 +792,6 @@ var self;
   //window.ClassesManager = ClassesManager;
 })();
 },{}],5:[function(require,module,exports){
-const _ = require('lodash');
-
-/**
- * Manages themes. If there is no value stored in the 'theme' cookie, it will
- * use the default theme instead.
- */
-(function() {
-
-  const cookieName = 'theme';
-  const defaultTheme = 'Default - Light';
-
-  /**
-   * Given a string of the form hh:mm:ss, i.e. 10:30:21 (at least that's what Nicolas
-   * promised me it does), returns an array of 3 integers specifying the time.
-   * @param {String} time a string representing the time.
-   * @return {int[]} an array containing integers [hh, mm, ss].
-   */
-  var parseTimeRemainingString = function(time) {
-    var parts = _.map(time.split(':'), _.parseInt);
-    var hour = (parts.length > 2) ? parts[0] : 0;
-    var min = _.nth(parts, -2);
-    var sec = _.nth(parts, -1);
-
-    return [hour, min, sec];
-  };
-  /**
-   * Given
-   * @param {String -> String[]} colors a partially applied function that returns 4 arrays of color strings (which is
-   * how themes are stored),
-   * @param {String} time the current time string,
-   * @return {String[]} the appropriate array of 3 color strings.
-   */
-  var getCurrentColorDefaultTiming = function(colors, time) {
-    var parts = parseTimeRemainingString(time);
-    var min = parts[1] + (60 * parts[0]);
-
-    if (min < 2)
-      return _.nth(colors, -1);
-    if (min < 5)
-      return _.nth(colors, -2);
-    if (min < 15)
-      return _.nth(colors, -3);
-    else
-      return _.nth(colors, -4);
-  };
-  /**
-    * Stores color schemes for each theme.
-    * @return {String -> String[]} a partially applied function that takes a time as an argument, and returns
-    * an array x of 3 colors where x[0] is the color of the time text, x[1] is the color
-    * of the period description, and x[2] is the background color.
-    */
-  var themes = {
-    // [text, subtitle, background, popup background]
-    'Default - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', 'lime', 'white'],
-      ['black', 'black', 'yellow', 'white'],
-      ['black', 'black', 'orange', 'white'],
-      ['black', 'black', 'red', 'white']
-    ]),
-    'Default - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['lime', 'white', 'black', '#555555'],
-      ['yellow', 'white', 'black', '#555555'],
-      ['orange', 'white', 'black', '#555555'],
-      ['red', 'white', 'black', '#555555']
-    ]),
-    'Grays - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', 'darkgray', 'white'],
-      ['black', 'black', 'silver', 'white'],
-      ['black', 'black', 'lightgray', 'white'],
-      ['black', 'black', 'white', 'white']
-    ]),
-    'Grays - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['darkgray', 'white', 'black', '#555555'],
-      ['silver', 'white', 'black', '#555555'],
-      ['lightgray', 'white', 'black', '#555555'],
-      ['white', 'white', 'black', '#555555']
-    ]),
-    'Pastel - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', '#bcffae', 'white'],
-      ['black', 'black', '#fff9b0', 'white'],
-      ['black', 'black', '#ffcfa5', 'white'],
-      ['black', 'black', '#ffbfd1', 'white']
-    ]),
-    'Pastel - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['#bcffae', 'white', 'black', '#555555'],
-      ['#fff9b0', 'white', 'black', '#555555'],
-      ['#ffcfa5', 'white', 'black', '#555555'],
-      ['#ffbfd1', 'white', 'black', '#555555']
-    ]),
-    'Blues - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', '#ccffff', 'white'],
-      ['black', 'black', '#33ccff', 'white'],
-      ['black', 'black', '#0066ff', 'white'],
-      ['black', 'black', '#002db3', 'white']
-    ]),
-    'Blues - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['#ccffff', 'white', 'black', '#555555'],
-      ['#33ccff', 'white', 'black', '#555555'],
-      ['#0066ff', 'white', 'black', '#555555'],
-      ['#002db3', 'white', 'black', '#555555']
-    ]),
-    'Rainbow - Light': function(time) {
-      var time = parseTimeRemainingString(time);
-      var sec = time[2] % 12;
-      var lastColor;
-      if(sec > 10)
-        lastColor = "red";
-      else if(sec > 8)
-        lastColor = "orange";
-      else if(sec > 6)
-        lastColor = "yellow";
-      else if(sec > 4)
-        lastColor = "lime";
-      else if(sec > 2)
-        lastColor = "cyan";
-      else
-        lastColor = "magenta";
-      return ["black", "black", lastColor];
-    },
-    'Rainbow - Dark': function(time) {
-      var time = parseTimeRemainingString(time);
-      var sec = time[2] % 12;
-      var lastColor;
-      if(sec > 10)
-        lastColor = "red";
-      else if(sec > 8)
-        lastColor = "orange";
-      else if(sec > 6)
-        lastColor = "yellow";
-      else if(sec > 4)
-        lastColor = "lime";
-      else if(sec > 2)
-        lastColor = "cyan";
-      else
-        lastColor = "magenta";
-      return [lastColor, "white", "black"];
-    }
-  };
-
-  /**
-   * Initializes a new ThemeManager object.
-   * @param {CookieManager} cookieManager the appropriate CookieManager to find the theme cookie.
-   */
-  var ThemeManager = function(cookieManager) {
-    this.cookieManager = cookieManager;
-  };
-
-  /**
-   * Gets the current theme. If the current theme were to somehow not to be in the 
-   * themes object, it would throw a nullpointerexception, but that should hopefully
-   * never happen.
-   * @return {String -> String[]} the partially applied function representing the current theme.
-   */
-  ThemeManager.prototype.getCurrentTheme = function() {
-    return themes[this.getCurrentThemeName()];
-  };
-  /**
-   * @return {String} the name of the current theme. Duh.
-   */
-  ThemeManager.prototype.getCurrentThemeName = function() {
-    if (!this.cookieManager.get(cookieName))
-      this.cookieManager.set(cookieName, defaultTheme);
-    return this.cookieManager.get(cookieName) || defaultTheme;
-  };
-  /**
-   * Sets the current theme by changing the value stored in the cookie.
-   * @param {String} themeName the name of the new theme to be set.
-   */
-  ThemeManager.prototype.setCurrentTheme = function(themeName) {
-    return this.cookieManager.set(cookieName, themeName);
-  };
-  /**
-   * @return {Object} the object/map of partially applied functions representing themes.
-   */
-  ThemeManager.prototype.getAvailableThemes = function() {
-    return themes;
-  };
-
-  module.exports = ThemeManager;
-  //window.ThemeManager = ThemeManager;
-})();
-},{"lodash":8}],6:[function(require,module,exports){
 (function (process,global){
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -6640,7 +6345,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":9}],7:[function(require,module,exports){
+},{"_process":8}],6:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -16895,7 +16600,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -33983,7 +33688,7 @@ return jQuery;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
