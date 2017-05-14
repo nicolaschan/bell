@@ -174,12 +174,7 @@ window.onload = function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        /*$("#icons").on("mouseenter",
-            function(ev) {
-                console.log("hi");
-                $("#settingsIcon").toggle();
-        });
-        console.log(gear);*/              // not supposed to be https
+                                  // not supposed to be https
         cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club", initializePopup);
     }
     catch(e) {

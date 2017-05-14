@@ -139,7 +139,6 @@ ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 		longValue = JSON.stringify(longValue);
 	longValue = btoa(longValue);
 	var parts = splitString(longValue, 2000);
-	console.log(parts);
 	for (var i = 0; i < parts.length; i++) {
 		self.set(key + '_' + i, parts[i], expires);
 	}
@@ -365,12 +364,7 @@ window.onload = function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        /*$("#icons").on("mouseenter",
-            function(ev) {
-                console.log("hi");
-                $("#settingsIcon").toggle();
-        });
-        console.log(gear);*/              // not supposed to be https
+                                  // not supposed to be https
         cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club", initializePopup);
     }
     catch(e) {
