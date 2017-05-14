@@ -311,6 +311,11 @@ const $ = require('jquery');
 
     $('#countdown').css('opacity', 1);
   };
+  /**
+   * Redraws the circle on the page (does not affect the background or text colors).
+   * The radius of the newly drawn circle is dependent on the smaller of the canvas object's
+   * two dimensions.
+   */
   UIManager.prototype.updateGraphics = function() {
     var c = $('#circle')[0];
     var ctx = c.getContext('2d');

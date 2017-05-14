@@ -1,3 +1,8 @@
+/**
+  * A module that does what it sounds like: it manages cookies.
+  * Should be used with some other API that does real cookie stuff, like
+  * https://www.npmjs.com/package/js-cookie.
+  */
 (function() {
 
   var CookieManager = function(Cookies) {
@@ -5,6 +10,14 @@
     this.lengthThreshold = 4000;
   };
 
+  /**
+   * Sets a cookie by its name and the value to set it to.
+   * 
+   * @param {String} key the name of the cookie to be set. It hopefully exists.
+   * @param value the new value of the cookie.
+   * @param {int} (optional) the number of days until expiration. If this is not 
+   * specified, it defaults to 365.
+   */
   CookieManager.prototype.set = function(key, value, expires) {
     this.Cookies.remove(key);
 
@@ -18,7 +31,6 @@
   };
   CookieManager.prototype.setRaw = function(key, rawValue, expires) {
     this.Cookies.remove(key);
-
     return this.Cookies.set(key, rawValue, {
       expires: (expires) ? expires : 365
     });

@@ -4,7 +4,24 @@ const async = require('async');
 
 var self;
 
+/**
+ * Runs a bell timer. Note that the timesync library must have been imported from somewhere
+ * else (since require('timesync') seems to complain). For the bell.lahs.club site, it can
+ * be found at /timesync/timesync.js. For external applications, it can be found at
+ * https://bell.lahs.club/timesync/timesync.js.
+ * Note that for usage in Chrome extensions, the following line must be added to manifest.json:
+ * "content_security_policy": "script-src 'self' https://bell.lahs.club; object-src 'self'",
+ * to allow the use of external libraries.
+ * Finally, the name of the host website can be changed as needed, provided that there is a
+ * /timsync/timesync.js somewhere.
+ */
 (function() {
+  /**
+   * Creates a new instance of BellTimer, with a ClassesManager object. The ClassesManager is
+   * necessary to store the current class period.
+   * @param {ClassesManager} classesManager
+   * @param {CookieManager} cookieManager
+   */
   var BellTimer = function(classesManager, cookieManager) {
     self = this;
 
@@ -30,7 +47,14 @@ var self;
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
-  BellTimer.prototype.reloadData = function(callback) {
+
+  /**
+   * Reloads schedule data from the host website.
+   * @param {String} host The URI string giving the location of the api. For LAHS,
+   * it should be "https://bell.lahs.club".
+   * @param {Function} callback The callback to be executed. Can be undefined.
+   */
+  BellTimer.prototype.reloadDataFromHost = function(host, callback) {
     var parseData = function(data) {
       var rawSchedules = data.schedules;
       for (var key in rawSchedules) {
@@ -60,7 +84,7 @@ var self;
             i--;
           }
         }
-      }
+      };
 
       self.schedules = rawSchedules;
       self.calendar = data.calendar;
@@ -160,7 +184,7 @@ var self;
       return calendar;
     };
 
-    $.get('/api/version?v=' + Date.now())
+    $.get(host + '/api/version?v=' + Date.now())
       .done(function(version) {
         if (self.version && self.version != version)
           $(window)[0].location.reload();
@@ -169,7 +193,7 @@ var self;
       });
 
     var getSchedules = function(callback) {
-      $.get('/api/schedules?v=' + Date.now())
+      $.get(host + '/api/schedules?v=' + Date.now())
         .done(function(schedules) {
           self.cookieManager.setLong('schedules', schedules);
           var schedules = parseSchedules(schedules);
@@ -181,7 +205,7 @@ var self;
         });
     };
     var getCalendar = function(schedules, callback) {
-      $.get('/api/calendar?v=' + Date.now())
+      $.get(host + '/api/calendar?v=' + Date.now())
         .done(function(calendar) {
           self.cookieManager.setLong('calendar', calendar);
           var calendar = parseCalendar(calendar, schedules);
@@ -193,7 +217,7 @@ var self;
         });
     };
     var getCorrection = function(callback) {
-      $.get('/api/correction?v=' + Date.now())
+      $.get(host + '/api/correction?v=' + Date.now())
         .done(function(correction) {
           correction = parseInt(correction);
           self.bellCompensation = correction;
@@ -215,6 +239,15 @@ var self;
       });
     });
   };
+  BellTimer.prototype.reloadData = function(callback) {
+    self.reloadDataFromHost("", callback);
+  }; //_.partial(self.reloadDataFromHost, "");
+  BellTimer.prototype.initializeFromHost = function(host, callback) {
+    async.series([
+      _.partial(self.initializeTimesyncFromHost, host),
+      _.partial(self.reloadDataFromHost, host)
+    ], callback);
+  };
   BellTimer.prototype.initialize = function(callback) {
     async.series([
       self.reloadData,
@@ -222,16 +255,17 @@ var self;
       //_.partial(self.synchronize, n)
     ], callback);
   };
-  BellTimer.prototype.initializeTimesync = function(callback) {
+  BellTimer.prototype.initiailizeTimesync = function(callback) {
+    self.initializeTimesyncFromHost("", callback);
+  };
+  BellTimer.prototype.initializeTimesyncFromHost = function(host, callback) {
     var callback = _.once(callback);
-
     if (typeof timesync == 'undefined') {
       self.ts = Date;
       return callback();
     }
-
     var ts = timesync.create({
-      server: '/timesync',
+      server: (host + '/timesync'),
       interval: 4 * 60 * 1000
     });
 
@@ -242,12 +276,16 @@ var self;
     ts.on('sync', _.once(function() {
       callback();
     }));
-
     self.ts = ts;
   };
   BellTimer.prototype.setCorrection = function(correction) {
     this.bellCompensation = correction;
   };
+  /**
+   * Returns the difference between the timesync server's time and the school's bell time.
+   * Note that this does not give the difference between timesync.now() and Date.now(), as
+   * that is handled by the server.
+   */
   BellTimer.prototype.getCorrection = function() {
     return this.bellCompensation;
   };
@@ -256,6 +294,7 @@ var self;
     this.startTime = startDate.getTime();
     this.devModeStartTime = Date.now();
     this.timeScale = scale;
+    console.log("Dev mode enabled, with startDate=", startDate, "scale=", scale);
   }
   BellTimer.prototype.getDate = function() {
     return new Date(this.ts.now() + this.bellCompensation);
@@ -270,6 +309,10 @@ var self;
       console.log(this.getNextPeriod());
     return this.getNextPeriod().timestamp.getTime() - (Math.floor(date.getTime() / 1000) * 1000);
   };
+  /**
+   * Returns the time remaining in this period as a String of form hh:mm:ss.
+   * @return the string specified above.
+   */
   BellTimer.prototype.getTimeRemainingString = function() {
     var date = this.getDate();
     var displayTimeNumber = function(time) {
@@ -394,9 +437,12 @@ var self;
     return schedule;
   };
   BellTimer.prototype.synchronize = function(n, callback) {
+    synchronizeFromHost("", n, callback);
+  }
+  BellTimer.prototype.synchronizeFromHost = function(host, n, callback) {
     var getTimeCorrection = function(callback) {
       var sentTime = Date.now();
-      $.get('/api/time', function(data) {
+      $.get(host + '/api/time', function(data) {
         var serverTime = data.time;
         var currentTime = Date.now();
 

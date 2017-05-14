@@ -1,80 +1,268 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-const $ = require('jquery');
 
-(function() {
+/**
+ * Acts as an intermediary between Chrome's cookie API and the extension.
+ * The exposed interface is the same as CookieManager, because duck typing is
+ * a useful thing.
+ *
+ * As of 5/12, all cookies stored by bell.lahs.club are now encoded in base 64,
+ * and so will all the cookies encoded here. To that end, the get/set functions
+ * will convert plaintext to base 64 or vice versa, and getRaw and setRaw will 
+ * return the raw values set in the cookies.
+ *
+ * To use this, manifest.json must have "cookies" in its permissions.
+ */
 
-  var self;
+var self;
 
-  var AnalyticsManager = function(cookieManager, themeManager, logger) {
-    self = this;
+const lengthThreshold = 4000;
+var btoa = window.btoa;
+var atob = window.atob;
 
-    this.cookieManager = cookieManager;
-    this.themeManager = themeManager;
-    this.logger = logger;
-    this.initialized = false;
-    this.newPageLoad = true;
-  };
-  AnalyticsManager.prototype.initialize = function(callback) {
-    if (this.initialized)
-      return callback();
+/**
+ * Creates a new instance of this pseudo-cookiemanager.
+ * Instead of actually asking the browser for a cookie every time the get method
+ * is invoked, all cookies are gotten upon initialization and stored in an object.
+ * The get method of this manager performs a lookup on the object.
+ *
+ * @param {String} url
+ * @param {Function} callback the setup function to be run after cookie initalization completes.
+ */
+var ChromeCookieManager = function(url, callback) {
+	self = this;
+	self.url = url;
+	self.storedCookies = {};
+	chrome.cookies.getAll({
+		url: self.url
+	}, function(cookies) {
+		for(cookie of cookies) {
+			// shoot me
+			self.storedCookies[cookie.name] = atob(cookie.value);
+		}
+		console.log("Cookies on load:", cookies);
+		callback();
+	});
+}
 
-    var setUuid = function(callback) {
-      $.get('/api/uuid', function(uuid) {
-        var uuid = uuid.id;
-        self.cookieManager.set('id', uuid);
-        callback();
-      });
-    };
-    var ensureUuid = function(callback) {
-      var uuid = self.cookieManager.get('id');
-      if (!uuid || uuid.length > 12)
-        setUuid(callback);
-      else
-        callback();
-    };
-    ensureUuid(function() {
-      this.initialized = true;
-      callback();
-    });
-  };
-  AnalyticsManager.prototype.reportAnalytics = function(callback) {
-    var newPageLoad = self.newPageLoad;
-    self.newPageLoad = false;
+ChromeCookieManager.prototype.set = function(key, value, expires) {
+	return null;
+	var val = encodeURI((typeof value == 'string') ? value : JSON.stringify(value));
+	var valBase64 = btoa(val);
+	if(valBase64.length > lengthThreshold)
+		return this.setLong(key, value, expires);
+	else
+		return this.setRaw(key, valBase64, expires);
+}
 
-    var report = function(callback) {
-      $.ajax({
-        type: 'POST',
-        url: '/api/analytics',
-        data: {
-          id: self.cookieManager.get('id'),
-          newPageLoad: newPageLoad,
-          source: 'web',
-          theme: self.themeManager.getCurrentThemeName(),
-          userAgent: $(window)[0].navigator.userAgent
-        },
-        success: function(res) {
-          self.newPageLoad = false;
+ChromeCookieManager.prototype.setRaw = function(key, value, expires) {
+	val = encodeURI((typeof value == 'string') ? value : JSON.stringify(value));
+	chrome.cookies.set(
+		{
+			url: self.url,
+			name: key,
+			value: val,
+			expirationDate: expires ? (daysToSeconds(expires)) : (daysToSeconds(365))
+		}, function(cookie) {
+			if(!cookie) {
+				console.log(key);
+				console.log(value);
+				throw new Error("Who took the cookie from the cookie jar?");
+			}
+			self.storedCookies[key] = cookie.value;
+		});
+	return value;
+};
 
-          if (!res.success)
-            self.logger.warn('Analytics are disabled');
-          else
-            self.logger.success('Analytics data sent successfully');
+ChromeCookieManager.prototype.get = function(key) {
+	var valBase64 = this.getRaw(key);
+	try {
+		if(valBase64)
+			return atob(valBase64);
+		else
+			return undefined;
+	} catch (e) {
+		self.convertCookieToBase64(key);
+		return valBase64;
+	}
+}
 
-          if (callback)
-            callback();
-        }
-      })
-    };
+ChromeCookieManager.prototype.getRaw = function(key) {
+	if(self.storedCookies[key])
+		return decodeURI(self.storedCookies[key]).replace(/%5D/g,"]").replace(/%5B/g,"[").replace(/%2C/g,",");
+};
 
-    return self.initialize(function() {
-      report(callback);
-    });
-  };
+ChromeCookieManager.prototype.convertCookieToBase64 = function(key) {
+	self.set(key, self.getRaw(key));
+}
 
-  module.exports = AnalyticsManager;
-  //window.AnalyticsManager = AnalyticsManager;
-})();
-},{"jquery":11}],2:[function(require,module,exports){
+ChromeCookieManager.prototype.getJSON = function(key) {
+	try {
+		return JSON.parse(self.get(key));
+	}
+	catch(e) {
+		return undefined;
+	}
+};
+
+var splitString = function(str, length) {
+    var parts = [];
+    for (var i = 0; i < str.length; i += length) {
+     	parts.push(str.substring(i, i + length));
+    }
+    return parts;
+};
+ChromeCookieManager.prototype.getLong = function(key) {
+	var longValue = '';
+	for (var i = 0; self.getRaw(key + '_' + i); i++) {
+		longValue += self.getRaw(key + '_' + i);
+	}
+	try {
+		var txt = atob(longValue);
+		if(!txt)
+			return undefined;
+		else
+			return txt;
+	} catch(e) {
+		return undefined;
+	}
+};
+ChromeCookieManager.prototype.getLongJSON = function(key) {
+	return JSON.parse(self.getLong(key));
+};
+ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
+	if (typeof longValue != 'string')
+		longValue = JSON.stringify(longValue);
+	longValue = btoa(longValue);
+	var parts = splitString(longValue, 2000);
+	console.log(parts);
+	for (var i = 0; i < parts.length; i++) {
+		self.set(key + '_' + i, parts[i], expires);
+	}
+	// clears unused cookies
+	for(j = i; j < self.get(key + "_" + j); j++) {
+		chrome.cookies.remove({
+			url: self.url,
+			name: key + "_" + j
+		}, function(cookie) {
+			self.storedCookies[cookie.name] = undefined;
+		});
+	}
+};
+
+/**
+ * Because the CookieManager class was written to take days until expiration
+ * as an argument of set, and chrome.cookies sets an expiration date in terms
+ * of seconds elapsed since the unix epoch, this is necessary.
+ *
+ * @param {int} days the number of days until expiration.
+ * @return {double} the date of expiration, in terms of number of seconds since
+ * the unix epoch.
+ */
+var daysToSeconds = function(days) {
+	var d = new Date();
+	d.setDate(days);
+	return d.getTime() / 1000;
+};
+
+/**
+ * Because js is an abomination of a language, we need to do this. It replaces 
+ * any instances of "%2C" with a comma, and any other weird character that might
+ * need replacing with whatever it's supposed to be. Oh, and it escapes quotes.
+ * BECAUSE REASONS.
+ * If decodeURI starts to fail for some unknown reason, use this.
+ */
+var lint = function(str) {
+	str = decodeURI(str);
+	str = str.replace(/%2C/g,",");
+	str = escapeAllQuotes(str);
+	return str; 
+}
+
+var escapeAllQuotes = function(str) {
+	return str.replace(/\"/g,"\\\"");
+}
+
+module.exports = ChromeCookieManager;
+},{}],2:[function(require,module,exports){
+
+const BellTimer = require("../js/BellTimer.js");
+const ChromeCookieManager = require("./ChromeCookieManager.js");
+const ClassesManager = require("../js/ClassesManager.js");
+
+var alarms = chrome.alarms;
+
+const beta = false;
+
+const host = "https://bell" + (beta ? "-beta" : "") + ".lahs.club";
+
+
+var nextAlarm;
+
+var correction;
+
+var initializeAlarm = function() {
+	bellTimer.initializeFromHost(host);
+	// bellTimer.enableDevMode(new Date('2017-05-12 8:00'), 60);
+	refresh();
+}
+
+var cookman = new ChromeCookieManager("http://bell" + (beta ? "-beta" : "") + ".lahs.club",  function() {
+	alarms.onAlarm.addListener(function(alarm) {
+		console.log("Next alarm:", alarm);
+		refresh();
+	});
+});
+
+var classes = new ClassesManager(cookman);
+var bellTimer = new BellTimer(classes, cookman);
+
+var nextIconColor = "lime";
+var nextIconPath = () => ("sizedicons/" + nextIconColor + ".png?v=1");
+
+var updateIconAndAlarm = function() {
+	var time = bellTimer.getTimeRemainingString();
+	var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
+	var msRemaining = bellTimer.getTimeRemainingNumber();
+	var nextAlarmTime;
+	if(time.split(':').length > 2)
+		min = 60;
+	chrome.browserAction.setIcon({path: {"16": nextIconPath()} });
+	if(min >= 15) { // Next icon is yellow
+		nextIconColor = "yellow";
+		nextAlarmTime = msRemaining - minToMS(15);
+	}
+	else if(min >= 5) { // Next icon is orange
+		nextIconColor = "orange";
+		nextAlarmTime = msRemaining - minToMS(5);
+	}
+	else if(min >= 2) { // Next icon is red
+		nextIconColor = "red";
+		nextAlarmTime = msRemaining - minToMS(2);
+	}
+	else { // Next icon is green
+		nextIconColor = "lime";
+		nextAlarmTime = msRemaining;
+	}
+	nextAlarm = alarms.create(nextIconColor, {when: Date.now() + nextAlarmTime});
+}
+
+var refresh = function() {
+	bellTimer.reloadDataFromHost(host, function() {
+		updateIconAndAlarm();
+	});
+}
+
+var minToMS = function(mins) {
+	return mins * 60 * 1000;
+}
+
+initializeAlarm();
+
+// uses https://developer.chrome.com/extensions/alarms
+// and http://stackoverflow.com/questions/8894461/updating-an-extension-button-dynamically-inspiration-required
+
+
+},{"../js/BellTimer.js":3,"../js/ClassesManager.js":4,"./ChromeCookieManager.js":1}],3:[function(require,module,exports){
 const _ = require('lodash');
 const $ = require('jquery');
 const async = require('async');
@@ -321,8 +509,8 @@ var self;
   }; //_.partial(self.reloadDataFromHost, "");
   BellTimer.prototype.initializeFromHost = function(host, callback) {
     async.series([
-      _.partial(self.reloadDataFromHost, host),
-      _.partial(self.initializeTimesyncFromHost, host)
+      _.partial(self.initializeTimesyncFromHost, host),
+      _.partial(self.reloadDataFromHost, host)
     ], callback);
   };
   BellTimer.prototype.initialize = function(callback) {
@@ -337,7 +525,6 @@ var self;
   };
   BellTimer.prototype.initializeTimesyncFromHost = function(host, callback) {
     var callback = _.once(callback);
-
     if (typeof timesync == 'undefined') {
       self.ts = Date;
       return callback();
@@ -359,6 +546,11 @@ var self;
   BellTimer.prototype.setCorrection = function(correction) {
     this.bellCompensation = correction;
   };
+  /**
+   * Returns the difference between the timesync server's time and the school's bell time.
+   * Note that this does not give the difference between timesync.now() and Date.now(), as
+   * that is handled by the server.
+   */
   BellTimer.prototype.getCorrection = function() {
     return this.bellCompensation;
   };
@@ -367,6 +559,7 @@ var self;
     this.startTime = startDate.getTime();
     this.devModeStartTime = Date.now();
     this.timeScale = scale;
+    console.log("Dev mode enabled, with startDate=", startDate, "scale=", scale);
   }
   BellTimer.prototype.getDate = function() {
     return new Date(this.ts.now() + this.bellCompensation);
@@ -579,7 +772,7 @@ var self;
   module.exports = BellTimer;
   //window.BellTimer = BellTimer;
 })();
-},{"async":10,"jquery":11,"lodash":13}],3:[function(require,module,exports){
+},{"async":5,"jquery":6,"lodash":7}],4:[function(require,module,exports){
 (function() {
 
   const cookieName = 'classes';
@@ -601,867 +794,7 @@ var self;
   module.exports = ClassesManager;
   //window.ClassesManager = ClassesManager;
 })();
-},{}],4:[function(require,module,exports){
-/**
-  * A module that does what it sounds like: it manages cookies.
-  * Should be used with some other API that does real cookie stuff, like
-  * https://www.npmjs.com/package/js-cookie.
-  */
-(function() {
-
-  var CookieManager = function(Cookies) {
-    this.Cookies = Cookies;
-    this.lengthThreshold = 4000;
-  };
-
-  /**
-   * Sets a cookie by its name and the value to set it to.
-   * 
-   * @param {String} key the name of the cookie to be set. It hopefully exists.
-   * @param value the new value of the cookie.
-   * @param {int} (optional) the number of days until expiration. If this is not 
-   * specified, it defaults to 365.
-   */
-  CookieManager.prototype.set = function(key, value, expires) {
-    this.Cookies.remove(key);
-
-    if (typeof value != 'string')
-      value = JSON.stringify(value);
-    var valueBase64 = btoa(value);
-    if (valueBase64.length > this.lengthThreshold)
-      return this.setLong(key, value, expires);
-
-    return this.setRaw(key, valueBase64, expires);
-  };
-  CookieManager.prototype.setRaw = function(key, rawValue, expires) {
-    this.Cookies.remove(key);
-    return this.Cookies.set(key, rawValue, {
-      expires: (expires) ? expires : 365
-    });
-  };
-  CookieManager.prototype.get = function(key) {
-    var valueBase64 = this.getRaw(key);
-    if (valueBase64 == undefined)
-      return valueBase64;
-    try {
-      return atob(valueBase64);
-    } catch (e) {
-      this.convertCookieToBase64(key); // for backwards compatibility
-      return valueBase64;
-    }
-  };
-  CookieManager.prototype.getRaw = function(key) {
-    return this.Cookies.get(key);
-  };
-  CookieManager.prototype.convertCookieToBase64 = function(key) {
-    this.set(key, this.getRaw(key));
-  };
-  CookieManager.prototype.getJSON = function(key) {
-    try {
-      return JSON.parse(this.get(key));
-    } catch (e) {
-      return undefined;
-    }
-  };
-
-  var splitString = function(str, length) {
-    var parts = [];
-    for (var i = 0; i < str.length; i += length) {
-      parts.push(str.substring(i, i + length));
-    }
-    return parts;
-  };
-  CookieManager.prototype.getLong = function(key) {
-    var longValueBase64 = '';
-    for (var i = 0; this.getRaw(key + '_' + i); i++) {
-      longValueBase64 += this.getRaw(key + '_' + i);
-    }
-    try {
-      return atob(longValueBase64);
-    } catch (e) {
-      return undefined;
-    }
-  };
-  CookieManager.prototype.getLongJSON = function(key) {
-    return JSON.parse(this.getLong(key));
-  };
-  CookieManager.prototype.setLong = function(key, longValue, expires) {
-    for (var i = 0; this.getRaw(key + '_' + i); i++)
-      this.Cookies.remove(key + '_' + i);
-    if (typeof longValue != 'string')
-      longValue = JSON.stringify(longValue);
-
-    var longValueBase64 = btoa(longValue);
-    var parts = splitString(longValueBase64, this.lengthThreshold);
-    for (var i = 0; i < parts.length; i++) {
-      this.setRaw(key + '_' + i, parts[i], expires);
-    }
-  };
-
-  module.exports = CookieManager;
-  //window.CookieManager = CookieManager;
-})();
 },{}],5:[function(require,module,exports){
-(function() {
-
-  var self;
-
-  var IntervalManager = function(intervals) {
-    self = this;
-
-    this.intervals = intervals;
-  };
-
-  IntervalManager.prototype.start = function(name) {
-    var interval = this.intervals[name];
-
-    clearInterval(interval.interval);
-    interval.interval = null;
-
-    interval.start(interval.func, function(newInterval) {
-      interval.interval = newInterval;
-    });
-  };
-  IntervalManager.prototype.restart = IntervalManager.prototype.start;
-
-  IntervalManager.prototype.startAll = function() {
-    for (var name in this.intervals)
-      self.start(name);
-  };
-
-  module.exports = IntervalManager;
-  //window.IntervalManager = IntervalManager;
-})();
-},{}],6:[function(require,module,exports){
-(function() {
-  var Logger = function(level) {
-    this.level = (level) ? level : 0;
-  };
-
-  Logger.prototype.log = function(message, prefix, color) {
-    console.log('%c' + getTimestamp() + ' %c' + prefix + '%c: %c' + message, 'color:gray;', 'color:' + color + ';font-weight:600;', 'color:#aaaaaa;', 'color:black;');
-  };
-
-  var getTimestamp = function() {
-    return new Date().toTimeString().substring(0, 8);
-  };
-  var toFunction = function(name, color) {
-    return function(message) {
-      Logger.prototype.log(message, name, color);
-    };
-  };
-
-  var levels = [{
-    level: -2,
-    name: 'trace',
-    func: toFunction('TRACE', 'cyan')
-  }, {
-    level: -1,
-    name: 'debug',
-    func: toFunction('DEBUG', 'gray')
-  }, {
-    level: 0,
-    name: 'success',
-    func: toFunction('SUCCESS', 'green')
-  }, {
-    level: 0,
-    name: 'info',
-    func: toFunction('INFO', 'blue')
-  }, {
-    level: 1,
-    name: 'warn',
-    func: console.warn
-  }, {
-    level: 2,
-    name: 'error',
-    func: console.error
-  }];
-
-  levels.reduce(function(acc, level) {
-    Logger.prototype[level.name] = function(message) {
-      if (level.level >= this.level)
-        level.func(message);
-    };
-  });
-
-  Logger.prototype.setLevel = function(level) {
-    level = level.toLowerCase();
-    if (level == 'all')
-      return (this.level = -1000);
-    if (level == 'none')
-      return (this.level = 1000);
-    for (var i in levels)
-      if (levels[i].name == level)
-        return (this.level = levels[i].level);
-  };
-
-  module.exports = Logger;
-  //window.SimpleLogger = Logger;
-})();
-},{}],7:[function(require,module,exports){
-const _ = require('lodash');
-
-/**
- * Manages themes. If there is no value stored in the 'theme' cookie, it will
- * use the default theme instead.
- */
-(function() {
-
-  const cookieName = 'theme';
-  const defaultTheme = 'Default - Light';
-
-  /**
-   * Given a string of the form hh:mm:ss, i.e. 10:30:21 (at least that's what Nicolas
-   * promised me it does), returns an array of 3 integers specifying the time.
-   * @param {String} time a string representing the time.
-   * @return {int[]} an array containing integers [hh, mm, ss].
-   */
-  var parseTimeRemainingString = function(time) {
-    var parts = _.map(time.split(':'), _.parseInt);
-    var hour = (parts.length > 2) ? parts[0] : 0;
-    var min = _.nth(parts, -2);
-    var sec = _.nth(parts, -1);
-
-    return [hour, min, sec];
-  };
-  /**
-   * Given
-   * @param {String -> String[]} colors a partially applied function that returns 4 arrays of color strings (which is
-   * how themes are stored),
-   * @param {String} time the current time string,
-   * @return {String[]} the appropriate array of 3 color strings.
-   */
-  var getCurrentColorDefaultTiming = function(colors, time) {
-    var parts = parseTimeRemainingString(time);
-    var min = parts[1] + (60 * parts[0]);
-
-    if (min < 2)
-      return _.nth(colors, -1);
-    if (min < 5)
-      return _.nth(colors, -2);
-    if (min < 15)
-      return _.nth(colors, -3);
-    else
-      return _.nth(colors, -4);
-  };
-  /**
-    * Stores color schemes for each theme.
-    * @return {String -> String[]} a partially applied function that takes a time as an argument, and returns
-    * an array x of 3 colors where x[0] is the color of the time text, x[1] is the color
-    * of the period description, and x[2] is the background color.
-    */
-  var themes = {
-    // [text, subtitle, background, popup background]
-    'Default - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', 'lime', 'white'],
-      ['black', 'black', 'yellow', 'white'],
-      ['black', 'black', 'orange', 'white'],
-      ['black', 'black', 'red', 'white']
-    ]),
-    'Default - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['lime', 'white', 'black', '#555555'],
-      ['yellow', 'white', 'black', '#555555'],
-      ['orange', 'white', 'black', '#555555'],
-      ['red', 'white', 'black', '#555555']
-    ]),
-    'Grays - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', 'darkgray', 'white'],
-      ['black', 'black', 'silver', 'white'],
-      ['black', 'black', 'lightgray', 'white'],
-      ['black', 'black', 'white', 'white']
-    ]),
-    'Grays - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['darkgray', 'white', 'black', '#555555'],
-      ['silver', 'white', 'black', '#555555'],
-      ['lightgray', 'white', 'black', '#555555'],
-      ['white', 'white', 'black', '#555555']
-    ]),
-    'Pastel - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', '#bcffae', 'white'],
-      ['black', 'black', '#fff9b0', 'white'],
-      ['black', 'black', '#ffcfa5', 'white'],
-      ['black', 'black', '#ffbfd1', 'white']
-    ]),
-    'Pastel - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['#bcffae', 'white', 'black', '#555555'],
-      ['#fff9b0', 'white', 'black', '#555555'],
-      ['#ffcfa5', 'white', 'black', '#555555'],
-      ['#ffbfd1', 'white', 'black', '#555555']
-    ]),
-    'Blues - Light': _.partial(getCurrentColorDefaultTiming, [
-      ['black', 'black', '#ccffff', 'white'],
-      ['black', 'black', '#33ccff', 'white'],
-      ['black', 'black', '#0066ff', 'white'],
-      ['black', 'black', '#002db3', 'white']
-    ]),
-    'Blues - Dark': _.partial(getCurrentColorDefaultTiming, [
-      ['#ccffff', 'white', 'black', '#555555'],
-      ['#33ccff', 'white', 'black', '#555555'],
-      ['#0066ff', 'white', 'black', '#555555'],
-      ['#002db3', 'white', 'black', '#555555']
-    ]),
-    'Rainbow - Light': function(time) {
-      var time = parseTimeRemainingString(time);
-      var sec = time[2] % 12;
-      var lastColor;
-      if(sec > 10)
-        lastColor = "red";
-      else if(sec > 8)
-        lastColor = "orange";
-      else if(sec > 6)
-        lastColor = "yellow";
-      else if(sec > 4)
-        lastColor = "lime";
-      else if(sec > 2)
-        lastColor = "cyan";
-      else
-        lastColor = "magenta";
-      return ["black", "black", lastColor];
-    },
-    'Rainbow - Dark': function(time) {
-      var time = parseTimeRemainingString(time);
-      var sec = time[2] % 12;
-      var lastColor;
-      if(sec > 10)
-        lastColor = "red";
-      else if(sec > 8)
-        lastColor = "orange";
-      else if(sec > 6)
-        lastColor = "yellow";
-      else if(sec > 4)
-        lastColor = "lime";
-      else if(sec > 2)
-        lastColor = "cyan";
-      else
-        lastColor = "magenta";
-      return [lastColor, "white", "black"];
-    }
-  };
-
-  /**
-   * Initializes a new ThemeManager object.
-   * @param {CookieManager} cookieManager the appropriate CookieManager to find the theme cookie.
-   */
-  var ThemeManager = function(cookieManager) {
-    this.cookieManager = cookieManager;
-  };
-
-  /**
-   * Gets the current theme. If the current theme were to somehow not to be in the 
-   * themes object, it would throw a nullpointerexception, but that should hopefully
-   * never happen.
-   * @return {String -> String[]} the partially applied function representing the current theme.
-   */
-  ThemeManager.prototype.getCurrentTheme = function() {
-    return themes[this.getCurrentThemeName()];
-  };
-  /**
-   * @return {String} the name of the current theme. Duh.
-   */
-  ThemeManager.prototype.getCurrentThemeName = function() {
-    if (!this.cookieManager.get(cookieName))
-      this.cookieManager.set(cookieName, defaultTheme);
-    return this.cookieManager.get(cookieName) || defaultTheme;
-  };
-  /**
-   * Sets the current theme by changing the value stored in the cookie.
-   * @param {String} themeName the name of the new theme to be set.
-   */
-  ThemeManager.prototype.setCurrentTheme = function(themeName) {
-    return this.cookieManager.set(cookieName, themeName);
-  };
-  /**
-   * @return {Object} the object/map of partially applied functions representing themes.
-   */
-  ThemeManager.prototype.getAvailableThemes = function() {
-    return themes;
-  };
-
-  module.exports = ThemeManager;
-  //window.ThemeManager = ThemeManager;
-})();
-},{"lodash":13}],8:[function(require,module,exports){
-const _ = require('lodash');
-const $ = require('jquery');
-
-(function() {
-
-  var helpers = {
-    updateTitle: _.throttle(function(text) {
-      $('head title').text(text);
-    }, 500, {
-      leading: true
-    })
-  };
-
-  var self;
-
-  var UIManager = function(bellTimer, cookieManager, themeManager, classesManager, analyticsManager) {
-    self = this;
-
-    this.bellTimer = bellTimer;
-    this.cookieManager = cookieManager;
-    this.themeManager = themeManager;
-    this.classesManager = classesManager;
-    this.analyticsManager = analyticsManager;
-  };
-  UIManager.prototype.initialize = function() {
-    // themes
-    var loadThemes = function() {
-      var refreshTheme = function() {
-        var theme = self.themeManager.getCurrentThemeName();
-        currentTheme = theme;
-        $('#themeSelect').val(theme);
-      };
-      $('#themeSelect').empty();
-      for (var i in self.themeManager.getAvailableThemes()) {
-        $('#themeSelect').append($('<option></option>').text(i));
-      }
-      $('#themeSelect').on('change', function(e) {
-        var theme = this.value;
-        self.themeManager.setCurrentTheme(theme);
-        self.analyticsManager.reportAnalytics();
-        refreshTheme();
-      });
-      refreshTheme();
-    };
-    // show scroll indicator if they've never scrolled down before
-    var showScrollIndicator = function() {
-      if (!self.cookieManager.getJSON('has_scrolled')) {
-        $('.downArrow').show();
-        $('#downIcon').click(function(e) {
-          $('body, html').animate({
-            scrollTop: $('#page2').offset().top
-          }, 1500);
-        });
-        $(window).on('scroll', function(e) {
-          if ($(window).scrollTop() > 250) {
-            $(window).off('scroll');
-            $('.downArrow').css('opacity', 0);
-            self.cookieManager.set('has_scrolled', true);
-            setTimeout(function() {
-              $('.downArrow').hide();
-            }, 1000);
-            setTimeout(function() {
-              $('#downIcon').hide();
-            }, 1000);
-          }
-        });
-      }
-    };
-    // set state of icons/settings panel
-    var setSettingsState = function() {
-      $('#icons').hide();
-      $('#doneIcon').hide();
-      $('#scheduleEntry').hide();
-      $('#icons').show();
-      $('#icons').css('visibility', 'visible');
-
-      var classes = self.classesManager.getClasses();
-
-      var settingsMode = false;
-      var enterSettingsMode = function() {
-        $('#settingsIcon').hide();
-        $('#scheduleDisplay').hide();
-        $('#doneIcon').css('opacity', 0);
-        $('#doneIcon').show();
-        $('#doneIcon').css('opacity', 1);
-        $('#scheduleEntry').css('opacity', 0);
-        $('#scheduleEntry').show();
-        $('#scheduleEntry').css('opacity', 1);
-        $('#period0').select();
-        settingsMode = true;
-      };
-      var exitSettingsMode = function() {
-        $('#doneIcon').hide();
-        $('#scheduleEntry').hide();
-        $('#settingsIcon').css('opacity', 0);
-        $('#settingsIcon').show();
-        $('#settingsIcon').css('opacity', 1);
-        $('#scheduleDisplay').css('opacity', 0);
-        $('#scheduleDisplay').show();
-        $('#scheduleDisplay').css('opacity', 1);
-        settingsMode = false;
-      };
-
-      var classesTexts = [];
-      var checkboxes = [];
-      $('#scheduleEntryTable').empty();
-      for (var i = 0; i < classes.length; i++) {
-        var input = $('<input type="text" class="inputBox" name="period' +
-          i + '" id="period' +
-          i + '" maxlength="20" placeholder="Period ' +
-          i + '" value="' + classes[i] + '">');
-        var checkbox = $('<input type="checkbox" name="checkbox' + i + '" id="checkbox' + i + '" class="checkbox" checked>');
-        var checkboxLabel = $('<label class="control control--checkbox"></label>').append(checkbox).append($('<div class="control__indicator"></div>'));
-        var checkboxColumn = $('<td class="tableCheckbox"></td>').append(checkboxLabel);
-        var row = $('<tr></tr>').append($('<td class="tableLabel"></td>').text('Period ' + i)).append($('<td class="tableInput"></td>').append(input)).append(checkboxColumn);
-        $('#scheduleEntryTable').append(row);
-        classesTexts.push(input);
-        checkboxes.push(checkbox);
-        var setToFree = function(index) {
-          checkboxes[index].prop('checked', false);
-          classesTexts[index].prop('disabled', true);
-          classesTexts[index].val('Free');
-
-          if (index == 7)
-            $('#period0').select();
-          else
-            $('#period' + (index + 1)).select();
-        };
-        if (classes[i].toLowerCase() == 'free') {
-          setToFree(i);
-        }
-        checkbox.change(function(e) {
-          var index = parseInt(this.name.substring(8));
-          if (this.checked) {
-            classesTexts[index].val('Period ' + index);
-            classesTexts[index].prop('disabled', false);
-            $('#period' + (index)).select();
-          } else {
-            setToFree(index);
-          }
-        });
-        input.on('keydown', function(e) {
-          var currentPeriod = parseInt(this.id.substring(6));
-          if (e.keyCode == 13) {
-            if (currentPeriod == 7)
-              $('#period0').select();
-            else
-              $('#period' + (currentPeriod + 1)).select();
-          }
-        });
-        input.on('keyup', function(e) {
-          var currentPeriod = parseInt(this.id.substring(6));
-          if (this.value.toLowerCase() == 'free') {
-            setToFree(currentPeriod);
-          }
-        });
-      }
-      var readClasses = function() {
-        var out = [];
-        for (var i in classesTexts) {
-          out.push(classesTexts[i].val().trim());
-        }
-        return out;
-      };
-
-      $('#settingsIcon').click(function() {
-        enterSettingsMode();
-      });
-      $('#doneIcon').click(function() {
-        exitSettingsMode();
-        self.classesManager.setClasses(readClasses());
-        self.bellTimer.reloadData();
-      });
-    };
-    // set font size on load and resize
-    var dynamicallySetFontSize = function() {
-      $('#time').css('font-size', (Math.min($(window).innerHeight() * 0.3, $(window).innerWidth() * 0.2)) + 'px');
-      $('.subtitle').css('font-size', (Math.min($(window).innerHeight() * 0.07, $(window).innerWidth() * 0.07)) + 'px');
-
-      $('.period').css('font-size', (Math.min($(window).innerHeight() * 0.03)) + 'px');
-      $('.current').css('font-size', (Math.min($(window).innerHeight() * 0.05)) + 'px');
-
-      // entry table size
-      var padding = ((Math.min($(window).innerHeight() * 0.015))) + 'px';
-      $('.tableLabel').css('font-size', ((Math.min($(window).innerHeight() * 0.025))) + 'px');
-      $('.tableLabel').css('padding', padding);
-      $('.tableCheckbox').css('padding', padding);
-      $('.tableInput').css('padding', padding);
-      $('#themeSelectColumn').css('padding', padding);
-      $('.inputBox').css('font-size', ((Math.min($(window).innerHeight() * 0.03))) + 'px');
-      $('.inputBox').css('padding', padding);
-      $('#themeSelect').css('font-size', ((Math.min($(window).innerHeight() * 0.03))) + 'px');
-      $('#themeSelect').css('padding', padding);
-    };
-    // slide in extension ad
-    var slideExtension = function() {
-      if (self.cookieManager.get('popup') == $('#extension-text').text())
-        return $('.extension').hide();
-
-      // $('#extension').css('transition', 'transform 2s ease-out,  background-color 1s ease');
-      // $('#extension').css('transform', 'translateX(0)');
-      $('.extension').css('visibility', 'visible');
-      $('.extension').css('opacity', '1');
-      $('#dismiss').click(function(e) {
-        self.cookieManager.set('popup', $('#extension-text').text());
-        $('.extension').css('opacity', '0');
-        setTimeout(function() {
-          $('.extension').hide();
-        }, 1050);
-        // $('#extension').css('transition', 'transform 0.7s ease-in,  background-color 1s ease');
-        // $('#extension').css('transform', 'translateX(120%)');
-      });
-    };
-
-    $(window).on('load resize', dynamicallySetFontSize);
-
-    loadThemes();
-    showScrollIndicator();
-    setSettingsState();
-    dynamicallySetFontSize();
-    slideExtension();
-  };
-  UIManager.prototype.update = function() {
-    var time = self.bellTimer.getTimeRemainingString();
-    var name = self.bellTimer.getCurrentPeriod().name;
-    var schedule = self.bellTimer.getCurrentSchedule();
-    var color = schedule.color;
-
-    var completed = self.bellTimer.getCompletedPeriods();
-    var current = self.bellTimer.getCurrentPeriod();
-    var future = self.bellTimer.getFuturePeriods();
-
-    var proportionElapsed = self.bellTimer.getProportionElapsed();
-
-    $('#time').text(time);
-    helpers.updateTitle(time);
-    $('#subtitle').text(name);
-    $('#scheduleName').text(schedule.displayName);
-    var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
-    if (time.split(':').length > 2)
-      min = 60;
-    if (min < 2) {
-      $('#favicon').attr('href', 'favicons/red.png?v=1');
-    } else if (min < 5) {
-      $('#favicon').attr('href', 'favicons/orange.png?v=1');
-    } else if (min < 15) {
-      $('#favicon').attr('href', 'favicons/yellow.png?v=1');
-    } else {
-      $('#favicon').attr('href', 'favicons/lime.png?v=1');
-    }
-
-    var theme = self.themeManager.getCurrentTheme();
-
-    $('#time').css('color', theme(time)[0]);
-    $('.subtitle').css('color', theme(time)[1]);
-    $('#page1').css('background-color', theme(time)[2]);
-
-    // popup stuff
-    $('.extension').css('background-color', theme(time)[3]);
-    $('.link').css('color', theme(time)[1]);
-
-    if (color) {
-      if (currentTheme == 'Default - Dark')
-        $('#time').css('color', color);
-      if (currentTheme == 'Default - Light')
-        $('#page1').css('background-color', color);
-    }
-
-
-    var displayTimeArray = function(timeArray) {
-      var hours = ((timeArray[0] == 0) ? 12 : (timeArray[0] > 12) ? timeArray[0] % 12 : timeArray[0]).toString();
-      var minutes = timeArray[1].toString();
-      if (minutes.length < 2)
-        minutes = '0' + minutes;
-      return hours + ':' + minutes;
-    };
-
-    var numberOfCompletedPeriods = 2;
-    var numberOfFuturePeriods = 5;
-    var totalPeriods = numberOfCompletedPeriods + numberOfFuturePeriods;
-
-    if (future.length < numberOfFuturePeriods) {
-      numberOfFuturePeriods = future.length;
-      numberOfCompletedPeriods = totalPeriods - numberOfFuturePeriods;
-    }
-    if (completed.length < numberOfCompletedPeriods) {
-      numberOfCompletedPeriods = completed.length;
-      numberOfFuturePeriods = totalPeriods - numberOfCompletedPeriods;
-    }
-
-    completed = _.takeRight(completed, numberOfCompletedPeriods);
-    future = _.take(future, numberOfFuturePeriods);
-
-    $('#scheduleTable').empty();
-    for (var i in completed) {
-      if (completed[i].name != 'None')
-        $('#scheduleTable').append($('<tr class="period completed"></tr>').append($('<td class="time"></td>').text(displayTimeArray(completed[i].time))).append($('<td></td>').text(completed[i].name)));
-    }
-    if (current && current.name != 'None')
-      $('#scheduleTable').append($('<tr class="period current"></tr>').append($('<td class="time"></td>').text(displayTimeArray([self.bellTimer.getDate().getHours(), self.bellTimer.getDate().getMinutes()]))).append($('<td></td>').text(current.name)));
-    for (var i in future) {
-      $('#scheduleTable').append($('<tr class="period"></tr>').append($('<td class="time"></td>').text(displayTimeArray(future[i].time))).append($('<td></td>').text(future[i].name)));
-    }
-    if ($('#scheduleTable').children().length == 0)
-      $('#noClasses').text('No classes today');
-    else
-      $('#noClasses').text('');
-
-    $('.period').css('font-size', (Math.min($(window).innerHeight() * 0.03)) + 'px');
-    $('.current').css('font-size', (Math.min($(window).innerHeight() * 0.05)) + 'px');
-
-    $('#countdown').css('opacity', 1);
-  };
-  /**
-   * Redraws the circle on the page (does not affect the background or text colors).
-   * The radius of the newly drawn circle is dependent on the smaller of the canvas object's
-   * two dimensions.
-   */
-  UIManager.prototype.updateGraphics = function() {
-    var c = $('#circle')[0];
-    var ctx = c.getContext('2d');
-
-    var side = Math.floor(Math.min($(window).height(), $(window).width()));
-    var width = side;
-    var height = side;
-
-    c.width = width;
-    c.height = height;
-
-    var time = self.bellTimer.getTimeRemainingString();
-    var color = self.themeManager.getCurrentTheme()(time)[1];
-    var proportion = self.bellTimer.getProportionElapsed();
-
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.lineWidth = side / 15;
-
-    var radius = (Math.min(width, height) / 2) * 0.95;
-    var posX = width / 2;
-    var posY = height / 2;
-
-    ctx.beginPath();
-    ctx.arc(posX, posY, radius, (Math.PI / -2), (Math.PI / -2) + (-2 * Math.PI) * (1 - proportion), true);
-    ctx.lineTo(posX, posY);
-    ctx.closePath();
-    ctx.fill();
-  };
-  UIManager.prototype.setLoadingMessage = function(message) {
-    $('.loading').show();
-    $('#loadingMessage').text(message);
-  };
-  UIManager.prototype.hideLoading = function() {
-    $('.loading').hide();
-  };
-  UIManager.prototype.showAlert = function(message, time) {
-    time = (time) ? time : 3000;
-
-    $('#alert-container').css('opacity', 0);
-    $('#alert').text(message);
-    $('#alert-container').css('opacity', 0.4);
-
-    setTimeout(function() {
-      $('#alert-container').css('opacity', 0);
-    }, time);
-  };
-
-  module.exports = UIManager;
-  //window.UIManager = UIManager;
-})();
-},{"jquery":11,"lodash":13}],9:[function(require,module,exports){
-(function (global){
-const async = require('async');
-const _ = require('lodash');
-const $ = require('jquery');
-const Cookies = require('js-cookie');
-const Visibility = require('visibilityjs');
-const BellTimer = require('./BellTimer.js');
-const SimpleLogger = require('./SimpleLogger.js');
-const CookieManager = require('./CookieManager.js');
-const ThemeManager = require('./ThemeManager.js');
-const ClassesManager = require('./ClassesManager.js');
-const AnalyticsManager = require('./AnalyticsManager.js');
-const UIManager = require('./UIManager.js');
-const IntervalManager = require('./IntervalManager.js');
-
-var logger = new SimpleLogger();
-logger.setLevel('warn');
-var cookieManager = new CookieManager(Cookies);
-var themeManager = new ThemeManager(cookieManager);
-var classesManager = new ClassesManager(cookieManager);
-var analyticsManager = new AnalyticsManager(cookieManager, themeManager, logger);
-var bellTimer = new BellTimer(classesManager, cookieManager);
-var uiManager = new UIManager(bellTimer, cookieManager, themeManager, classesManager, analyticsManager);
-
-var intervals = {
-  fast: {
-    start: function(func, callback) {
-      callback(setInterval(func, 1000 / 30));
-    },
-    func: uiManager.updateGraphics
-  },
-  oneSecond: {
-    start: function(func, callback) {
-      setTimeout(function() {
-        func();
-        callback(setInterval(function() {
-          func();
-
-          // This function should be called every second, on the second.
-          // Detect if it is more than 100 ms off, and if so, restart interval.
-          var waitUntilNextTick = bellTimer.getWaitUntilNextTick();
-          var offset = Math.min(waitUntilNextTick, 1000 - waitUntilNextTick);
-          if (offset > 100 && (Visibility.state() == 'visible')) {
-            logger.debug('Tick offset was ' + offset + ' ms, restarting interval...');
-            intervalManager.restart('oneSecond');
-          }
-        }, 1000));
-      }, 1000 - bellTimer.getWaitUntilNextTick());
-    },
-    func: uiManager.update
-  },
-  background: {
-    start: function(func, callback) {
-      callback(setInterval(func, 4 * 60 * 1000));
-    },
-    func: function() {
-      logger.info('Loading data and synchronizing...');
-      bellTimer.reloadData(function() {
-        logger.success('Bell timer reloaded');
-        logger.info('Synchronization correction: ' + bellTimer.synchronizationCorrection);
-        intervalManager.restart('oneSecond');
-      });
-    }
-  }
-};
-var intervalManager = new IntervalManager(intervals);
-bellTimer.setDebugLogFunction(logger.debug);
-//bellTimer.enableDevMode(new Date('2017-02-16 23:59:55'), 1);
-
-global.bellTimer = bellTimer;
-global.logger = logger;
-global.cookieManager = cookieManager;
-logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
-
-$(window).on('load', function() {
-  async.series([
-
-    // Initialize BellTimer
-    async.asyncify(_.partial(logger.info, 'Loading data...')),
-    async.asyncify(_.partial(uiManager.setLoadingMessage, 'Loading')),
-    _.partial(bellTimer.reloadData),
-    async.asyncify(_.partial(logger.info, 'Synchronizing...')),
-    async.asyncify(_.partial(uiManager.setLoadingMessage, 'Synchronizing')),
-    _.partial(bellTimer.initializeTimesync),
-    async.asyncify(_.partial(logger.success, 'Bell timer initialized')),
-    async.asyncify(uiManager.hideLoading),
-
-    // Initialize UIManager
-    async.asyncify(uiManager.initialize),
-    async.asyncify(uiManager.update),
-    async.asyncify(_.partial(logger.success, 'UI initialized and updated')),
-
-    // Start intervals
-    //async.asyncify(),
-
-  ], function(err) {
-
-    // Report analytics
-    analyticsManager.reportAnalytics();
-
-    intervalManager.startAll();
-    logger.success('Ready!');
-
-    // var adjustment = Math.round(bellTimer.getCorrection() / 1000);
-    // var adjustmentString = adjustment + ' ' + ((adjustment == 1) ? 'second' : 'seconds');
-    // uiManager.showAlert('Adjusted ' + adjustmentString + ' to match school time');
-
-  });
-});
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./AnalyticsManager.js":1,"./BellTimer.js":2,"./ClassesManager.js":3,"./CookieManager.js":4,"./IntervalManager.js":5,"./SimpleLogger.js":6,"./ThemeManager.js":7,"./UIManager.js":8,"async":10,"jquery":11,"js-cookie":12,"lodash":13,"visibilityjs":14}],10:[function(require,module,exports){
 (function (process,global){
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -7015,7 +6348,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":17}],11:[function(require,module,exports){
+},{"_process":8}],6:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -17270,174 +16603,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],12:[function(require,module,exports){
-/*!
- * JavaScript Cookie v2.1.4
- * https://github.com/js-cookie/js-cookie
- *
- * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
- * Released under the MIT license
- */
-;(function (factory) {
-	var registeredInModuleLoader = false;
-	if (typeof define === 'function' && define.amd) {
-		define(factory);
-		registeredInModuleLoader = true;
-	}
-	if (typeof exports === 'object') {
-		module.exports = factory();
-		registeredInModuleLoader = true;
-	}
-	if (!registeredInModuleLoader) {
-		var OldCookies = window.Cookies;
-		var api = window.Cookies = factory();
-		api.noConflict = function () {
-			window.Cookies = OldCookies;
-			return api;
-		};
-	}
-}(function () {
-	function extend () {
-		var i = 0;
-		var result = {};
-		for (; i < arguments.length; i++) {
-			var attributes = arguments[ i ];
-			for (var key in attributes) {
-				result[key] = attributes[key];
-			}
-		}
-		return result;
-	}
-
-	function init (converter) {
-		function api (key, value, attributes) {
-			var result;
-			if (typeof document === 'undefined') {
-				return;
-			}
-
-			// Write
-
-			if (arguments.length > 1) {
-				attributes = extend({
-					path: '/'
-				}, api.defaults, attributes);
-
-				if (typeof attributes.expires === 'number') {
-					var expires = new Date();
-					expires.setMilliseconds(expires.getMilliseconds() + attributes.expires * 864e+5);
-					attributes.expires = expires;
-				}
-
-				// We're using "expires" because "max-age" is not supported by IE
-				attributes.expires = attributes.expires ? attributes.expires.toUTCString() : '';
-
-				try {
-					result = JSON.stringify(value);
-					if (/^[\{\[]/.test(result)) {
-						value = result;
-					}
-				} catch (e) {}
-
-				if (!converter.write) {
-					value = encodeURIComponent(String(value))
-						.replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);
-				} else {
-					value = converter.write(value, key);
-				}
-
-				key = encodeURIComponent(String(key));
-				key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
-				key = key.replace(/[\(\)]/g, escape);
-
-				var stringifiedAttributes = '';
-
-				for (var attributeName in attributes) {
-					if (!attributes[attributeName]) {
-						continue;
-					}
-					stringifiedAttributes += '; ' + attributeName;
-					if (attributes[attributeName] === true) {
-						continue;
-					}
-					stringifiedAttributes += '=' + attributes[attributeName];
-				}
-				return (document.cookie = key + '=' + value + stringifiedAttributes);
-			}
-
-			// Read
-
-			if (!key) {
-				result = {};
-			}
-
-			// To prevent the for loop in the first place assign an empty array
-			// in case there are no cookies at all. Also prevents odd result when
-			// calling "get()"
-			var cookies = document.cookie ? document.cookie.split('; ') : [];
-			var rdecode = /(%[0-9A-Z]{2})+/g;
-			var i = 0;
-
-			for (; i < cookies.length; i++) {
-				var parts = cookies[i].split('=');
-				var cookie = parts.slice(1).join('=');
-
-				if (cookie.charAt(0) === '"') {
-					cookie = cookie.slice(1, -1);
-				}
-
-				try {
-					var name = parts[0].replace(rdecode, decodeURIComponent);
-					cookie = converter.read ?
-						converter.read(cookie, name) : converter(cookie, name) ||
-						cookie.replace(rdecode, decodeURIComponent);
-
-					if (this.json) {
-						try {
-							cookie = JSON.parse(cookie);
-						} catch (e) {}
-					}
-
-					if (key === name) {
-						result = cookie;
-						break;
-					}
-
-					if (!key) {
-						result[name] = cookie;
-					}
-				} catch (e) {}
-			}
-
-			return result;
-		}
-
-		api.set = api;
-		api.get = function (key) {
-			return api.call(api, key);
-		};
-		api.getJSON = function () {
-			return api.apply({
-				json: true
-			}, [].slice.call(arguments));
-		};
-		api.defaults = {};
-
-		api.remove = function (key, attributes) {
-			api(key, '', extend(attributes, {
-				expires: -1
-			}));
-		};
-
-		api.withConverter = init;
-
-		return api;
-	}
-
-	return init(function () {});
-}));
-
-},{}],13:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -34525,368 +33691,7 @@ return jQuery;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],14:[function(require,module,exports){
-module.exports = require('./lib/visibility.timers.js')
-
-},{"./lib/visibility.timers.js":16}],15:[function(require,module,exports){
-;(function (global) {
-    "use strict";
-
-    var lastId = -1;
-
-    // Visibility.js allow you to know, that your web page is in the background
-    // tab and thus not visible to the user. This library is wrap under
-    // Page Visibility API. It fix problems with different vendor prefixes and
-    // add high-level useful functions.
-    var self = {
-
-        // Call callback only when page become to visible for user or
-        // call it now if page is visible now or Page Visibility API
-        // doesn’t supported.
-        //
-        // Return false if API isn’t supported, true if page is already visible
-        // or listener ID (you can use it in `unbind` method) if page isn’t
-        // visible now.
-        //
-        //   Visibility.onVisible(function () {
-        //       startIntroAnimation();
-        //   });
-        onVisible: function (callback) {
-            var support = self.isSupported();
-            if ( !support || !self.hidden() ) {
-                callback();
-                return support;
-            }
-
-            var listener = self.change(function (e, state) {
-                if ( !self.hidden() ) {
-                    self.unbind(listener);
-                    callback();
-                }
-            });
-            return listener;
-        },
-
-        // Call callback when visibility will be changed. First argument for
-        // callback will be original event object, second will be visibility
-        // state name.
-        //
-        // Return listener ID to unbind listener by `unbind` method.
-        //
-        // If Page Visibility API doesn’t supported method will be return false
-        // and callback never will be called.
-        //
-        //   Visibility.change(function(e, state) {
-        //       Statistics.visibilityChange(state);
-        //   });
-        //
-        // It is just proxy to `visibilitychange` event, but use vendor prefix.
-        change: function (callback) {
-            if ( !self.isSupported() ) {
-                return false;
-            }
-            lastId += 1;
-            var number = lastId;
-            self._callbacks[number] = callback;
-            self._listen();
-            return number;
-        },
-
-        // Remove `change` listener by it ID.
-        //
-        //   var id = Visibility.change(function(e, state) {
-        //       firstChangeCallback();
-        //       Visibility.unbind(id);
-        //   });
-        unbind: function (id) {
-            delete self._callbacks[id];
-        },
-
-        // Call `callback` in any state, expect “prerender”. If current state
-        // is “prerender” it will wait until state will be changed.
-        // If Page Visibility API doesn’t supported, it will call `callback`
-        // immediately.
-        //
-        // Return false if API isn’t supported, true if page is already after
-        // prerendering or listener ID (you can use it in `unbind` method)
-        // if page is prerended now.
-        //
-        //   Visibility.afterPrerendering(function () {
-        //       Statistics.countVisitor();
-        //   });
-        afterPrerendering: function (callback) {
-            var support   = self.isSupported();
-            var prerender = 'prerender';
-
-            if ( !support || prerender != self.state() ) {
-                callback();
-                return support;
-            }
-
-            var listener = self.change(function (e, state) {
-                if ( prerender != state ) {
-                    self.unbind(listener);
-                    callback();
-                }
-            });
-            return listener;
-        },
-
-        // Return true if page now isn’t visible to user.
-        //
-        //   if ( !Visibility.hidden() ) {
-        //       VideoPlayer.play();
-        //   }
-        //
-        // It is just proxy to `document.hidden`, but use vendor prefix.
-        hidden: function () {
-            return !!(self._doc.hidden || self._doc.webkitHidden);
-        },
-
-        // Return visibility state: 'visible', 'hidden' or 'prerender'.
-        //
-        //   if ( 'prerender' == Visibility.state() ) {
-        //       Statistics.pageIsPrerendering();
-        //   }
-        //
-        // Don’t use `Visibility.state()` to detect, is page visible, because
-        // visibility states can extend in next API versions.
-        // Use more simpler and general `Visibility.hidden()` for this cases.
-        //
-        // It is just proxy to `document.visibilityState`, but use
-        // vendor prefix.
-        state: function () {
-            return self._doc.visibilityState       ||
-                   self._doc.webkitVisibilityState ||
-                   'visible';
-        },
-
-        // Return true if browser support Page Visibility API.
-        //
-        //   if ( Visibility.isSupported() ) {
-        //       Statistics.startTrackingVisibility();
-        //       Visibility.change(function(e, state)) {
-        //           Statistics.trackVisibility(state);
-        //       });
-        //   }
-        isSupported: function () {
-            return !!(self._doc.visibilityState ||
-                      self._doc.webkitVisibilityState);
-        },
-
-        // Link to document object to change it in tests.
-        _doc: document || {},
-
-        // Callbacks from `change` method, that wait visibility changes.
-        _callbacks: { },
-
-        // Listener for `visibilitychange` event.
-        _change: function(event) {
-            var state = self.state();
-
-            for ( var i in self._callbacks ) {
-                self._callbacks[i].call(self._doc, event, state);
-            }
-        },
-
-        // Set listener for `visibilitychange` event.
-        _listen: function () {
-            if ( self._init ) {
-                return;
-            }
-
-            var event = 'visibilitychange';
-            if ( self._doc.webkitVisibilityState ) {
-                event = 'webkit' + event;
-            }
-
-            var listener = function () {
-                self._change.apply(self, arguments);
-            };
-            if ( self._doc.addEventListener ) {
-                self._doc.addEventListener(event, listener);
-            } else {
-                self._doc.attachEvent(event, listener);
-            }
-            self._init = true;
-        }
-
-    };
-
-    if ( typeof(module) != 'undefined' && module.exports ) {
-        module.exports = self;
-    } else {
-        global.Visibility = self;
-    }
-
-})(this);
-
-},{}],16:[function(require,module,exports){
-;(function (window) {
-    "use strict";
-
-    var lastTimer = -1;
-
-    var install = function (Visibility) {
-
-        // Run callback every `interval` milliseconds if page is visible and
-        // every `hiddenInterval` milliseconds if page is hidden.
-        //
-        //   Visibility.every(60 * 1000, 5 * 60 * 1000, function () {
-        //       checkNewMails();
-        //   });
-        //
-        // You can skip `hiddenInterval` and callback will be called only if
-        // page is visible.
-        //
-        //   Visibility.every(1000, function () {
-        //       updateCountdown();
-        //   });
-        //
-        // It is analog of `setInterval(callback, interval)` but use visibility
-        // state.
-        //
-        // It return timer ID, that you can use in `Visibility.stop(id)` to stop
-        // timer (`clearInterval` analog).
-        // Warning: timer ID is different from interval ID from `setInterval`,
-        // so don’t use it in `clearInterval`.
-        //
-        // On change state from hidden to visible timers will be execute.
-        Visibility.every = function (interval, hiddenInterval, callback) {
-            Visibility._time();
-
-            if ( !callback ) {
-                callback = hiddenInterval;
-                hiddenInterval = null;
-            }
-
-            lastTimer += 1;
-            var number = lastTimer;
-
-            Visibility._timers[number] = {
-                visible:  interval,
-                hidden:   hiddenInterval,
-                callback: callback
-            };
-            Visibility._run(number, false);
-
-            if ( Visibility.isSupported() ) {
-                Visibility._listen();
-            }
-            return number;
-        };
-
-        // Stop timer from `every` method by it ID (`every` method return it).
-        //
-        //   slideshow = Visibility.every(5 * 1000, function () {
-        //       changeSlide();
-        //   });
-        //   $('.stopSlideshow').click(function () {
-        //       Visibility.stop(slideshow);
-        //   });
-        Visibility.stop = function(id) {
-            if ( !Visibility._timers[id] ) {
-                return false;
-            }
-            Visibility._stop(id);
-            delete Visibility._timers[id];
-            return true;
-        };
-
-        // Callbacks and intervals added by `every` method.
-        Visibility._timers = { };
-
-        // Initialize variables on page loading.
-        Visibility._time = function () {
-            if ( Visibility._timed ) {
-                return;
-            }
-            Visibility._timed     = true;
-            Visibility._wasHidden = Visibility.hidden();
-
-            Visibility.change(function () {
-                Visibility._stopRun();
-                Visibility._wasHidden = Visibility.hidden();
-            });
-        };
-
-        // Try to run timer from every method by it’s ID. It will be use
-        // `interval` or `hiddenInterval` depending on visibility state.
-        // If page is hidden and `hiddenInterval` is null,
-        // it will not run timer.
-        //
-        // Argument `runNow` say, that timers must be execute now too.
-        Visibility._run = function (id, runNow) {
-            var interval,
-                timer = Visibility._timers[id];
-
-            if ( Visibility.hidden() ) {
-                if ( null === timer.hidden ) {
-                    return;
-                }
-                interval = timer.hidden;
-            } else {
-                interval = timer.visible;
-            }
-
-            var runner = function () {
-                timer.last = new Date();
-                timer.callback.call(window);
-            }
-
-            if ( runNow ) {
-                var now  = new Date();
-                var last = now - timer.last ;
-
-                if ( interval > last ) {
-                    timer.delay = setTimeout(function () {
-                        timer.id = setInterval(runner, interval);
-                        runner();
-                    }, interval - last);
-                } else {
-                    timer.id = setInterval(runner, interval);
-                    runner();
-                }
-
-            } else {
-              timer.id = setInterval(runner, interval);
-            }
-        };
-
-        // Stop timer from `every` method by it’s ID.
-        Visibility._stop = function (id) {
-            var timer = Visibility._timers[id];
-            clearInterval(timer.id);
-            clearTimeout(timer.delay);
-            delete timer.id;
-            delete timer.delay;
-        };
-
-        // Listener for `visibilitychange` event.
-        Visibility._stopRun = function (event) {
-            var isHidden  = Visibility.hidden(),
-                wasHidden = Visibility._wasHidden;
-
-            if ( (isHidden && !wasHidden) || (!isHidden && wasHidden) ) {
-                for ( var i in Visibility._timers ) {
-                    Visibility._stop(i);
-                    Visibility._run(i, !isHidden);
-                }
-            }
-        };
-
-        return Visibility;
-    }
-
-    if ( typeof(module) != 'undefined' && module.exports ) {
-        module.exports = install(require('./visibility.core'));
-    } else {
-        install(window.Visibility)
-    }
-
-})(window);
-
-},{"./visibility.core":15}],17:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -35068,4 +33873,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[9]);
+},{}]},{},[2]);
