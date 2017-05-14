@@ -218,7 +218,7 @@ const $ = require('jquery');
     showScrollIndicator();
     setSettingsState();
     dynamicallySetFontSize();
-    slideExtension();
+    // slideExtension();
   };
   UIManager.prototype.update = function() {
     var time = self.bellTimer.getTimeRemainingString();
