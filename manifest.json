@@ -1,21 +1,24 @@
 {
-	"manifest_version": 2,
-	"name": "bell.lahs.club Extension",
-	"version": "0.0.0.1",
-	"content_security_policy": "script-src 'self' https://bell.lahs.club; object-src 'self'",
-	"browser_action": {
-		"default_icon": "favicons/lime.png",
-		"default_popup": "chrome_extension/popup.html",
-		"default_title": "Bell"
-	},
-	"background": {
-		"page": "chrome_extension/background.html"
-	},
-	"permissions": [
-		"cookies",
-		"alarms",
-		"https://bell.lahs.club/*",
-		"http://bell.lahs.club/*"
-	]
-
+  "manifest_version": 2,
+  "name": "bell.lahs.club Extension",
+  "description": "An extension that displays the time remaining in classes at Los Altos High School, as seen on the website bell.lahs.club.",
+  "version": "0.0.0.1",
+  "content_security_policy": "script-src 'self' https://bell.lahs.club; object-src 'self'",
+  "browser_action": {
+    "default_icon": "favicons/lime.png",
+    "default_popup": "chrome_extension/popup.html",
+    "default_title": "Bell"
+  },
+  /*"background": {
+    "page": "chrome_extension/background.html"
+  },*/
+  "permissions": [
+    "cookies",
+    "alarms",
+    "https://bell.lahs.club/*",
+    "http://bell.lahs.club/*"
+  ],
+  "icons": {
+    "128": "icons/icon128.png"
+  }
 }

@@ -246,19 +246,23 @@ var updateIconAndAlarm = function() {
 		nextAlarmTime = msRemaining;
 	}
 	console.log("Next icon color:", nextIconColor);
-	console.log("Next alarm time:", nextAlarmTime);
+	console.log("Next alarm in about", msToMin(nextAlarmTime), "minutes");
 	alarms.create(nextIconColor, {when: (Date.now() + nextAlarmTime)});
-}
+};
 
 var refresh = function() {
 	bellTimer.reloadDataFromHost(host, function() {
 		updateIconAndAlarm();
 	});
-}
+};
 
 var minToMS = function(mins) {
 	return mins * 60 * 1000;
-}
+};
+
+var msToMin = function(ms) {
+	return ms / (60 * 1000);
+};
 
 initializeAlarm();
 
