@@ -64,7 +64,6 @@ var intervals = {
 };
 var intervalManager = new IntervalManager(intervals);
 bellTimer.setDebugLogFunction(logger.debug);
-//bellTimer.enableDevMode(new Date('2017-02-16 23:59:55'), 1);
 
 global.bellTimer = bellTimer;
 global.logger = logger;
