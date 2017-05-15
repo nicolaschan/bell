@@ -35,7 +35,7 @@
 06/01/2017 finals-thu
 06/02/2017 finals-fri
 06/03/2017-08/13/2017 holiday (Summer Recess)
-09/04/2017 recess (Labor Day)
+09/04/2017 holiday (Labor Day)
 09/20/2017 modified-even
 09/21/2017 modified-odd
 11/10/2017 holiday (Veteran's Day)

@@ -26,6 +26,9 @@ var self;
       date.setMilliseconds(0);
     return date;
   };
+  var dateToString = function(date) {
+    return date.getYear() + '-' + date.getMonth() + '-' + date.getDate();
+  };
 
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
@@ -138,16 +141,16 @@ var self;
                 scheduleName: scheduleName,
                 customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
               };
-              while (date.toISOString().substring(0, 10) != endDate.toISOString().substring(0, 10)) {
-                calendar.specialDays[date.toISOString().substring(0, 10)] = schedule;
+              while (dateToString(date) != dateToString(endDate)) {
+                calendar.specialDays[dateToString(date)] = schedule;
                 date.setDate(date.getDate() + 1);
               }
-              calendar.specialDays[endDate.toISOString().substring(0, 10)] = schedule;
+              calendar.specialDays[dateToString(endDate)] = schedule;
             } else {
               // is not a range
               var date = new Date(line.split(' ')[0]);
               var scheduleName = line.split(' ')[1];
-              calendar.specialDays[date.toISOString().substring(0, 10)] = {
+              calendar.specialDays[dateToString(date)] = {
                 scheduleName: scheduleName,
                 customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
               };
@@ -258,10 +261,10 @@ var self;
     this.timeScale = scale;
   }
   BellTimer.prototype.getDate = function() {
-    return new Date(this.ts.now() + this.bellCompensation);
+    if (this.devMode)
+      return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
 
-    // if (this.devMode)
-    //   return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
+    return new Date(this.ts.now() + this.bellCompensation);
     // return new Date(Date.now() + this.bellCompensation + this.synchronizationCorrection);
   };
   BellTimer.prototype.getTimeRemainingNumber = function() {
@@ -375,7 +378,7 @@ var self;
   };
   BellTimer.prototype.getCurrentSchedule = function(date) {
     if (!date) date = self.getDate();
-    var dateString = date.toISOString().substring(0, 10);
+    var dateString = dateToString(date);
     var specialDay = self.calendar.specialDays[dateString];
 
     var schedule;
