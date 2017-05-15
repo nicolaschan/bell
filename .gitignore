@@ -2,7 +2,7 @@
 bellxt.zip
 
 # Bundle
-bundle.*
+js/*.bundle.*
 
 # Licenses
 dependencylicenses.txt
