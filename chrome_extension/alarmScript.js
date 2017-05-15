@@ -9,13 +9,11 @@ const beta = false;
 
 const host = "https://bell" + (beta ? "-beta" : "") + ".lahs.club";
 
-
-var nextAlarm;
-
 var correction;
 
 var initializeAlarm = function() {
 	bellTimer.initializeFromHost(host);
+	console.log("Alarm initialized");
 	// bellTimer.enableDevMode(new Date('2017-05-12 8:00'), 60);
 	refresh();
 }
@@ -57,7 +55,9 @@ var updateIconAndAlarm = function() {
 		nextIconColor = "lime";
 		nextAlarmTime = msRemaining;
 	}
-	nextAlarm = alarms.create(nextIconColor, {when: Date.now() + nextAlarmTime});
+	console.log("Next icon color:", nextIconColor);
+	console.log("Next alarm time:", nextAlarmTime);
+	alarms.create(nextIconColor, {when: (Date.now() + nextAlarmTime)});
 }
 
 var refresh = function() {

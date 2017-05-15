@@ -37,7 +37,12 @@ var ChromeCookieManager = function(url, callback) {
 	}, function(cookies) {
 		for(cookie of cookies) {
 			// shoot me
-			self.storedCookies[cookie.name] = atob(cookie.value);
+			try {
+				self.storedCookies[cookie.name] = atob(cookie.value);
+			}
+			catch(e) {
+				self.storedCookies[cookie.name] = cookie.value;
+			}
 		}
 		console.log("Cookies on load:", cookies);
 		callback();
@@ -134,7 +139,6 @@ ChromeCookieManager.prototype.setLong = function(key, longValue, expires) {
 		longValue = JSON.stringify(longValue);
 	longValue = btoa(longValue);
 	var parts = splitString(longValue, 2000);
-	console.log(parts);
 	for (var i = 0; i < parts.length; i++) {
 		self.set(key + '_' + i, parts[i], expires);
 	}
@@ -195,13 +199,11 @@ const beta = false;
 
 const host = "https://bell" + (beta ? "-beta" : "") + ".lahs.club";
 
-
-var nextAlarm;
-
 var correction;
 
 var initializeAlarm = function() {
 	bellTimer.initializeFromHost(host);
+	console.log("Alarm initialized");
 	// bellTimer.enableDevMode(new Date('2017-05-12 8:00'), 60);
 	refresh();
 }
@@ -243,7 +245,9 @@ var updateIconAndAlarm = function() {
 		nextIconColor = "lime";
 		nextAlarmTime = msRemaining;
 	}
-	nextAlarm = alarms.create(nextIconColor, {when: Date.now() + nextAlarmTime});
+	console.log("Next icon color:", nextIconColor);
+	console.log("Next alarm time:", nextAlarmTime);
+	alarms.create(nextIconColor, {when: (Date.now() + nextAlarmTime)});
 }
 
 var refresh = function() {
