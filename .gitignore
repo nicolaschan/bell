@@ -1,6 +1,9 @@
 # Chrome app zip
 bellxt.zip
 
+# Bundle
+bundle.*
+
 # Licenses
 dependencylicenses.txt
 
