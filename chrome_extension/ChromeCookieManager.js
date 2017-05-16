@@ -7,7 +7,7 @@
  * As of 5/12, all cookies stored by bell.lahs.club are now encoded in base 64,
  * and so will all the cookies encoded here. To that end, the get/set functions
  * will convert plaintext to base 64 or vice versa, and getRaw and setRaw will 
- * return the raw values set in the cookies.
+ * return the raw values set in the cookies. Or maybe plaintext.
  *
  * To use this, manifest.json must have "cookies" in its permissions.
  */
@@ -121,13 +121,14 @@ ChromeCookieManager.prototype.getLong = function(key) {
 		longValue += self.getRaw(key + '_' + i);
 	}
 	try {
+		return longValue;
+	}
+	catch(e) {
 		var txt = atob(longValue);
 		if(!txt)
 			return undefined;
 		else
 			return txt;
-	} catch(e) {
-		return undefined;
 	}
 };
 ChromeCookieManager.prototype.getLongJSON = function(key) {

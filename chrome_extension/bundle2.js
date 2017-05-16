@@ -8,7 +8,7 @@
  * As of 5/12, all cookies stored by bell.lahs.club are now encoded in base 64,
  * and so will all the cookies encoded here. To that end, the get/set functions
  * will convert plaintext to base 64 or vice versa, and getRaw and setRaw will 
- * return the raw values set in the cookies.
+ * return the raw values set in the cookies. Or maybe plaintext.
  *
  * To use this, manifest.json must have "cookies" in its permissions.
  */
@@ -122,13 +122,14 @@ ChromeCookieManager.prototype.getLong = function(key) {
 		longValue += self.getRaw(key + '_' + i);
 	}
 	try {
+		return longValue;
+	}
+	catch(e) {
 		var txt = atob(longValue);
 		if(!txt)
 			return undefined;
 		else
 			return txt;
-	} catch(e) {
-		return undefined;
 	}
 };
 ChromeCookieManager.prototype.getLongJSON = function(key) {
@@ -418,6 +419,9 @@ var self;
       date.setMilliseconds(0);
     return date;
   };
+  var dateToString = function(date) {
+    return date.getYear() + '-' + date.getMonth() + '-' + date.getDate();
+  };
 
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
@@ -537,16 +541,16 @@ var self;
                 scheduleName: scheduleName,
                 customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
               };
-              while (date.toISOString().substring(0, 10) != endDate.toISOString().substring(0, 10)) {
-                calendar.specialDays[date.toISOString().substring(0, 10)] = schedule;
+              while (dateToString(date) != dateToString(endDate)) {
+                calendar.specialDays[dateToString(date)] = schedule;
                 date.setDate(date.getDate() + 1);
               }
-              calendar.specialDays[endDate.toISOString().substring(0, 10)] = schedule;
+              calendar.specialDays[dateToString(endDate)] = schedule;
             } else {
               // is not a range
               var date = new Date(line.split(' ')[0]);
               var scheduleName = line.split(' ')[1];
-              calendar.specialDays[date.toISOString().substring(0, 10)] = {
+              calendar.specialDays[dateToString(date)] = {
                 scheduleName: scheduleName,
                 customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
               };
@@ -565,6 +569,10 @@ var self;
           $(window)[0].location.reload();
         else
           self.version = version;
+      })
+      .fail(function() {
+        console.log("Request to", host, "/api/version failed.");
+        self.version = 0;
       });
 
     var getSchedules = function(callback) {
@@ -575,6 +583,7 @@ var self;
           callback(null, schedules);
         })
         .fail(function() {
+          console.log("Request to", host, "/api/schedules failed. Attempting to retrieve schedule from cookies.");
           var schedules = parseSchedules(self.cookieManager.getLong('schedules'));
           callback(null, schedules);
         });
@@ -588,6 +597,7 @@ var self;
         })
         .fail(function() {
           var calendar = parseCalendar(self.cookieManager.getLong('calendar'), schedules);
+          console.log("Request to", host, "/api/calendar failed. Attempting to retrieve calendar from cookies.");
           callback(null, calendar);
         });
     };
@@ -672,10 +682,10 @@ var self;
     console.log("Dev mode enabled, with startDate=", startDate, "scale=", scale);
   }
   BellTimer.prototype.getDate = function() {
-    return new Date(this.ts.now() + this.bellCompensation);
+    if (this.devMode)
+      return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
 
-    // if (this.devMode)
-    //   return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
+    return new Date(this.ts.now() + this.bellCompensation);
     // return new Date(Date.now() + this.bellCompensation + this.synchronizationCorrection);
   };
   BellTimer.prototype.getTimeRemainingNumber = function() {
@@ -793,7 +803,7 @@ var self;
   };
   BellTimer.prototype.getCurrentSchedule = function(date) {
     if (!date) date = self.getDate();
-    var dateString = date.toISOString().substring(0, 10);
+    var dateString = dateToString(date);
     var specialDay = self.calendar.specialDays[dateString];
 
     var schedule;
@@ -826,6 +836,10 @@ var self;
         var correction = correctedTime - currentTime;
 
         callback(null, correction);
+      })
+      .fail(function() {
+        console.log("Request to", host, "/api/time failed.");
+        callback(null, 0);
       });
     };
 

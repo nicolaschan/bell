@@ -193,6 +193,10 @@ var self;
           $(window)[0].location.reload();
         else
           self.version = version;
+      })
+      .fail(function() {
+        console.log("Request to", host, "/api/version failed.");
+        self.version = 0;
       });
 
     var getSchedules = function(callback) {
@@ -203,6 +207,7 @@ var self;
           callback(null, schedules);
         })
         .fail(function() {
+          console.log("Request to", host, "/api/schedules failed. Attempting to retrieve schedule from cookies.");
           var schedules = parseSchedules(self.cookieManager.getLong('schedules'));
           callback(null, schedules);
         });
@@ -216,6 +221,7 @@ var self;
         })
         .fail(function() {
           var calendar = parseCalendar(self.cookieManager.getLong('calendar'), schedules);
+          console.log("Request to", host, "/api/calendar failed. Attempting to retrieve calendar from cookies.");
           callback(null, calendar);
         });
     };
@@ -454,6 +460,10 @@ var self;
         var correction = correctedTime - currentTime;
 
         callback(null, correction);
+      })
+      .fail(function() {
+        console.log("Request to", host, "/api/time failed.");
+        callback(null, 0);
       });
     };
 
