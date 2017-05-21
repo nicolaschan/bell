@@ -91,6 +91,8 @@ var setup = function() {
         var posX = side / 2;
         var posY = side / 2;
 
+        ctx.clearRect(0, 0, c.width, c.height);
+
         ctx.beginPath();
         ctx.arc(posX, posY, radius, (Math.PI / -2), (Math.PI / -2) + (-2 * Math.PI) * (1 - proportion), true);
         ctx.lineTo(posX, posY);
