@@ -1074,7 +1074,7 @@ const $ = require('jquery');
 
   var helpers = {
     updateTitle: _.throttle(function(text) {
-      $('head title').text(text);
+      $('#title').text(text);
     }, 500, {
       leading: true
     })
@@ -1320,7 +1320,7 @@ const $ = require('jquery');
 
     var theme = self.themeManager.getCurrentTheme();
 
-    $('#time').css('color', theme(time)[0]);
+    $('.time').css('color', theme(time)[0]);
     $('.subtitle').css('color', theme(time)[1]);
     $('#page1').css('background-color', theme(time)[2]);
 
@@ -1330,7 +1330,7 @@ const $ = require('jquery');
 
     if (color) {
       if (currentTheme == 'Default - Dark')
-        $('#time').css('color', color);
+        $('.time').css('color', color);
       if (currentTheme == 'Default - Light')
         $('#page1').css('background-color', color);
     }
@@ -1503,6 +1503,7 @@ bellTimer.setDebugLogFunction(logger.debug);
 global.bellTimer = bellTimer;
 global.logger = logger;
 global.cookieManager = cookieManager;
+global.$ = $;
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
 $(window).on('load', function() {

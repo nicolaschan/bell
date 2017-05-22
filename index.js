@@ -59,6 +59,9 @@ var startWebServer = function(callback) {
       server_name: config['server name']
     });
   });
+  app.get('/blog', (req, res) => {
+    res.render('blog');
+  });
 
   //if (config['enable redis'])
   app.get('/stats', (req, res) => {

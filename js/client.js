@@ -68,6 +68,7 @@ bellTimer.setDebugLogFunction(logger.debug);
 global.bellTimer = bellTimer;
 global.logger = logger;
 global.cookieManager = cookieManager;
+global.$ = $;
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
 $(window).on('load', function() {
