@@ -230,6 +230,7 @@ var startWebServer = function(callback) {
   app.use('/favicons', express.static('favicons'));
   app.use('/js', express.static('js'));
   app.use('/css', express.static('css'));
+  app.use('/img', express.static('img'));
 
   server.listen(config.port, function() {
     logger.success('Web server listening on *:' + config.port);

@@ -168,6 +168,7 @@ p.signature {
 	-webkit-backface-visibility: hidden;
 	transition: background-color 3s ease;
 	overflow-x: hidden;
+	background-position: center;
 }
 .centered {
 	position: absolute;

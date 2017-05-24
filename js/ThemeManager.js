@@ -109,7 +109,25 @@ const _ = require('lodash');
         return ['cyan', 'white', 'black', '#555555'];
       else
         return ['magenta', 'white', 'black', '#555555'];
-    }
+    },
+    'Secret: Jonathan': _.partial(getCurrentColorDefaultTiming, [
+      ['lime', 'white', {
+        'background-image': 'url(\'../img/jonathan-1.png\')',
+        'background-size': '100%'
+      }, '#555555'],
+      ['yellow', 'white', {
+        'background-image': 'url(\'../img/jonathan-1.png\')',
+        'background-size': '166%'
+      }, '#555555'],
+      ['orange', 'white', {
+        'background-image': 'url(\'../img/jonathan-1.png\')',
+        'background-size': '233%'
+      }, '#555555'],
+      ['red', 'white', {
+        'background-image': 'url(\'../img/jonathan-1.png\')',
+        'background-size': '300%'
+      }, '#555555']
+    ])
   };
 
   var ThemeManager = function(cookieManager) {
@@ -129,6 +147,9 @@ const _ = require('lodash');
   };
   ThemeManager.prototype.getAvailableThemes = function() {
     return themes;
+  };
+  ThemeManager.prototype.getDefaultThemeName = function() {
+    return defaultTheme;
   };
 
   module.exports = ThemeManager;
