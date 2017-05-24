@@ -1,186 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],2:[function(require,module,exports){
 const $ = require('jquery');
 
 (function() {
@@ -256,7 +74,7 @@ const $ = require('jquery');
   module.exports = AnalyticsManager;
   //window.AnalyticsManager = AnalyticsManager;
 })();
-},{"jquery":12}],3:[function(require,module,exports){
+},{"jquery":11}],2:[function(require,module,exports){
 const _ = require('lodash');
 const $ = require('jquery');
 const async = require('async');
@@ -723,7 +541,7 @@ var self;
   module.exports = BellTimer;
   //window.BellTimer = BellTimer;
 })();
-},{"async":11,"jquery":12,"lodash":14}],4:[function(require,module,exports){
+},{"async":10,"jquery":11,"lodash":13}],3:[function(require,module,exports){
 (function() {
 
   const cookieName = 'classes';
@@ -744,7 +562,7 @@ var self;
   module.exports = ClassesManager;
   //window.ClassesManager = ClassesManager;
 })();
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function() {
 
   var CookieManager = function(Cookies) {
@@ -832,7 +650,7 @@ var self;
   module.exports = CookieManager;
   //window.CookieManager = CookieManager;
 })();
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function() {
 
   var self;
@@ -863,7 +681,7 @@ var self;
   module.exports = IntervalManager;
   //window.IntervalManager = IntervalManager;
 })();
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function() {
   var Logger = function(level) {
     this.level = (level) ? level : 0;
@@ -929,7 +747,7 @@ var self;
   module.exports = Logger;
   //window.SimpleLogger = Logger;
 })();
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 const _ = require('lodash');
 
 (function() {
@@ -1066,7 +884,7 @@ const _ = require('lodash');
   module.exports = ThemeManager;
   //window.ThemeManager = ThemeManager;
 })();
-},{"lodash":14}],9:[function(require,module,exports){
+},{"lodash":13}],8:[function(require,module,exports){
 const _ = require('lodash');
 const $ = require('jquery');
 
@@ -1431,7 +1249,7 @@ const $ = require('jquery');
   module.exports = UIManager;
   //window.UIManager = UIManager;
 })();
-},{"jquery":12,"lodash":14}],10:[function(require,module,exports){
+},{"jquery":11,"lodash":13}],9:[function(require,module,exports){
 (function (global){
 const async = require('async');
 const _ = require('lodash');
@@ -1506,6 +1324,8 @@ global.cookieManager = cookieManager;
 global.$ = $;
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
+// bellTimer.enableDevMode(new Date('2017-05-26 8:00'), 1);
+
 $(window).on('load', function() {
   async.series([
 
@@ -1542,7 +1362,7 @@ $(window).on('load', function() {
   });
 });
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./AnalyticsManager.js":2,"./BellTimer.js":3,"./ClassesManager.js":4,"./CookieManager.js":5,"./IntervalManager.js":6,"./SimpleLogger.js":7,"./ThemeManager.js":8,"./UIManager.js":9,"async":11,"jquery":12,"js-cookie":13,"lodash":14,"visibilityjs":15}],11:[function(require,module,exports){
+},{"./AnalyticsManager.js":1,"./BellTimer.js":2,"./ClassesManager.js":3,"./CookieManager.js":4,"./IntervalManager.js":5,"./SimpleLogger.js":6,"./ThemeManager.js":7,"./UIManager.js":8,"async":10,"jquery":11,"js-cookie":12,"lodash":13,"visibilityjs":14}],10:[function(require,module,exports){
 (function (process,global){
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -7096,7 +6916,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":1}],12:[function(require,module,exports){
+},{"_process":17}],11:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -17351,7 +17171,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*!
  * JavaScript Cookie v2.1.4
  * https://github.com/js-cookie/js-cookie
@@ -17518,7 +17338,7 @@ return jQuery;
 	return init(function () {});
 }));
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -34606,10 +34426,10 @@ return jQuery;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = require('./lib/visibility.timers.js')
 
-},{"./lib/visibility.timers.js":17}],16:[function(require,module,exports){
+},{"./lib/visibility.timers.js":16}],15:[function(require,module,exports){
 ;(function (global) {
     "use strict";
 
@@ -34802,7 +34622,7 @@ module.exports = require('./lib/visibility.timers.js')
 
 })(this);
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 ;(function (window) {
     "use strict";
 
@@ -34967,4 +34787,97 @@ module.exports = require('./lib/visibility.timers.js')
 
 })(window);
 
-},{"./visibility.core":16}]},{},[10]);
+},{"./visibility.core":15}],17:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}]},{},[9]);

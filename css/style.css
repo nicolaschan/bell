@@ -7,6 +7,13 @@ body {
 	// overflow-x: hidden;
 }
 
+.message-header {
+	padding: 10px;
+	background-color: #ffffaa;
+	margin-bottom: 20px;
+	text-align: center;
+}
+
 .blog-container {
 	padding: 20px;
 	margin: 0 auto;
@@ -67,8 +74,13 @@ p.signature {
 	font-size: 13px;
 	background-color: #f0f0f0;
 }
-.blog-container a:link, a:visited {
+.blog-container a:link, .blog-container a:visited {
+	color: black;
+}
+.article-body a:link, .article-body a:visited {
 	color: darkturquoise;
+}
+.blog-container a:link, .blog-container a:visited {
 	text-decoration: none;
 }
 .blog-container a:hover {

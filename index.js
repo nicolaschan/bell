@@ -62,6 +62,12 @@ var startWebServer = function(callback) {
   app.get('/blog', (req, res) => {
     res.render('blog');
   });
+  app.get('/xt', (req, res) => {
+    res.redirect('https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc');
+  });
+  app.get('/extension', (req, res) => {
+    res.redirect('https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc');
+  });
 
   //if (config['enable redis'])
   app.get('/stats', (req, res) => {

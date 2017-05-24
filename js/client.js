@@ -71,6 +71,8 @@ global.cookieManager = cookieManager;
 global.$ = $;
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
+// bellTimer.enableDevMode(new Date('2017-05-26 8:00'), 1);
+
 $(window).on('load', function() {
   async.series([
 
