@@ -859,7 +859,25 @@ const _ = require('lodash');
         return ['cyan', 'white', 'black', '#555555'];
       else
         return ['magenta', 'white', 'black', '#555555'];
-    }
+    },
+    'Secret: Jonathan': _.partial(getCurrentColorDefaultTiming, [
+      ['lime', 'white', {
+        'background-image': 'url(\'../img/jonathan-1.png\')',
+        'background-size': '100%'
+      }, '#555555'],
+      ['yellow', 'white', {
+        'background-image': 'url(\'../img/jonathan-1.png\')',
+        'background-size': '166%'
+      }, '#555555'],
+      ['orange', 'white', {
+        'background-image': 'url(\'../img/jonathan-1.png\')',
+        'background-size': '233%'
+      }, '#555555'],
+      ['red', 'white', {
+        'background-image': 'url(\'../img/jonathan-1.png\')',
+        'background-size': '300%'
+      }, '#555555']
+    ])
   };
 
   var ThemeManager = function(cookieManager) {
@@ -879,6 +897,9 @@ const _ = require('lodash');
   };
   ThemeManager.prototype.getAvailableThemes = function() {
     return themes;
+  };
+  ThemeManager.prototype.getDefaultThemeName = function() {
+    return defaultTheme;
   };
 
   module.exports = ThemeManager;
@@ -910,6 +931,33 @@ const $ = require('jquery');
     this.analyticsManager = analyticsManager;
   };
   UIManager.prototype.initialize = function() {
+    var manageSecrets = function() {
+      // from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+      var getParameterByName = function(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+      };
+      // end stackoverflow
+
+      var secretParameter = getParameterByName('secret');
+      var enabledSecrets = this.cookieManager.getJSON('secrets') || [];
+      if (secretParameter && enabledSecrets.indexOf(secretParameter) < 0)
+        enabledSecrets.push(secretParameter);
+
+      var removeSecretParameter = getParameterByName('rmsecret');
+      if (removeSecretParameter && enabledSecrets.indexOf(removeSecretParameter) > -1)
+        enabledSecrets.splice(enabledSecrets.indexOf(removeSecretParameter), 1);
+      this.cookieManager.set('secrets', enabledSecrets);
+
+      if (secretParameter || removeSecretParameter)
+        window.location = '/';
+    };
+
     // themes
     var loadThemes = function() {
       var refreshTheme = function() {
@@ -919,12 +967,22 @@ const $ = require('jquery');
       };
       $('#themeSelect').empty();
       for (var i in self.themeManager.getAvailableThemes()) {
+        if (i.toLowerCase().indexOf('secret') == 0) {
+          var enabledSecrets = this.cookieManager.getJSON('secrets');
+          var themeName = i.toLowerCase().substring(i.toLowerCase().indexOf(': ') + 2);
+          if (!enabledSecrets || enabledSecrets.indexOf(themeName) < 0) {
+            if (self.themeManager.getCurrentThemeName() == i)
+              self.themeManager.setCurrentTheme(self.themeManager.getDefaultThemeName());
+            continue;
+          }
+        }
         $('#themeSelect').append($('<option></option>').text(i));
       }
       $('#themeSelect').on('change', function(e) {
         var theme = this.value;
         self.themeManager.setCurrentTheme(theme);
-        self.analyticsManager.reportAnalytics();
+        if (theme.toLowerCase().indexOf('secret') != 0)
+          self.analyticsManager.reportAnalytics();
         refreshTheme();
       });
       refreshTheme();
@@ -1101,6 +1159,7 @@ const $ = require('jquery');
 
     $(window).on('load resize', dynamicallySetFontSize);
 
+    manageSecrets();
     loadThemes();
     showScrollIndicator();
     setSettingsState();
@@ -1140,7 +1199,14 @@ const $ = require('jquery');
 
     $('.time').css('color', theme(time)[0]);
     $('.subtitle').css('color', theme(time)[1]);
-    $('#page1').css('background-color', theme(time)[2]);
+    if (typeof theme(time)[2] == 'string') {
+      $('#page1').css('background-color', theme(time)[2]);
+      $('#page1').css('background-image', '');
+      $('#page1').css('background-size', '');
+    } else {
+      for (var prop in theme(time)[2])
+        $('#page1').css(prop, theme(time)[2][prop]);
+    }
 
     // popup stuff
     $('.extension').css('background-color', theme(time)[3]);
@@ -1324,7 +1390,7 @@ global.cookieManager = cookieManager;
 global.$ = $;
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
-// bellTimer.enableDevMode(new Date('2017-05-26 8:00'), 1);
+// bellTimer.enableDevMode(new Date('2017-05-23 8:00'), 60);
 
 $(window).on('load', function() {
   async.series([
