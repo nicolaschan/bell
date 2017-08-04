@@ -68,9 +68,9 @@
 14:00 {7}
 15:30 After School
 
-* weekend (Weekend) [cyan]
+* weekend (Weekend) [lightskyblue]
 
-* holiday (Holiday) [magenta]
+* holiday (Holiday) [coral]
 
 * finals-wed (Wednesday Finals)
 8:05 Passing to {2}
