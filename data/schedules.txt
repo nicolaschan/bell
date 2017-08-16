@@ -244,7 +244,7 @@
 14:45 {7}
 15:30 After School
 
-* eclipse (Eclipse Viewing Activity)
+* eclipse (Eclipse)
 7:15 Passing to {0}
 7:20 {0}
 8:05 Passing to {1}
