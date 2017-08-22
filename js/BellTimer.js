@@ -113,7 +113,7 @@ var self;
     };
     var parseCalendar = function(text, schedules) {
       var calendar = {
-        defaultWeek: [],
+        defaultWeek: [], // 0 is Sunday, 1 is Monday, etc.
         specialDays: {}
       };
 
