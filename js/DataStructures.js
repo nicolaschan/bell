@@ -14,10 +14,17 @@ var ClassType = {
 	LAB: 2
 };
 
-
 // TODO
 // have the user first enter a class, then set specifics for disc/lec/lab
 // with alternative option to enter a custom block
+
+var Week = function() {
+	this.schedules = [];
+};
+
+var Schedule = function() {
+	this.classes = [];
+};
 
 /**
  * Specifies a custom class period.
@@ -47,4 +54,13 @@ var Section = function(day, start, end, bldg, room, type, instr) {
 	this.bldg = bldg;
 	this.room = room;
 	this.instr = instr;
+};
+
+/**
+ * Specifies a custom section not attached to a class object.
+ * The two classes are idential, except this takes a class name as the first argument.
+ */
+var CustomSection = function(clazz, day, start, end, bldg, room, type, instr) {
+	Section.apply(this, day, start, end, bldg, room, type, instr);
+	this.clazz = clazz;
 };
