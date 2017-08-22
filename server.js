@@ -228,7 +228,7 @@ var startWebServer = function(callback) {
   });
 
   app.use('/favicons', express.static('favicons'));
-  app.use('/js', express.static('js'));
+  app.use('/bin', express.static('bin'));
   app.use('/css', express.static('css'));
   app.use('/img', express.static('img'));
 
