@@ -1,6 +1,7 @@
 module.exports = {
   entry: {
-    app: ['./js/client.js', './js/stats.js']
+    client: ['./js/client.js'],
+    stats: ['./js/stats.js']
   },
   output: {
     path: __dirname + '/bin/',

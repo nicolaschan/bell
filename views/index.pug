@@ -1,62 +1,49 @@
-//
-  Copyright (c) 2017 Nicolas Chan <nicolas@nicolaschan.com>
-  MIT License (https://github.com/nicolaschan/bell)
-  Version: #{version}
-  Server: #{server_name}
-
-doctype html
-html
-  head
-    title#title Bell Countdown
-    link(rel="shortcut icon", type="image/png", href="/favicons/empty.png")#favicon
-    link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto")
-    link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
-    link(rel="stylesheet", type="text/css", href="/css/style.css?v=" + version)
-    script(type="text/javascript", src="/timesync/timesync.js")
-    script(type="text/javascript", src="/bin/client.js?v=" + version)
-  body
-    .container#page1
-      .centered#countdown
-        span.time#time
+extends generic.pug
+block body
+  script(type="text/javascript", src="/timesync/timesync.js")
+  script(type="text/javascript", src="/bin/client.js?v=" + version)
+  .container#page1
+    .centered#countdown
+      span.time#time
+      br
+      span.subtitle
+        span#subtitle
         br
-        span.subtitle
-          span#subtitle
-          br
-          span.subtitle#scheduleName
-      canvas.centered#circle
-      .bottom.alert-message#alert-container
-        .alert-text#alert
-      .top.right.extension#extension
+        span.subtitle#scheduleName
+    canvas.centered#circle
+    .bottom.alert-message#alert-container
+      .alert-text#alert
+    .top.right.extension#extension
+      table
+        tr
+          td
+            //a.link.center-vertical(href="/blog", target="_blank")
+            span#extension-text Welcome back to school, and have a great year!
+          td
+            a.dismiss.center-vertical#dismiss(href="#")
+              i.material-icons cancel
+  .container#page2
+    .centered
+      span#scheduleDisplay
+        span.period#noClasses
+        span#schedule
+          table#scheduleTable
+      span#scheduleEntry
+        table#scheduleEntryTable
+        hr
         table
           tr
-            td
-              //a.link.center-vertical(href="/blog", target="_blank")
-              span#extension-text Welcome back to school, and have a great year!
-            td
-              a.dismiss.center-vertical#dismiss(href="#")
-                i.material-icons cancel
-    .container#page2
-      .centered
-        span#scheduleDisplay
-          span.period#noClasses
-          span#schedule
-            table#scheduleTable
-        span#scheduleEntry
-          table#scheduleEntryTable
-          hr
-          table
-            tr
-              td.tableLabel Theme
-              td#themeSelectColumn
-                select#themeSelect
-                  option(selected) Default - Light
-      .footer-right#icons
-        i.material-icons#settingsIcon settings
-        i.material-icons#doneIcon done
-      .footer-left
-    .centered.loading
-      i.material-icons#loadingIcon sync
-      br
-      span#loadingMessage Loading
-    .downArrow
-      i.material-icons#downIcon keyboard_arrow_down
+            td.tableLabel Theme
+            td#themeSelectColumn
+              select#themeSelect
+                option(selected) Default - Light
+    .footer-right#icons
+      i.material-icons#settingsIcon settings
+      i.material-icons#doneIcon done
+    .footer-left
+  .centered.loading
+    i.material-icons#loadingIcon sync
+    br
+    span#loadingMessage Loading
+  .downArrow
+    i.material-icons#downIcon keyboard_arrow_down
