@@ -38,3 +38,6 @@ jspm_packages
 
 # "Compiled" JavaScript
 bin
+
+# Package lock
+package-lock.json
