@@ -31,13 +31,15 @@ var CustomClass = function(name) {
 };
 exporting.CustomClass = CustomClass;
 
+// TODO associate sections with classes
+
 /**
- * Adds a section to a class, and performs validation against the schedule.
+ * Adds a section to a schedule, and performs validation against the schedule.
  */
 var addSection = function(schedule, section) {
 	checkNewSectionOverlap(schedule, section);
-	this.sections.push(section);
-	checkAllSectionOverlap(schedule, this.sections);
+	schedule.push(section);
+	checkAllSectionOverlap(schedule);
 };
 exporting.addSection = addSection;
 
@@ -56,7 +58,7 @@ var removeSection = function(schedule, serial) {
 	if(typeof idx === 'undefined')
 		return false;
 	else {
-		schedule.splice(index, 1);
+		schedule.splice(idx, 1);
 		return true;
 	}
 };
@@ -95,16 +97,22 @@ Section.prototype.splitStart = function() {
 	var ret = this.start.split(":");
 	if(ret.length != 2)
 		throw new Error("Bad time string: " + this.start);
-	else
+	else {
+		ret[0] = parseInt(ret[0]);
+		ret[1] = parseInt(ret[1]);
 		return ret;
+	}
 };
 
 Section.prototype.splitEnd = function() {
 	var ret = this.end.split(":");
 	if(ret.length != 2)
 		throw new Error("Bad time string: " + this.start);
-	else
+	else {
+		ret[0] = parseInt(ret[0]);
+		ret[1] = parseInt(ret[1]);
 		return ret;
+	}
 };
 
 /**
@@ -119,11 +127,13 @@ Section.prototype.validate = function() {
 };
 
 /**
- * Checks if this section overlaps with another.
+ * Checks if this section's time overlaps with another.
  * If one section's end time is the same as the other's start time, it will act as if there is no
  * overlap.
  */
 Section.prototype.checkConflict = function(other) {
+	if(this.day !== other.day)
+		return;
 	var earlierEnd = this.end;
 	var laterStart = other.start;
 	var comp = compareTimes(this.start, other.start);
@@ -133,7 +143,7 @@ Section.prototype.checkConflict = function(other) {
 		earlierEnd = other.end;
 		laterStart = this.start;
 	}
-	if(compareTimes(earlierEnd, laterStart) < 0)
+	if(compareTimes(earlierEnd, laterStart) > 0)
 		throw new Error("Schedule conflict detected between " + laterStart + " and " + earlierEnd);
 };
 
@@ -151,6 +161,10 @@ var compareTimes = function(time, other) {
 		throw new Error("Bad time string: " + time);
 	if(other.length != 2)
 		throw new Error("Bad time string: " + other);
+	time[0] = parseInt(time[0]);
+	time[1] = parseInt(time[1]);
+	other[0] = parseInt(other[0]);
+	other[1] = parseInt(other[1]);
 	if(time[0] > other[0])
 		return 1;
 	else if(time[0] < other[0])
@@ -196,7 +210,7 @@ exporting.checkNewSectionOverlap = checkNewSectionOverlap;
  */
 var checkAllSectionOverlap = function(sched) {
 	for(let i = 0; i < sched.length; i++) {
-		for(let j = i; j < sched.length; j++) {
+		for(let j = i + 1; j < sched.length; j++) {
 			sched[i].checkConflict(sched[j]);
 		}
 	}
