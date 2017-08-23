@@ -22,9 +22,50 @@ body {
 
 .blog-header {
 	padding: 20px;
-	background-color: lime;
+	background-color: #ddd;
 	transition: background-color 3s ease;
 	text-align: center;
+}
+
+ul.class-list {
+	padding: 0;
+}
+
+ul.class-list li {
+	font-size: 1.2em;
+	list-style: none;
+	margin: 0.2em 8em;
+	padding: 0.3em;
+	border: 1px solid #ddd;
+	font-weight: 700;
+}
+
+table.sections tbody tr td {
+	color: #aaa;
+	font-size: 0.7em;
+	font-weight: 400;
+	margin: 0;
+	border: none;
+	padding: 0;
+	padding-right: 0.4em;
+}
+table.sections tbody tr td.day {
+	font-weight: 800;
+}
+.add-class-link {
+	text-align: center;
+	margin: 1em;
+}
+a.add-class:link, a.add-class:visited {
+	text-decoration: none;
+	color: #aaa;
+	padding: 0.5em;
+	border: 1px solid #aaa;
+	transition: color 0.5s ease, border-color 0.5s ease;
+}
+a.add-class:hover {
+	color: darkturquoise;
+	border-color: darkturquoise;
 }
 
 .bold {

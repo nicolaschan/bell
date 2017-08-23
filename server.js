@@ -59,8 +59,8 @@ var startWebServer = function(callback) {
       server_name: config['server name']
     });
   });
-  app.get('/enter', (req, res) => {
-    res.render('enter');
+  app.get('/classes', (req, res) => {
+    res.render('classes');
   });
   app.get('/blog', (req, res) => {
     res.render('blog');
