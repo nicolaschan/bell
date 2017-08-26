@@ -62,6 +62,9 @@ var startWebServer = function(callback) {
   app.get('/classes', (req, res) => {
     res.render('classes');
   });
+  app.get('/enter', (req, res) => {
+    res.render('enter');
+  });
   app.get('/blog', (req, res) => {
     res.render('blog');
   });
@@ -228,6 +231,9 @@ var startWebServer = function(callback) {
   app.get('/api/themes', (req, res) => {
     res.set('Content-Type', 'text/json');
     res.sendFile(__dirname + '/data/themes.json');
+  });
+  app.get('/css/clockpicker.css', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/clockpicker/dist/jquery-clockpicker.min.css')
   });
 
   app.use('/favicons', express.static('favicons'));

@@ -7,6 +7,11 @@ body {
 	// overflow-x: hidden;
 }
 
+#enter-section input,
+#enter-section select {
+	margin: 0.1em 0.5em;
+}
+
 .message-header {
 	padding: 10px;
 	background-color: #ffffaa;
@@ -25,6 +30,15 @@ body {
 	background-color: #ddd;
 	transition: background-color 3s ease;
 	text-align: center;
+}
+
+.course-input {
+	text-align: center;
+}
+
+input.course-name {
+	margin: 2em 0.5em;
+	width: 20em;
 }
 
 ul.class-list {
@@ -52,18 +66,18 @@ table.sections tbody tr td {
 table.sections tbody tr td.day {
 	font-weight: 800;
 }
-.add-class-link {
+.add-link {
 	text-align: center;
 	margin: 1em;
 }
-a.add-class:link, a.add-class:visited {
+a.add:link, a.add:visited {
 	text-decoration: none;
 	color: #aaa;
 	padding: 0.5em;
 	border: 1px solid #aaa;
 	transition: color 0.5s ease, border-color 0.5s ease;
 }
-a.add-class:hover {
+a.add:hover {
 	color: darkturquoise;
 	border-color: darkturquoise;
 }

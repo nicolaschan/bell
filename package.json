@@ -7,8 +7,7 @@
     "build": "webpack -p",
     "build:watch": "npm run build -- -w",
     "prebuild": "npm install",
-    "test": "mocha",
-    "start": "node server.js"
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
