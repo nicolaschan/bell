@@ -42,6 +42,10 @@
 09/04/2017 holiday (Labor Day)
 09/20/2017 modified-even
 09/21/2017 modified-odd
+10/10/2017 assembly (Homecoming Assembly)
+10/11/2017 special-activities
+10/12/2017 normal
+10/13/2017 minimum-day
 11/10/2017 holiday (Veteran's Day)
 11/22/2017 holiday (Teacher Service Day)
 11/23/2017 holiday (Thanksgiving Day)

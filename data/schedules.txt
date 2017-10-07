@@ -127,24 +127,24 @@
 12:35 After School
 
 * minimum-day (Minimum Day)
-7:25 Passing to {0}
-7:30 {0}
-8:00 Passing to {1}
-8:05 {1}
-8:35 Passing to {2}
-8:40 {2}
-9:10 Passing to {3}
-9:15 {3}
-9:45 Passing to {4}
-9:50 {4}
-10:20 Brunch
-10:30 Passing to {5}
-10:35 {5}
-11:05 Passing to {6}
-11:10 {6}
-11:40 Passing to {7}
-11:45 {7}
-12:15 After School
+7:30 Passing to {0}
+7:35 {0}
+8:10 Passing to {1}
+8:15 {1}
+8:50 Passing to {2}
+8:55 {2}
+9:30 Brunch
+9:40 Passing to {3}
+9:45 {3}
+10:20 Passing to {4}
+10:25 {4}
+11:00 Passing to {5}
+11:05 {5}
+11:40 Passing to {6}
+11:45 {6}
+12:20 Passing to {7}
+12:25 {7}
+13:00 After School
 
 * communication-even (Communication Even Block)
 7:15 Passing to {0}
@@ -265,3 +265,8 @@
 14:40 Passing to {7}
 14:45 {7}
 15:30 After School
+
+* special-activities (Special Activities)
+8:05 Passing to Student Activities/Testing
+8:10 Student Activities/Testing
+12:30 After School
