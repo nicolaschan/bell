@@ -16,5 +16,11 @@ module.exports = {
   output: {
     path: __dirname + '/bin/',
     filename: '[name].js'
+  },
+  module: {
+    rules: [{
+      test: /\.coffee$/,
+      use: ['coffee-loader']
+    }]
   }
 };

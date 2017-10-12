@@ -27,6 +27,7 @@
     "visibilityjs": "^1.2.4"
   },
   "devDependencies": {
+    "coffee-loader": "^0.8.0",
     "coffeescript": "^2.0.1",
     "gulp": "^3.9.1",
     "gulp-shell": "^0.5.2",
