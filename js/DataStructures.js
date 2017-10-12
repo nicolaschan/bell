@@ -1,24 +1,4 @@
-var Week = {
-	SUN: 0,
-	MON: 1,
-	TUE: 2,
-	WED: 3,
-	THU: 4,
-	FRI: 5,
-	SAT: 6
-};
-
-var ClassType = {
-	DISC: 0,
-	LEC: 1,
-	LAB: 2
-};
-
 var exporting = {};
-
-// TODO
-// have the user first enter a class, then set specifics for disc/lec/lab
-// with alternative option to enter a custom block
 
 /**
  * Specifies a custom class period.
@@ -68,20 +48,12 @@ exporting.removeSection = removeSection;
  * Specifies a section within a class.
  *
  * @param {Week} day specifies the day of the week.
- * @param {String} start specifies the start time of the class. Must be formatted as "xx:xx".
- * @param {String} end specifies the end time of the class. Must be formatted as "xx:xx:".
- * @param {String} bldg the building in which the class takes place.
- * @param {int} room the number of the room in which the class is held.
- * @param {ClassType} the type of session this schedule block is is.
- * @param {String} the name of the instructor.
+ * @param {[Int]} time specifies start and end. I hope it was validated.
  */
-var Section = function(day, start, end, bldg, room, type, instr) {
+var Section = function(day, time) {
 	this.day = day;
-	this.start = start;
-	this.end = end;
-	this.bldg = bldg;
-	this.room = room;
-	this.instr = instr;
+	this.start = time[0];
+	this.end = time[1];
 };
 exporting.Section = Section;
 
@@ -93,6 +65,7 @@ Section.prototype.identifier = function() {
 	return this.day + this.start;
 };
 
+/*
 Section.prototype.splitStart = function() {
 	var ret = this.start.split(":");
 	if(ret.length != 2)
@@ -114,13 +87,12 @@ Section.prototype.splitEnd = function() {
 		return ret;
 	}
 };
+*/
 
 /**
  * Ensures that an entered section is valid.
  */
 Section.prototype.validate = function() {
-	if(this.day < Week.SUN || this.day > Week.SAT)
-		throw new Error("Invalid day of the week");
 	if(compareTimes(this.start, this.end) > 0);
 	else
 		throw new Error("End time must come before start time");
