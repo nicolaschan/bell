@@ -1,14 +1,8 @@
 extends generic.pug
 block body
+  script(src='/bin/settings.js')
   .blog-header
     h1 Settings 
   .container
-    .top.right.extension#extension
-      table
-        tr
-          td
-            //a.link.center-vertical(href="/blog", target="_blank")
-            span#extension-text A More Customizable Bell Countdown
-          td
-            a.dismiss.center-vertical#dismiss(href="#")
-              i.material-icons cancel
+    .centered
+      input.inputBox.center-text(type='text', placeholder='Subscribe to Schedule', maxlength=16, autofocus)

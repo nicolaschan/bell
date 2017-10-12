@@ -62,6 +62,10 @@ a.course-link {
 	text-align: center;
 }
 
+.center-text {
+	text-align: center;
+}
+
 input.course-name {
 	margin: 2em 0.5em;
 	width: 20em;
