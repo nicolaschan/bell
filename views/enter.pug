@@ -4,7 +4,8 @@ block body
   .blog-header
     h1 Enter Course 
   .course-input Course Name
-    input.inputBox.course-name(type='text', placeholder='Course Name', maxlength='30', autofocus)
+    input.inputBox.course-name#course-name(type='text', placeholder='Course Name', maxlength='30', autofocus)
     #enter-section
   .add-link
     a.add#add-section-button(href='#') + Add Section
+    a.add#done-button(href='#') Done

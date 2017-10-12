@@ -1,26 +1,8 @@
 extends generic.pug
 block body
+  script(src='/bin/classes.js')
   .blog-header
     h1 Enter Classes
   .add-link
     a(href="/enter").add + Add Class
-  ul.class-list
-    li CS 61A LEC
-      table.sections
-        tr
-          td.day Mon
-          td 8a - 9a
-        tr
-          td.day Wed
-          td 8a - 9a
-        tr
-          td.day Fri
-          td 8a - 9a
-    li MATH 54 LEC
-      table.sections
-        tr
-          td.day Tue
-          td 8a - 9a
-        tr
-          td.day Thu
-          td 8a - 9a
+  ul.class-list#class-list

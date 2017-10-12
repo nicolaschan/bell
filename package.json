@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack -p",
+    "build": "webpack",
     "build:watch": "npm run build -- -w",
-    "prebuild": "npm install",
     "test": "mocha"
   },
   "author": "",
@@ -28,6 +27,7 @@
     "visibilityjs": "^1.2.4"
   },
   "devDependencies": {
+    "coffeescript": "^2.0.1",
     "gulp": "^3.9.1",
     "gulp-shell": "^0.5.2",
     "mocha": "^3.5.0",

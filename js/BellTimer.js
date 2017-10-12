@@ -33,7 +33,60 @@ var self;
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
+  BellTimer.prototype.loadCustomCourses = function(callback) {
+    var courses = self.cookieManager.getJSON('courses');
+
+    var calendar = {
+      defaultWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      specialDays: {}
+    };
+
+    var schedules = {};
+
+    for (var i in calendar.defaultWeek) {
+      schedules[calendar.defaultWeek[i]] = {
+        displayName: calendar.defaultWeek[i],
+        periods: []
+      };
+    }
+
+    for (var name in courses) {
+      for (var section of courses[name]) {
+        if (!schedules[section[0]])
+          schedules[section[0]] = {
+            displayName: section[0],
+            periods: []
+          };
+        schedules[section[0]].periods.push({
+          name: name,
+          time: section[1]
+        });
+        if (section[2][0] == 24)
+          console.log(name, section);
+        schedules[section[0]].periods.push({
+          name: 'Free',
+          time: section[2]
+        });
+        schedules[section[0]].periods
+          .sort((a, b) => {
+            var startDifference = (a.time[0] * 60 + a.time[1]) - (b.time[0] * 60 + b.time[1]);
+            return startDifference;
+          });
+      }
+    }
+
+    self.bellCompensation = 0;
+    self.schedules = schedules;
+    self.calendar = calendar;
+
+    if (callback)
+      return callback();
+  };
   BellTimer.prototype.reloadData = function(callback) {
+    var dataSource = self.cookieManager.getDefault('source', 'lahs');
+    if (dataSource == 'custom')
+      return self.loadCustomCourses(callback);
+
     var parseData = function(data) {
       var rawSchedules = data.schedules;
       for (var key in rawSchedules) {

@@ -65,6 +65,9 @@ var startWebServer = function(callback) {
   app.get('/enter', (req, res) => {
     res.render('enter');
   });
+  app.get('/settings', (req, res) => {
+    res.render('settings');
+  });
   app.get('/blog', (req, res) => {
     res.render('blog');
   });

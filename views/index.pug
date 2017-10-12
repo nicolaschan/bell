@@ -1,7 +1,6 @@
 extends generic.pug
 block body
-  script(type="text/javascript", src="/timesync/timesync.js")
-  script(type="text/javascript", src="/bin/client.js?v=" + version)
+  script(type="text/javascript", src="/bin/client.js")
   .container#page1
     .centered#countdown
       span.time#time
@@ -18,7 +17,7 @@ block body
         tr
           td
             //a.link.center-vertical(href="/blog", target="_blank")
-            span#extension-text Welcome back to school, and have a great year!
+            span#extension-text A More Customizable Bell Countdown
           td
             a.dismiss.center-vertical#dismiss(href="#")
               i.material-icons cancel

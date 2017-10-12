@@ -34,6 +34,12 @@
       return valueBase64;
     }
   };
+  CookieManager.prototype.getDefault = function(key, defaultValue) {
+    var result = this.get(key);
+    if (!result)
+      this.set(key, defaultValue);
+    return this.get(key);
+  };
   CookieManager.prototype.getRaw = function(key) {
     return this.Cookies.get(key);
   };

@@ -201,7 +201,8 @@ const $ = require('jquery');
       };
 
       $('#settingsIcon').click(function() {
-        enterSettingsMode();
+        window.location.href = '/settings'
+          // enterSettingsMode();
       });
       $('#doneIcon').click(function() {
         exitSettingsMode();

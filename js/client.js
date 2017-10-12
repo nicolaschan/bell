@@ -13,7 +13,7 @@ const UIManager = require('./UIManager.js');
 const IntervalManager = require('./IntervalManager.js');
 
 var logger = new SimpleLogger();
-logger.setLevel('warn');
+logger.setLevel('info');
 var cookieManager = new CookieManager(Cookies);
 var themeManager = new ThemeManager(cookieManager);
 var classesManager = new ClassesManager(cookieManager);
@@ -79,7 +79,7 @@ $(window).on('load', function() {
     // Initialize BellTimer
     async.asyncify(_.partial(logger.info, 'Loading data...')),
     async.asyncify(_.partial(uiManager.setLoadingMessage, 'Loading')),
-    _.partial(bellTimer.reloadData),
+    _.partial(bellTimer.initialize),
     async.asyncify(_.partial(logger.info, 'Synchronizing...')),
     async.asyncify(_.partial(uiManager.setLoadingMessage, 'Synchronizing')),
     _.partial(bellTimer.initializeTimesync),
@@ -95,7 +95,6 @@ $(window).on('load', function() {
     //async.asyncify(),
 
   ], function(err) {
-
     // Report analytics
     analyticsManager.reportAnalytics();
 

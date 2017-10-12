@@ -4,7 +4,8 @@ module.exports = {
   entry: {
     client: ['./js/client.js'],
     stats: ['./js/stats.js'],
-    enter: ['./js/enter.js']
+    enter: ['./js/enter.js'],
+    classes: ['./js/classes.js']
   },
   resolve: {
     alias: {}
