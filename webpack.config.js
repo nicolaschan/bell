@@ -2,11 +2,11 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    client: ['./js/client.js'],
-    stats: ['./js/stats.js'],
-    enter: ['./js/enter.js'],
-    classes: ['./js/classes.js'],
-    settings: ['./js/settings.js']
+    client: ['./src/client.js'],
+    stats: ['./src/stats.js'],
+    enter: ['./src/enter.js'],
+    classes: ['./src/classes.js'],
+    settings: ['./src/settings.coffee']
   },
   resolve: {
     alias: {}
