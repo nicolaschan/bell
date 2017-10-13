@@ -50,8 +50,8 @@ var self;
       };
     }
 
-    for (var name in courses) {
-      for (var section of courses[name]) {
+    for (var course of courses) {
+      for (var section of course) {
         if (!schedules[section[0]])
           schedules[section[0]] = {
             displayName: section[0],

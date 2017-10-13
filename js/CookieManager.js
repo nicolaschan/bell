@@ -6,7 +6,7 @@
     };
 
     CookieManager.prototype.set = function(key, value, expires) {
-        this.Cookies.remove(key);
+        this.remove(key);
 
         if (typeof value != 'string')
             value = JSON.stringify(value);
@@ -17,7 +17,7 @@
         return this.setRaw(key, valueBase64, expires);
     };
     CookieManager.prototype.setRaw = function(key, rawValue, expires) {
-        this.Cookies.remove(key);
+        this.remove(key);
 
         return this.Cookies.set(key, rawValue, {
             expires: (expires) ? expires : 365
@@ -77,7 +77,7 @@
     };
     CookieManager.prototype.setLong = function(key, longValue, expires) {
         for (var i = 0; this.getRaw(key + '_' + i); i++)
-            this.Cookies.remove(key + '_' + i);
+            this.remove(key + '_' + i);
         if (typeof longValue != 'string')
             longValue = JSON.stringify(longValue);
 
@@ -86,6 +86,10 @@
         for (var i = 0; i < parts.length; i++) {
             this.setRaw(key + '_' + i, parts[i], expires);
         }
+    };
+
+    CookieManager.prototype.remove = function(key) {
+        return this.Cookies.remove(key);
     };
 
     module.exports = CookieManager;

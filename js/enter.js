@@ -57,7 +57,7 @@ var parseTime = function(timestring) {
      */
     timestring = timestring.trim();
     // check if AM/PM is specified
-    var tokens = timestring.split(/[\sap]/);
+    var tokens = timestring.split(/\s/);
     var checkTime = function(time) { // time is an int array :)
         var hour = time[0];
         var min = time[1];
@@ -66,24 +66,30 @@ var parseTime = function(timestring) {
     var getTime = function(time) { // time is a string array
         if (time.length != 1 && time.length != 2)
             throw new Error("Failed to parse time " + tokens[0]);
+        var x;
         if (time.length == 1)
-            return [parseInt(time[0]), 0];
+            x = [parseInt(time[0]), 0];
         else
-            return [parseInt(time[0]), parseInt(time[1])]
+            x = [parseInt(time[0]), parseInt(time[1])];
+        if (checkTime(x))
+            return x;
+        else
+            throw new Error("Time " + x + " is out of range.");
     };
-    getTime = (time) => checkTime(getTime(time));
+    console.log(tokens);
+    var word = (arr, x) => arr.toUpperCase().indexOf(x) > -1;
     switch (tokens.length) {
         case 1: // TODO interpret either as 24hr or as most likely 12hr input
-            return getTime(tokens[0].split(':'));
         case 2: // someone told AM/PM (or o'clock)
             var pm = false;
-            var word = tokens[1].toUpperCase();
-            if (word === 'AM');
-            else if (word === 'PM')
-                pm = true
-            else if (word === 'O\'CLOCK');
-            else
-                throw new Error("Failed to parse time " + tokens)
+            var i = tokens.length - 1;
+            if (word(tokens[i], 'AM'));
+            else if (word(tokens[i], 'PM'))
+                pm = true;
+            else if (word(tokens[i], 'O\'CLOCK'));
+            else if (tokens.length == 2)
+                throw new Error("Failed to parse time " + tokens);
+            tokens[0] = removeNonNumbers(tokens[0]);
             var [hour, min] = getTime(tokens[0].split(':'));
             return [hour + (pm ? (hour < 12 ? 12 : 0) : 0), min]
         case 0:
@@ -115,10 +121,9 @@ var saveCourse = function() {
     var courseName = $('#course-name').val().trim();
     var sectionDoms = $('#enter-section').children();
     var sections = [];
-    for (var i = 0; i < sectionDoms.length; i++) {
-        sections.push(readSection(sectionDoms[i]));
+    for (s of sectionDoms) {
+        sections.push(readSection(s));
     }
-
     var courses = cookieManager.getJSON('courses') || {};
     courses[courseName] = sections;
     cookieManager.set('courses', courses);
