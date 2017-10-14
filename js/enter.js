@@ -76,7 +76,6 @@ var parseTime = function(timestring) {
         else
             throw new Error("Time " + x + " is out of range.");
     };
-    console.log(tokens);
     var word = (arr, x) => arr.toUpperCase().indexOf(x) > -1;
     switch (tokens.length) {
         case 1: // TODO interpret either as 24hr or as most likely 12hr input
