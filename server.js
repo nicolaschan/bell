@@ -5,9 +5,11 @@ const express = require('express');
 const app = express();
 const server = http.createServer(app);
 const fs = require('fs');
+const path = require('path');
 const shortid = require('shortid');
 const async = require('async');
 const redis = require('redis');
+const request = require('request');
 const _ = require('lodash');
 const Sniffr = require('sniffr');
 const crypto = require('crypto');
@@ -43,14 +45,32 @@ var startWebServer = function(callback) {
     currentVersion = hash.update(fs.readFileSync('data/version.txt').toString()).digest('hex');
     return currentVersion;
   };
-  var getCorrection = function() {
-    return _.parseInt(fs.readFileSync('data/correction.txt').toString());
+  var getCorrection = function(source, callback) {
+    var meta = getLocalMeta(source);
+    if (meta.source == 'local')
+      return callback(null, _.parseInt(fs.readFileSync(`data/${source}/correction.txt`).toString()));
+    return request.get(`${meta.source}/api/data/${source}/correction`, (err, resp, body) => callback(err, body));
   };
-  var getSchedules = function() {
-    return fs.readFileSync('data/schedules.txt').toString();
+  var getSchedules = function(source, callback) {
+    var meta = getLocalMeta(source);
+    if (meta.source == 'local')
+      return callback(null, fs.readFileSync(`data/${source}/schedules.txt`).toString());
+    return request.get(`${meta.source}/api/data/${source}/schedules`, (err, resp, body) => callback(err, body));
   };
-  var getCalendar = function() {
-    return fs.readFileSync('data/calendar.txt').toString();
+  var getCalendar = function(source, callback) {
+    var meta = getLocalMeta(source);
+    if (meta.source == 'local')
+      return callback(null, fs.readFileSync(`data/${source}/calendar.txt`).toString());
+    return request.get(`${meta.source}/api/data/${source}/calendar`, (err, resp, body) => callback(err, body));
+  };
+  var getLocalMeta = function(source) {
+    return JSON.parse(fs.readFileSync(`./data/${source}/meta.json`).toString());
+  };
+  var getMeta = function(source, callback) {
+    var meta = JSON.parse(fs.readFileSync(`./data/${source}/meta.json`).toString());
+    if (meta.source == 'local')
+      return callback(null, meta);
+    return request.get(`${meta.source}/api/data/${source}/meta`, (err, resp, body) => callback(err, JSON.parse(body)));
   };
 
   app.get('/', (req, res) => {
@@ -58,6 +78,9 @@ var startWebServer = function(callback) {
       version: getVersion(),
       server_name: config['server name']
     });
+  });
+  app.get('/periods', (req, res) => {
+    res.render('periods');
   });
   app.get('/classes', (req, res) => {
     res.render('classes');
@@ -133,17 +156,31 @@ var startWebServer = function(callback) {
         res.json(out);
       });
     });
-  app.get('/api/correction', (req, res) => {
-    res.set('Content-Type', 'text/plain');
-    res.send(getCorrection().toString());
+
+  app.get('/api/sources', (req, res) => {
+    var directories = fs.readdirSync('data').filter(name => fs.lstatSync(path.join('data', name)).isDirectory());
+    directories = directories.map(source => {
+      var meta = require(`./data/${source}/meta.json`);
+      meta.id = source;
+      return meta;
+    });
+    res.json(directories);
   });
-  app.get('/api/calendar', (req, res) => {
-    res.set('Content-Type', 'text/plain');
-    res.send(getCalendar());
+
+  app.get('/api/data/:source/meta', (req, res) => {
+    getMeta(req.params.source, (err, meta) => res.json(meta));
   });
-  app.get('/api/schedules', (req, res) => {
+  app.get('/api/data/:source/correction', (req, res) => {
     res.set('Content-Type', 'text/plain');
-    res.send(getSchedules());
+    getCorrection(req.params.source, (err, correction) => res.send(correction.toString()));
+  });
+  app.get('/api/data/:source/calendar', (req, res) => {
+    res.set('Content-Type', 'text/plain');
+    getCalendar(req.params.source, (err, calendar) => res.send(calendar));
+  });
+  app.get('/api/data/:source/schedules', (req, res) => {
+    res.set('Content-Type', 'text/plain');
+    getSchedules(req.params.source, (err, schedules) => res.send(schedules));
   });
   app.get('/api/version', (req, res) => {
     res.set('Content-Type', 'text/plain');

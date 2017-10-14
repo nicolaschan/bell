@@ -37,7 +37,7 @@ const $ = require('jquery');
       // end stackoverflow
 
       var secretParameter = getParameterByName('secret');
-      var enabledSecrets = this.cookieManager.getJSON('secrets') || [];
+      var enabledSecrets = this.cookieManager.get('secrets') || [];
       if (secretParameter && enabledSecrets.indexOf(secretParameter) < 0)
         enabledSecrets.push(secretParameter);
 
@@ -46,7 +46,11 @@ const $ = require('jquery');
         enabledSecrets.splice(enabledSecrets.indexOf(removeSecretParameter), 1);
       this.cookieManager.set('secrets', enabledSecrets);
 
-      if (secretParameter || removeSecretParameter)
+      var source = getParameterByName('source');
+      if (source)
+        this.cookieManager.set('source', source);
+
+      if (secretParameter || removeSecretParameter || source)
         window.location = '/';
     };
 
@@ -60,7 +64,7 @@ const $ = require('jquery');
       $('#themeSelect').empty();
       for (var i in self.themeManager.getAvailableThemes()) {
         if (i.toLowerCase().indexOf('secret') == 0) {
-          var enabledSecrets = this.cookieManager.getJSON('secrets');
+          var enabledSecrets = this.cookieManager.get('secrets');
           var themeName = i.toLowerCase().substring(i.toLowerCase().indexOf(': ') + 2);
           if (!enabledSecrets || enabledSecrets.indexOf(themeName) < 0) {
             if (self.themeManager.getCurrentThemeName() == i)
@@ -81,7 +85,7 @@ const $ = require('jquery');
     };
     // show scroll indicator if they've never scrolled down before
     var showScrollIndicator = function() {
-      if (!self.cookieManager.getJSON('has_scrolled')) {
+      if (!self.cookieManager.get('has_scrolled')) {
         $('.downArrow').show();
         $('#downIcon').click(function(e) {
           $('body, html').animate({

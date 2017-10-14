@@ -6,7 +6,8 @@ module.exports = {
     stats: ['./src/stats.js'],
     enter: ['./src/enter.js'],
     classes: ['./src/classes.js'],
-    settings: ['./src/settings.coffee']
+    settings: ['./src/settings.coffee'],
+    periods: ['./src/periods.coffee']
   },
   resolve: {
     alias: {}

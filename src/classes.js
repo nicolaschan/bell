@@ -1,8 +1,6 @@
 const $ = require('jquery');
-const CookieManager = require('./CookieManager.js');
-const Cookies = require('js-cookie');
+const cookieManager = require('./CookieManager2.js');
 
-var cookieManager = new CookieManager(Cookies);
 global.cookieManager = cookieManager;
 
 var padNumber = function(number, padding) {
@@ -34,7 +32,7 @@ var generateCourseElement = function(name, sections) {
   }
   var deleteLink = $('<a class="delete-link" href="#"></a>').text('Delete');
   deleteLink.click(function(e) {
-    var courses = cookieManager.getJSON('courses');
+    var courses = cookieManager.get('courses');
     delete courses[name];
     cookieManager.set('courses', courses);
     reloadCourses();
@@ -45,7 +43,7 @@ var generateCourseElement = function(name, sections) {
 };
 
 var reloadCourses = function() {
-  var courses = cookieManager.getJSON('courses');
+  var courses = cookieManager.get('courses');
   $('#class-list').empty();
   for (var name in courses) {
     $('#class-list').append(generateCourseElement(name, courses[name]));

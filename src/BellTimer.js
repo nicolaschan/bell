@@ -34,7 +34,7 @@ var self;
     this.debug = logger;
   };
   BellTimer.prototype.loadCustomCourses = function(callback) {
-    var courses = self.cookieManager.getJSON('courses');
+    var courses = self.cookieManager.get('courses');
 
     var calendar = {
       defaultWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -89,6 +89,7 @@ var self;
 
     var parseData = function(data) {
       var rawSchedules = data.schedules;
+
       for (var key in rawSchedules) {
         var schedule = rawSchedules[key];
         for (var i = 0; i < schedule.periods.length; i++) {
@@ -99,7 +100,9 @@ var self;
             return a.concat(b);
           });
           for (var j = 1; j < nameSplit.length; j += 2) {
-            nameSplit[j] = self.classesManager.getClasses()[parseInt(nameSplit[j])];
+            var selectedName = self.cookieManager.getDefault('periods', {})[nameSplit[j]];
+            nameSplit[j] = selectedName || nameSplit[j];
+            // nameSplit[j] = self.classesManager.getClasses()[parseInt(nameSplit[j])];
           }
           var name = nameSplit.reduce(function(a, b) {
             return a.concat(b);
@@ -127,7 +130,7 @@ var self;
     var parseSchedules = function(text) {
       var outputSchedules = {};
 
-      var lines = text.split('\n');
+      var lines = text.split('\n').map(s => s.replace('\r', ''));
 
       var currentScheduleName;
       var currentSchedule;
@@ -170,7 +173,7 @@ var self;
         specialDays: {}
       };
 
-      var lines = text.split('\n');
+      var lines = text.split('\n').map(s => s.replace('\r', ''));
 
       for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
@@ -225,31 +228,31 @@ var self;
       });
 
     var getSchedules = function(callback) {
-      $.get('/api/schedules?v=' + Date.now())
+      $.get(`/api/data/${dataSource}/schedules?v=${Date.now()}`)
         .done(function(schedules) {
-          self.cookieManager.setLong('schedules', schedules);
+          self.cookieManager.set('schedules', schedules);
           var schedules = parseSchedules(schedules);
           callback(null, schedules);
         })
         .fail(function() {
-          var schedules = parseSchedules(self.cookieManager.getLong('schedules'));
+          var schedules = parseSchedules(self.cookieManager.get('schedules'));
           callback(null, schedules);
         });
     };
     var getCalendar = function(schedules, callback) {
-      $.get('/api/calendar?v=' + Date.now())
+      $.get(`/api/data/${dataSource}/calendar?v=${Date.now()}`)
         .done(function(calendar) {
-          self.cookieManager.setLong('calendar', calendar);
+          self.cookieManager.set('calendar', calendar);
           var calendar = parseCalendar(calendar, schedules);
           callback(null, calendar)
         })
         .fail(function() {
-          var calendar = parseCalendar(self.cookieManager.getLong('calendar'), schedules);
+          var calendar = parseCalendar(self.cookieManager.get('calendar'), schedules);
           callback(null, calendar);
         });
     };
     var getCorrection = function(callback) {
-      $.get('/api/correction?v=' + Date.now())
+      $.get(`/api/data/${dataSource}/correction?v=${Date.now()}`)
         .done(function(correction) {
           correction = parseInt(correction);
           self.bellCompensation = correction;
@@ -362,6 +365,7 @@ var self;
     var date = this.getDate();
     return this.getPeriodByNumber(date, this.getCurrentPeriodNumber(date));
   };
+  var x = true;
   BellTimer.prototype.getPeriodByNumber = function(date, i) {
     var currentPeriods = this.getCurrentSchedule(date).periods;
     if (i == -1) {

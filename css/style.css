@@ -7,6 +7,37 @@ body {
 	// overflow-x: hidden;
 }
 
+.selectize-dropdown, .selectize-input {
+	border-radius: 0;
+	border: 1px solid #fff;
+	line-height: 32px;
+	font-size: 16px;
+}
+.selectize-input input {
+	font-size: 16px;
+}
+.selectize-input.dropdown-active {
+	border-radius: 0;
+	border-color: darkturquoise;
+}
+
+.selectize-control.single .selectize-input {
+	background-color: white;
+	background-image: none;
+	border-color: #eee;
+}
+
+.selectize-dropdown.single {
+	border-color: #eee;
+}
+
+.desc {
+	color: #555;
+	text-align: justify;
+	margin: 1em 0;
+	font-size: 12px;
+}
+
 a.delete-link:link,
 a.delete-link:visited {
 	font-weight: 300;
@@ -69,6 +100,9 @@ a.course-link {
 input.course-name {
 	margin: 2em 0.5em;
 	width: 20em;
+}
+input.subscribe-name {
+	margin-bottom: 0.3em;
 }
 
 ul.class-list {
@@ -256,6 +290,11 @@ p.signature {
 	overflow-x: hidden;
 	background-position: center;
 }
+
+.inline {
+	display: inline-block;
+}
+
 .centered {
 	position: absolute;
 	top: 50%;

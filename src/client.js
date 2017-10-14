@@ -1,11 +1,10 @@
 const async = require('async');
 const _ = require('lodash');
 const $ = require('jquery');
-const Cookies = require('js-cookie');
 const Visibility = require('visibilityjs');
 const BellTimer = require('./BellTimer.js');
 const SimpleLogger = require('./SimpleLogger.js');
-const CookieManager = require('./CookieManager.js');
+// const CookieManager = require('./CookieManager.js');
 const ThemeManager = require('./ThemeManager.js');
 const ClassesManager = require('./ClassesManager.js');
 const AnalyticsManager = require('./AnalyticsManager.js');
@@ -14,7 +13,8 @@ const IntervalManager = require('./IntervalManager.js');
 
 var logger = new SimpleLogger();
 logger.setLevel('info');
-var cookieManager = new CookieManager(Cookies);
+// var cookieManager = new CookieManager(Cookies);
+var cookieManager = require('./CookieManager2.js');
 var themeManager = new ThemeManager(cookieManager);
 var classesManager = new ClassesManager(cookieManager);
 var analyticsManager = new AnalyticsManager(cookieManager, themeManager, logger);
@@ -69,6 +69,7 @@ global.bellTimer = bellTimer;
 global.logger = logger;
 global.cookieManager = cookieManager;
 global.$ = $;
+
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
 // bellTimer.enableDevMode(new Date('2017-05-23 8:00'), 60);
