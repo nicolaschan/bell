@@ -2,6 +2,7 @@ $ = require 'jquery'
 selectize = require 'selectize'
 
 cookieManager = require './CookieManager2'
+requestManager = require './RequestManager'
 ThemeManager = require './ThemeManager'
 
 themeManager = new ThemeManager cookieManager
@@ -12,7 +13,7 @@ global.themeManager = themeManager
 $ ->
 
   source = cookieManager.get 'source'
-  $.get("/api/data/#{source}/meta").done (meta) ->
+  requestManager.get("/api/data/#{source}/meta").then (meta) ->
     unless meta.periods
       return window.location.href = '/settings'
 

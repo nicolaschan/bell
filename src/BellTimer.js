@@ -2,6 +2,8 @@ const _ = require('lodash');
 const $ = require('jquery');
 const async = require('async');
 
+const requestManager = require('./RequestManager');
+
 var self;
 
 (function() {
@@ -82,7 +84,7 @@ var self;
     if (callback)
       return callback();
   };
-  BellTimer.prototype.reloadData = function(callback) {
+  BellTimer.prototype.reloadData = async function(callback) {
     var dataSource = self.cookieManager.getDefault('source', 'lahs');
     if (dataSource == 'custom')
       return self.loadCustomCourses(callback);
@@ -219,60 +221,25 @@ var self;
       return calendar;
     };
 
-    $.get('/api/version?v=' + Date.now())
-      .done(function(version) {
-        if (self.version && self.version != version)
-          $(window)[0].location.reload();
-        else
-          self.version = version;
-      });
+    var version = await requestManager.get('/api/version');
+    if (self.version && self.version != version)
+      $(window)[0].location.reload();
+    else
+      self.version = version;
 
-    var getSchedules = function(callback) {
-      $.get(`/api/data/${dataSource}/schedules?v=${Date.now()}`)
-        .done(function(schedules) {
-          self.cookieManager.set('schedules', schedules);
-          var schedules = parseSchedules(schedules);
-          callback(null, schedules);
-        })
-        .fail(function() {
-          var schedules = parseSchedules(self.cookieManager.get('schedules'));
-          callback(null, schedules);
-        });
-    };
-    var getCalendar = function(schedules, callback) {
-      $.get(`/api/data/${dataSource}/calendar?v=${Date.now()}`)
-        .done(function(calendar) {
-          self.cookieManager.set('calendar', calendar);
-          var calendar = parseCalendar(calendar, schedules);
-          callback(null, calendar)
-        })
-        .fail(function() {
-          var calendar = parseCalendar(self.cookieManager.get('calendar'), schedules);
-          callback(null, calendar);
-        });
-    };
-    var getCorrection = function(callback) {
-      $.get(`/api/data/${dataSource}/correction?v=${Date.now()}`)
-        .done(function(correction) {
-          correction = parseInt(correction);
-          self.bellCompensation = correction;
-          callback(null, correction);
-        })
-        .fail(function() {
-          self.bellCompensation = 0;
-          callback(null, 0);
-        });
-    };
-    getCorrection(function(err, correction) {
-      getSchedules(function(err, schedules) {
-        getCalendar(schedules, function(err, calendar) {
-          parseData({
-            schedules: schedules,
-            calendar: calendar
-          }, callback);
-        });
-      });
-    });
+    var correction = await requestManager.getDefault(`/api/data/${dataSource}/correction`, '0');
+    self.bellCompensation = parseInt(correction);
+
+    var schedules = await requestManager.get(`/api/data/${dataSource}/schedules`);
+    schedules = parseSchedules(schedules);
+
+    var calendar = await requestManager.get(`/api/data/${dataSource}/calendar`);
+    calendar = parseCalendar(calendar, schedules);
+
+    return parseData({
+      schedules: schedules,
+      calendar: calendar
+    }, callback);
   };
   BellTimer.prototype.initialize = function(callback) {
     async.series([
@@ -456,16 +423,17 @@ var self;
   BellTimer.prototype.synchronize = function(n, callback) {
     var getTimeCorrection = function(callback) {
       var sentTime = Date.now();
-      $.get('/api/time', function(data) {
-        var serverTime = data.time;
-        var currentTime = Date.now();
+      requestManager.getNoCache('/api/time')
+        .then(data => {
+          var serverTime = data.time;
+          var currentTime = Date.now();
 
-        var delay = Math.floor((currentTime - sentTime) / 2);
-        var correctedTime = serverTime + delay;
-        var correction = correctedTime - currentTime;
+          var delay = Math.floor((currentTime - sentTime) / 2);
+          var correctedTime = serverTime + delay;
+          var correction = correctedTime - currentTime;
 
-        callback(null, correction);
-      });
+          callback(null, correction);
+        });
     };
 
     var synchronize = function(n, callback) {

@@ -2,6 +2,7 @@ $ = require 'jquery'
 selectize = require 'selectize'
 
 cookieManager = require './CookieManager2'
+requestManager = require './RequestManager'
 ThemeManager = require './ThemeManager'
 
 themeManager = new ThemeManager cookieManager
@@ -20,7 +21,7 @@ $ ->
       {name: 'Custom', id: 'custom'}
     ]
     load: (query, callback) ->
-      $.get "/api/sources?query=#{query}", callback
+      requestManager.get("/api/sources?query=#{query}").then callback
     preload: yes
     render:
       item: (item, escape) -> "<div><b>#{item.name}</b> (#{item.id})</div>"
@@ -31,7 +32,7 @@ $ ->
         $('#edit-classes-button').prop 'href', '/classes'
         $('#edit-classes-button').text 'Edit Classes'
       else
-        $.get("/api/data/#{value}/meta").done (meta) ->
+        requestManager.get("/api/data/#{value}/meta").then (meta) ->
           $('#edit-classes-button').prop 'href', if meta.periods then '/periods' else '/classes' 
           $('#edit-classes-button').text if meta.periods then 'Edit Periods' else 'Edit Classes' 
     onLoad: (data) -> 

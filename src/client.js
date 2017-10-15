@@ -50,13 +50,13 @@ var intervals = {
   },
   background: {
     start: function(func, callback) {
-      callback(setInterval(func, 4 * 60 * 1000));
+      callback(setInterval(func, 4 * 60 * 1000 /*4 * 60 * 1000*/ ));
     },
     func: function() {
       logger.info('Loading data and synchronizing...');
       bellTimer.reloadData(function() {
         logger.success('Bell timer reloaded');
-        logger.info('Synchronization correction: ' + bellTimer.synchronizationCorrection);
+        logger.info('Synchronization correction: ' + bellTimer.bellCompensation);
         intervalManager.restart('oneSecond');
       });
     }
@@ -69,6 +69,7 @@ global.bellTimer = bellTimer;
 global.logger = logger;
 global.cookieManager = cookieManager;
 global.$ = $;
+global.requestManager = require('./RequestManager');
 
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
