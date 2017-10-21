@@ -41,6 +41,7 @@ jspm_packages
 
 # "Compiled" JavaScript
 bin
+chrome_extension/bin
 
 # Package lock
 package-lock.json
