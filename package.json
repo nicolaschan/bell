@@ -38,7 +38,7 @@
         "coffeescript": "^2.0.1",
         "gulp": "^3.9.1",
         "gulp-shell": "^0.5.2",
-        "mocha": "^3.5.0",
+        "mocha": "^3.5.3",
         "webpack": "^3.5.5"
     }
 }
