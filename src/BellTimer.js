@@ -88,8 +88,11 @@ var self;
       };
     }
 
-    for (var name in courses) {
-      for (var section of courses[name]) {
+    for (var id in courses) {
+      var course = courses[id];
+      var name = course.name;
+      var sections = course.sections;
+      for (var section of sections) {
         if (!schedules[section[0]])
           schedules[section[0]] = {
             displayName: section[0],
@@ -99,8 +102,6 @@ var self;
           name: name,
           time: section[1]
         });
-        if (section[2][0] == 24)
-          console.log(name, section);
         schedules[section[0]].periods.push({
           name: 'Free',
           time: section[2]

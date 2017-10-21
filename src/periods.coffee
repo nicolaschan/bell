@@ -39,7 +39,7 @@ $ ->
       textFieldIndex++
       return row
 
-    savedPeriods = cookieManager.getDefault('periods', {})
+    savedPeriods = cookieManager.get 'periods', {}
     for period in meta.periods
       row = generateTextFieldRow period
       periodName = savedPeriods[period] or period

@@ -20,8 +20,11 @@ var displayTimeArray = function(time) {
   return hour + min + part;
 };
 
-var generateCourseElement = function(name, sections) {
-  var element = $('<li></li>').append($(`<a class="course-link" href="/enter?class=${name}"></a>`).text(name));
+var generateCourseElement = function(id, course) {
+  var name = course.name;
+  var sections = course.sections;
+
+  var element = $('<li></li>').append($(`<a class="course-link" href="/enter?course=${id}"></a>`).text(name));
   var tableBody = $('<tbody></tbody>');
   var table = $('<table class="sections"></table>').append(tableBody);
   for (var section in sections) {
@@ -33,7 +36,7 @@ var generateCourseElement = function(name, sections) {
   var deleteLink = $('<a class="delete-link" href="#"></a>').text('Delete');
   deleteLink.click(function(e) {
     var courses = cookieManager.get('courses');
-    delete courses[name];
+    delete courses[id];
     cookieManager.set('courses', courses);
     reloadCourses();
   });
@@ -45,8 +48,8 @@ var generateCourseElement = function(name, sections) {
 var reloadCourses = function() {
   var courses = cookieManager.get('courses');
   $('#class-list').empty();
-  for (var name in courses) {
-    $('#class-list').append(generateCourseElement(name, courses[name]));
+  for (var id in courses) {
+    $('#class-list').append(generateCourseElement(id, courses[id]));
   }
 };
 

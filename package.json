@@ -21,6 +21,7 @@
     "loggy": "^0.3.5",
     "lzutf8": "^0.4.6",
     "pug": "^2.0.0-beta11",
+    "query-string": "^5.0.0",
     "redis": "^2.6.3",
     "request": "^2.83.0",
     "selectize": "^0.12.4",
