@@ -4,8 +4,10 @@ Web application to synchronize a timer to indicate the end of the periods at sch
 ## Features
 - Support for weekly schedules
 - Support for special schedules and holidays
+- Support for entering custom schedules
+- Support for fetching data from distributed sources
 - Visual indicator of the proportion of the time elapsed in current period
-- Customizable theme and period names, stored with client-side cookies
+- Customizable theme and period names, stored client-side
 - Accurately synchronizes, even if client computer time is incorrect
 - Adjustable correction for use when the server time is not the exact same as the school time
 - Stastistics and analytics recorded to a redis database, including number of daily hits and most popular themes
@@ -24,16 +26,16 @@ Before the weekly schedule can be created, we need to fill in the relevant sched
 Here is an example of how you would enter in a schedule:
 ```
 * even (Even Block)
-7:10 Passing to {0}
-7:15 {0}
-8:45 Passing to {2}
-8:50 {2}
+7:10 Passing to {Period 0}
+7:15 {Period 0}
+8:45 Passing to {Period 2}
+8:50 {Period 2}
 10:25 Brunch
-10:40 Passing to {4}
-10:45 {4}
+10:40 Passing to {Period 4}
+10:45 {Period 4}
 12:15 Lunch
-13:00 Passing to {6}
-13:05 {6}
+13:00 Passing to {Period 6}
+13:05 {Period 6}
 14:35 After School
 ```
 
