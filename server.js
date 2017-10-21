@@ -172,7 +172,7 @@ var startWebServer = function(callback) {
   });
   app.get('/api/data/:source/correction', (req, res) => {
     res.set('Content-Type', 'text/plain');
-    getCorrection(req.params.source, (err, correction) => res.send(correction.toString()));
+    getCorrection(req.params.source, (err, correction) => res.send(correction ? correction.toString() : '0'));
   });
   app.get('/api/data/:source/calendar', (req, res) => {
     res.set('Content-Type', 'text/plain');

@@ -4,7 +4,7 @@ const $ = require('jquery');
 const cache = 'requestCache';
 
 const RequestManager = {
-  get: async function(url) {
+  get: async function(url, defaultValue) {
     var result;
     try {
       result = await RequestManager.getNoCache(url);
@@ -12,21 +12,17 @@ const RequestManager = {
     } catch (e) {
       result = RequestManager.getCached(url);
     }
-    return result;
+    return result || defaultValue;
   },
   getNoCache: async function(url) {
     return await $.get(`${url}?_v=${Date.now()}`);
-  },
-  getDefault: async function(url, defaultValue) {
-    var result = await RequestManager.get(url);
-    return result || defaultValue;
   },
   getCached: function(url) {
     var cached = RequestManager.getAllCached();
     return cached[url];
   },
   getAllCached: function() {
-    return cookieManager.getDefault(cache, {});
+    return cookieManager.get(cache, {});
   },
   setAllCached: function(all) {
     return cookieManager.set(cache, all);

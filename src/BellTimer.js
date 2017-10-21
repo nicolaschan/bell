@@ -35,6 +35,42 @@ var self;
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
+  BellTimer.prototype.setBellCompensation = function(bellCompensation) {
+    this.bellCompensation = 0;
+  };
+  BellTimer.prototype.setSchedulesAndCalendar = function(schedules, calendar) {
+    var empty = true;
+    for (var day of calendar.defaultWeek) {
+      for (var period in schedules[day].periods) {
+        if (period.toLowerCase() != 'free') {
+          empty = false;
+          break;
+        }
+      }
+      if (!empty)
+        break;
+    }
+
+    if (empty) {
+      this.schedules = {
+        None: {
+          displayName: 'No schedules',
+          periods: [{
+            name: 'None',
+            time: [6, 0]
+          }]
+        }
+      };
+      this.calendar = {
+        defaultWeek: ['None', 'None', 'None', 'None', 'None', 'None', 'None'],
+        specialDays: {}
+      };
+      self.empty = true;
+    } else {
+      this.schedules = schedules;
+      this.calendar = calendar;
+    }
+  };
   BellTimer.prototype.loadCustomCourses = function(callback) {
     var courses = self.cookieManager.get('courses');
 
@@ -77,15 +113,14 @@ var self;
       }
     }
 
-    self.bellCompensation = 0;
-    self.schedules = schedules;
-    self.calendar = calendar;
+    self.setBellCompensation(0);
+    self.setSchedulesAndCalendar(schedules, calendar);
 
     if (callback)
       return callback();
   };
   BellTimer.prototype.reloadData = async function(callback) {
-    var dataSource = self.cookieManager.getDefault('source', 'lahs');
+    var dataSource = self.cookieManager.get('source', 'lahs');
     if (dataSource == 'custom')
       return self.loadCustomCourses(callback);
 
@@ -102,7 +137,7 @@ var self;
             return a.concat(b);
           });
           for (var j = 1; j < nameSplit.length; j += 2) {
-            var selectedName = self.cookieManager.getDefault('periods', {})[nameSplit[j]];
+            var selectedName = self.cookieManager.get('periods', {})[nameSplit[j]];
             nameSplit[j] = selectedName || nameSplit[j];
             // nameSplit[j] = self.classesManager.getClasses()[parseInt(nameSplit[j])];
           }
@@ -123,8 +158,7 @@ var self;
         }
       }
 
-      self.schedules = rawSchedules;
-      self.calendar = data.calendar;
+      self.setSchedulesAndCalendar(rawSchedules, data.calendar);
 
       if (callback)
         callback();
@@ -227,8 +261,8 @@ var self;
     else
       self.version = version;
 
-    var correction = await requestManager.getDefault(`/api/data/${dataSource}/correction`, '0');
-    self.bellCompensation = parseInt(correction);
+    var correction = await requestManager.get(`/api/data/${dataSource}/correction`, '0');
+    self.setBellCompensation(parseInt(correction));
 
     var schedules = await requestManager.get(`/api/data/${dataSource}/schedules`);
     schedules = parseSchedules(schedules);

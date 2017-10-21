@@ -390,6 +390,15 @@ td {
 #doneIcon:hover {
 	color: limegreen;
 }
+.doneIcon {
+	font-size: 50px;
+	color: #aaaaaa;
+	cursor: pointer;
+	transition: color 1s ease, opacity 2s ease;
+}
+.doneIcon:hover {
+	color: limegreen;
+}
 .loading {
 	text-align: center;
 	font-size: 18px;

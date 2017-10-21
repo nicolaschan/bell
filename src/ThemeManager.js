@@ -157,7 +157,7 @@ const _ = require('lodash');
     return theme;
   };
   ThemeManager.prototype.getCurrentThemeName = function() {
-    return this.cookieManager.getDefault('theme', defaultTheme);
+    return this.cookieManager.get('theme', defaultTheme);
   };
   ThemeManager.prototype.setCurrentTheme = function(themeName) {
     return this.cookieManager.set('theme', themeName);

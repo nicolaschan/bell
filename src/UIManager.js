@@ -282,14 +282,19 @@ const $ = require('jquery');
     var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
     if (time.split(':').length > 2)
       min = 60;
+
+    // Refresh icon every 10 sec in case icon isn't loaded properly
+    // https://github.com/nicolaschan/bell/issues/13
+    var cacheVersion = Math.floor(Date.now() / 10000);
+
     if (min < 2) {
-      $('#favicon').attr('href', 'favicons/red.png?v=1');
+      $('#favicon').attr('href', `favicons/red.png?v=${cacheVersion}`);
     } else if (min < 5) {
-      $('#favicon').attr('href', 'favicons/orange.png?v=1');
+      $('#favicon').attr('href', `favicons/orange.png?v=${cacheVersion}`);
     } else if (min < 15) {
-      $('#favicon').attr('href', 'favicons/yellow.png?v=1');
+      $('#favicon').attr('href', `favicons/yellow.png?v=${cacheVersion}`);
     } else {
-      $('#favicon').attr('href', 'favicons/lime.png?v=1');
+      $('#favicon').attr('href', `favicons/lime.png?v=${cacheVersion}`);
     }
 
     var theme = self.themeManager.getCurrentTheme();

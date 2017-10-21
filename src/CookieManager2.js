@@ -1,20 +1,14 @@
 const LZUTF8 = require('lzutf8');
 
 const CookieManager = {
-  get: function(key) {
+  get: function(key, defaultValue) {
     var raw = localStorage.getItem(key);
     if (!raw)
-      return null;
+      return defaultValue;
     var decompressed = LZUTF8.decompress(raw, {
       inputEncoding: 'BinaryString'
     });
     return JSON.parse(decompressed);
-  },
-  getDefault: function(key, defaultValue) {
-    var value = CookieManager.get(key);
-    if (!value)
-      CookieManager.set(key, defaultValue);
-    return CookieManager.get(key);
   },
   set: function(key, value) {
     var compressed = LZUTF8.compress(JSON.stringify(value), {
