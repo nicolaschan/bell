@@ -59,6 +59,7 @@ var intervals = {
         logger.info('Synchronization correction: ' + bellTimer.bellCompensation);
         intervalManager.restart('oneSecond');
       });
+      uiManager.loadPopup();
     }
   }
 };

@@ -1,15 +1,17 @@
+const Promise = require('bluebird');
+
 const config = require('./config.json');
 const logger = require('loggy');
 const http = require('http');
 const express = require('express');
 const app = express();
 const server = http.createServer(app);
-const fs = require('fs');
+const fs = Promise.promisifyAll(require('fs'));
 const path = require('path');
 const shortid = require('shortid');
 const async = require('async');
 const redis = require('redis');
-const request = require('request');
+const request = Promise.promisifyAll(require('request'));
 const _ = require('lodash');
 const Sniffr = require('sniffr');
 const crypto = require('crypto');
@@ -37,18 +39,24 @@ var connectToRedis = function(callback) {
 };
 var startWebServer = function(callback) {
   var cache = function(time, f) {
-    // takes a zero argument function and caches its result
+    // takes a function and caches its result
     // for a set number of seconds
 
     var previousCheck = 0;
-    var cached;
+    var cache = {};
 
     return function() {
-      if (Date.now() - previousCheck < 1000 * time && cached)
-        return cached;
-      previousCheck = Date.now();
-      cached = f();
-      return cached;
+      if (Date.now() - previousCheck > 1000 * time)
+        cache = {};
+
+      argumentString = JSON.stringify(arguments);
+
+      if (!cache[argumentString]) {
+        previousCheck = Date.now();
+        cache[argumentString] = f.apply(null, arguments);
+      }
+
+      return cache[argumentString];
     };
   };
 
@@ -63,33 +71,44 @@ var startWebServer = function(callback) {
     return JSON.parse(fs.readFileSync(`./data/message.json`).toString());
   });
 
-  var getCorrection = function(source, callback) {
-    var meta = getLocalMeta(source);
+  var getCorrection = cache(60, async function(source) {
+    var meta = await getLocalMeta(source);
+    if (meta.source == 'local') {
+      var correction = await fs.readFileAsync(`data/${source}/correction.txt`);
+      return _.parseInt(correction.toString());
+    }
+    var res = await request.getAsync(`${meta.source}/api/data/${source}/correction`);
+    return res.body;
+  });
+  var getSchedules = cache(60, async function(source) {
+    var meta = await getLocalMeta(source);
+    if (meta.source == 'local') {
+      var schedules = await fs.readFileAsync(`data/${source}/schedules.txt`);
+      return schedules.toString();
+    }
+    var res = await request.getAsync(`${meta.source}/api/data/${source}/schedules`);
+    return res.body;
+  });
+  var getCalendar = cache(60, async function(source) {
+    var meta = await getLocalMeta(source);
+    if (meta.source == 'local') {
+      var calendar = await fs.readFileAsync(`data/${source}/calendar.txt`);
+      return calendar.toString();
+    }
+    var res = await request.getAsync(`${meta.source}/api/data/${source}/calendar`);
+    return res.body;
+  });
+  var getLocalMeta = cache(60, async function(source) {
+    var meta = await fs.readFileAsync(`./data/${source}/meta.json`);
+    return JSON.parse(meta.toString());
+  });
+  var getMeta = cache(60, async function(source) {
+    var meta = await getLocalMeta(source);
     if (meta.source == 'local')
-      return callback(null, _.parseInt(fs.readFileSync(`data/${source}/correction.txt`).toString()));
-    return request.get(`${meta.source}/api/data/${source}/correction`, (err, resp, body) => callback(err, body));
-  };
-  var getSchedules = function(source, callback) {
-    var meta = getLocalMeta(source);
-    if (meta.source == 'local')
-      return callback(null, fs.readFileSync(`data/${source}/schedules.txt`).toString());
-    return request.get(`${meta.source}/api/data/${source}/schedules`, (err, resp, body) => callback(err, body));
-  };
-  var getCalendar = function(source, callback) {
-    var meta = getLocalMeta(source);
-    if (meta.source == 'local')
-      return callback(null, fs.readFileSync(`data/${source}/calendar.txt`).toString());
-    return request.get(`${meta.source}/api/data/${source}/calendar`, (err, resp, body) => callback(err, body));
-  };
-  var getLocalMeta = function(source) {
-    return JSON.parse(fs.readFileSync(`./data/${source}/meta.json`).toString());
-  };
-  var getMeta = function(source, callback) {
-    var meta = JSON.parse(fs.readFileSync(`./data/${source}/meta.json`).toString());
-    if (meta.source == 'local')
-      return callback(null, meta);
-    return request.get(`${meta.source}/api/data/${source}/meta`, (err, resp, body) => callback(err, JSON.parse(body)));
-  };
+      return meta;
+    var res = await request.getAsync(`${meta.source}/api/data/${source}/meta`);
+    return res.body;
+  });
 
   app.get('/', (req, res) => {
     res.render('index', {
@@ -187,23 +206,26 @@ var startWebServer = function(callback) {
   });
 
   app.get('/api/data/:source/meta', (req, res) => {
-    getMeta(req.params.source, (err, meta) => res.json(meta));
+    getMeta(req.params.source).then(meta => res.json(meta));
   });
   app.get('/api/data/:source/correction', (req, res) => {
     res.set('Content-Type', 'text/plain');
-    getCorrection(req.params.source, (err, correction) => res.send(correction ? correction.toString() : '0'));
+    getCorrection(req.params.source).then(correction => res.send(correction ? correction.toString() : '0'));
   });
   app.get('/api/data/:source/calendar', (req, res) => {
     res.set('Content-Type', 'text/plain');
-    getCalendar(req.params.source, (err, calendar) => res.send(calendar));
+    getCalendar(req.params.source).then(calendar => res.send(calendar));
   });
   app.get('/api/data/:source/schedules', (req, res) => {
     res.set('Content-Type', 'text/plain');
-    getSchedules(req.params.source, (err, schedules) => res.send(schedules));
+    getSchedules(req.params.source).then(schedules => res.send(schedules));
   });
   app.get('/api/version', (req, res) => {
     res.set('Content-Type', 'text/plain');
     res.send(getVersion());
+  });
+  app.get('/api/message', (req, res) => {
+    res.json(getMessage());
   });
   app.get('/api/uuid', (req, res) => {
     res.set('Content-Type', 'text/json');

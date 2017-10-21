@@ -37,7 +37,7 @@ $ ->
           $('#edit-classes-button').text if meta.periods then 'Edit Periods' else 'Edit Classes' 
     onLoad: (data) -> 
       unless hasLoaded
-        sourceSelector[0].selectize.setValue cookieManager.get('source')
+        sourceSelector[0].selectize.setValue cookieManager.get('source', 'lahs')
         hasLoaded = yes
 
   themeSelector = $('select#theme').selectize

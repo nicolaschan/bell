@@ -1,4 +1,5 @@
 {
-  "message": "Announcing the Updated Countdown",
+  "enabled": true,
+  "text": "Announcing the Updated Countdown",
   "href": "https://blog.countdown.zone"
 }

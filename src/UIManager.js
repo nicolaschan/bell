@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const $ = require('jquery');
+const requestManager = require('./RequestManager');
 
 (function() {
 
@@ -261,7 +262,40 @@ const $ = require('jquery');
     showScrollIndicator();
     setSettingsState();
     dynamicallySetFontSize();
-    slideExtension();
+    self.loadPopup();
+    // slideExtension();
+  };
+  UIManager.prototype.loadPopup = async function() {
+    var message = await requestManager.get('/api/message');
+    message.text = message.text.trim();
+
+    if (!message.enabled || !message.text)
+      return $('.extension').hide();
+    if (self.cookieManager.get('popup') == message.text)
+      return $('.extension').hide();
+    if ($('#extension-text').text() == message.text)
+      return;
+
+    $('#popup').empty();
+    if (message.href)
+      $('#popup').append(
+        $(`<a class="link center-vertical" href=${message.href} target="_blank"></a>`)
+        .append($(`<span id="extension-text"></span>`).text(message.text))
+      );
+    else
+      $('#popup').append($(`<span id="extension-text"></span>`).text(message.text));
+
+
+    $('.extension').css('visibility', 'visible');
+    $('.extension').css('opacity', 1);
+    $('.extension').show();
+    $('#dismiss').click(function(e) {
+      self.cookieManager.set('popup', message.text);
+      $('.extension').css('opacity', '0');
+      setTimeout(function() {
+        $('.extension').hide();
+      }, 1050);
+    });
   };
   UIManager.prototype.update = function() {
     var time = self.bellTimer.getTimeRemainingString();

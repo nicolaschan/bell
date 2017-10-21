@@ -15,12 +15,9 @@ block body
     .top.right.extension#extension
       table
         tr
-          td
-            if message.href
-              a.link.center-vertical(href=message.href, target="_blank")
-                span#extension-text #{message.message}
-            else
-              span#extension-text #{message.message}
+          td#popup
+              //- a.link.center-vertical(href=message.href, target="_blank")
+              //-   span#extension-text #{message.message}
           td
             a.dismiss.center-vertical#dismiss(href="#")
               i.material-icons cancel
