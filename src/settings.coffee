@@ -10,6 +10,7 @@ requestManager = new RequestManager cookieManager
 themeManager = new ThemeManager cookieManager
 
 global.cookieManager = cookieManager
+global.requestManager = requestManager
 global.themeManager = themeManager
 
 $ ->

@@ -25,6 +25,7 @@ const beta = false;
 
 var setup = function() {
     // bellTimer.enableDevMode(new Date('2017-05-12 8:00'), 60);
+
     var c = document.getElementById("circle");
     var ctx = c.getContext('2d');
 
@@ -64,8 +65,6 @@ var setup = function() {
         var color = schedule.color;
         var theme = thememan.getCurrentTheme();
         var themeName = thememan.getCurrentThemeName();
-
-        console.log(theme(time));
 
         $('#time').css('color', theme(time)[0]);
         $('.subtitle').css('color', theme(time)[1]);

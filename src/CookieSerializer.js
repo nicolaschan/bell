@@ -12,6 +12,18 @@ class Serializer {
             inputEncoding: 'BinaryString'
         }));
     }
+
+    serializeAll(obj) {
+        for (var key in obj)
+            obj[key] = this.serialize(obj[key]);
+        return obj;
+    }
+
+    deserializeAll(obj) {
+        for (var key in obj)
+            obj[key] = this.deserialize(obj[key])
+        return obj;
+    }
 }
 
 module.exports = Serializer;

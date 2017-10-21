@@ -24,6 +24,11 @@ class BellTimer {
         this.devMode = false;
         this.startTime = 0;
         this.timeScale = 1;
+
+        var devModeCookie = this.cookieManager.get('dev_mode');
+        if (devModeCookie) {
+            this.enableDevMode(devModeCookie.startDate, devModeCookie.scale);
+        }
     }
 
     setDebugLogFunction(logger) {
@@ -303,10 +308,23 @@ class BellTimer {
     }
 
     enableDevMode(startDate, scale) {
+        console.warn('You are in Developer Mode! Disable with `bellTimer.disableDevMode()`')
+
         this.devMode = true;
-        this.startTime = startDate.getTime();
+        this.startTime = new Date(startDate).getTime();
         this.devModeStartTime = Date.now();
         this.timeScale = scale;
+
+        this.cookieManager.set('dev_mode', {
+            enabled: this.devMode,
+            startDate: startDate,
+            scale: scale
+        });
+    }
+
+    disableDevMode() {
+        this.devMode = false;
+        this.cookieManager.remove('dev_mode');
     }
 
     getDate() {

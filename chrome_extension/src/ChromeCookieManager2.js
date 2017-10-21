@@ -1,18 +1,13 @@
+const $ = require('jquery');
+
 const CookieSerializer = require('../../src/CookieSerializer');
 const cookieSerializer = new CookieSerializer();
 
 class CookieManager {
-    constructor(port) {
-        this.port = port;
-        this.cookies = {};
-
-        this.addListener(msg => this.cookies = msg.value);
-    }
-
-    addListener(listener) {
-        this.port.onMessage.addListener(listener);
-        this.port.onMessage.removeListener(this.listener);
-        this.listener = listener;
+    constructor(cookies) {
+        this.cookies = cookies;
+        chrome.storage.local.clear(() =>
+            chrome.storage.local.set(cookies));
     }
 
     get(key, defaultValue) {
@@ -36,10 +31,20 @@ class CookieManager {
 }
 
 var CookieManagerFactory = async function() {
-    var port = await new Promise((resolve, reject) => {
-        chrome.runtime.onConnectExternal.addListener(resolve);
-    });
-    return new CookieManager(port);
+    if (window.countdownOnline) {
+        var port = await new Promise((resolve, reject) =>
+            chrome.runtime.onConnectExternal.addListener(resolve));
+
+        var cookies = await new Promise((resolve, reject) => {
+            port.onMessage.addListener(msg => resolve(msg.value));
+        });
+        return new CookieManager(cookies);
+    }
+
+    // Offline => get cookies from local storage
+    var items = await new Promise((resolve, reject) =>
+        chrome.storage.local.get(resolve));
+    return new CookieManager(items);
 };
 
 module.exports = CookieManagerFactory;

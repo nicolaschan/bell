@@ -40,14 +40,15 @@ Most stuff taken from the Google example page
       Could not load canvas.
     </canvas>
     <div class="centered loading"><i id="loadingIcon" class="material-icons">sync</i><br><span id="loadingMessage">Loading</span></div>
-    <script type="text/javascript" src="https://bell.lahs.club/timesync/timesync.js"></script>
+    <script type="text/javascript" src="http://localhost:8005/timesync/timesync.js"></script>
+    <script type="text/javascript" src="http://localhost:8005/bin/online.js"></script>
     <script src="bin/popup.js?v=undefined"></script>
 
     <style type="text/css">
-      iframe {
+      #iframe {
         display: none;
       }
     </style>
-    <iframe src="http://localhost:8005"></iframe>
+    <iframe src="http://localhost:8005" id="iframe"></iframe>
   </body>
 </html>
