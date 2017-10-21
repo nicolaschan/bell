@@ -1,19 +1,6 @@
 var exporting = {};
 
 /**
- * Specifies a custom class period.
- * 
- * @param {String} name the name of the class
- */
-var CustomClass = function(name) {
-	this.name = name;
-	this.sections = [];
-};
-exporting.CustomClass = CustomClass;
-
-// TODO associate sections with classes
-
-/**
  * Adds a section to a schedule, and performs validation against the schedule.
  */
 var addSection = function(schedule, section) {
@@ -48,12 +35,14 @@ exporting.removeSection = removeSection;
  * Specifies a section within a class.
  *
  * @param {Week} day specifies the day of the week.
- * @param {[Int]} time specifies start and end. I hope it was validated.
+ * @param {[Int]} start specifies [hour, min].
+ * @param {[Int]} end see start.
  */
-var Section = function(day, time) {
+var Section = function(day, start, end) {
 	this.day = day;
-	this.start = time[0];
-	this.end = time[1];
+	this.start = start;
+	this.end = end;
+	validate(this);
 };
 exporting.Section = Section;
 
@@ -92,10 +81,11 @@ Section.prototype.splitEnd = function() {
 /**
  * Ensures that an entered section is valid.
  */
-Section.prototype.validate = function() {
-	if(compareTimes(this.start, this.end) > 0);
-	else
-		throw new Error("End time must come before start time");
+var validate = function(sect) {
+	if(sect.start.length != 2 || sect.end.length != 2)
+		throw new Error("Too many fields in start or end time " + sect.start + " " + sect.end);
+	if(compareTimes(sect.start, sect.end) > 0)
+		throw new Error("End time must come after start time");
 };
 
 /**
@@ -149,16 +139,6 @@ var compareTimes = function(time, other) {
 		return 0;
 };
 exporting.compareTimes = compareTimes;
-
-/**
- * Specifies a custom section not attached to a class object.
- * The two classes are idential, except this takes a class name as the first argument.
- */
-var CustomSection = function(clazz, day, start, end, bldg, room, type, instr) {
-	Section.apply(this, day, start, end, bldg, room, type, instr);
-	this.clazz = clazz;
-};
-exporting.CustomSection = CustomSection;
 
 /**
  * Checks a new section against the current schedule before attempting to add the class to the schedule.
