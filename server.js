@@ -15,6 +15,7 @@ const Sniffr = require('sniffr');
 const crypto = require('crypto');
 var client; // redis client
 const timesyncServer = require('timesync/server');
+const base64Img = require('base64-img');
 
 var connectToRedis = function(callback) {
   if (!config['enable redis']) {
@@ -197,6 +198,14 @@ var startWebServer = function(callback) {
       time: Date.now()
     });
   });
+
+  // For converting images
+  // app.get('/api/favicons/:color', (req, res) => {
+  //   base64Img.base64(`${__dirname}/favicons/${req.params.color}.png`, (err, data) => {
+  //     res.set('Content-Type', 'text/plain');
+  //     res.send(data);
+  //   });
+  // });
 
   var bodyParser = require('body-parser')
   app.use(bodyParser.json()); // to support JSON-encoded bodies
