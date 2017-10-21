@@ -7,6 +7,68 @@ body {
 	// overflow-x: hidden;
 }
 
+.selectize-dropdown, .selectize-input {
+	border-radius: 0;
+	border: 1px solid #fff;
+	line-height: 32px;
+	font-size: 16px;
+}
+.selectize-input input {
+	font-size: 16px;
+}
+.selectize-input.dropdown-active {
+	border-radius: 0;
+	border-color: darkturquoise;
+}
+
+.selectize-control.single .selectize-input {
+	background-color: white;
+	background-image: none;
+	border-color: #eee;
+}
+
+.selectize-dropdown.single {
+	border-color: #eee;
+}
+
+.desc {
+	color: #555;
+	text-align: justify;
+	margin: 1em 0;
+	font-size: 12px;
+}
+
+a.delete-link:link,
+a.delete-link:visited {
+	font-weight: 300;
+	text-decoration: none;
+	font-size: 0.7em;
+	color: #aaa;
+}
+a.delete-link:hover {
+	color: red;
+}
+a.delete-link {
+	transition: color 0.6s ease;
+}
+
+a.course-link:link,
+a.course-link:visited {
+	color: #000;
+	text-decoration: none;
+}
+a.course-link:hover {
+	color: darkturquoise;
+}
+a.course-link {
+	transition: color 0.6s ease;
+}
+
+#enter-section input,
+#enter-section select {
+	margin: 0.1em 0.5em;
+}
+
 .message-header {
 	padding: 10px;
 	background-color: #ffffaa;
@@ -22,9 +84,67 @@ body {
 
 .blog-header {
 	padding: 20px;
-	background-color: lime;
+	background-color: #ddd;
 	transition: background-color 3s ease;
 	text-align: center;
+}
+
+.course-input {
+	text-align: center;
+}
+
+.center-text {
+	text-align: center;
+}
+
+input.course-name {
+	margin: 2em 0.5em;
+	width: 20em;
+}
+input.subscribe-name {
+	margin-bottom: 0.3em;
+}
+
+ul.class-list {
+	padding: 0;
+}
+
+ul.class-list li {
+	font-size: 1.2em;
+	list-style: none;
+	margin: 0.2em 8em;
+	padding: 0.3em;
+	border: 1px solid #ddd;
+	font-weight: 700;
+}
+
+table.sections tbody tr td {
+	color: #555;
+	font-size: 0.7em;
+	font-weight: 400;
+	margin: 0;
+	border: none;
+	padding: 0;
+	padding-right: 0.4em;
+}
+table.sections tbody tr td.day {
+	font-weight: 800;
+}
+.add-link {
+	text-align: center;
+	margin: 1em;
+}
+a.add:link, a.add:visited {
+	text-decoration: none;
+	color: #aaa;
+	margin: 0 0.5em;
+	padding: 0.5em;
+	border: 1px solid #aaa;
+	transition: color 0.5s ease, border-color 0.5s ease;
+}
+a.add:hover {
+	color: darkturquoise;
+	border-color: darkturquoise;
 }
 
 .bold {
@@ -170,6 +290,11 @@ p.signature {
 	overflow-x: hidden;
 	background-position: center;
 }
+
+.inline {
+	display: inline-block;
+}
+
 .centered {
 	position: absolute;
 	top: 50%;
@@ -263,6 +388,15 @@ td {
 	transition: color 1s ease, opacity 2s ease;
 }
 #doneIcon:hover {
+	color: limegreen;
+}
+.doneIcon {
+	font-size: 50px;
+	color: #aaaaaa;
+	cursor: pointer;
+	transition: color 1s ease, opacity 2s ease;
+}
+.doneIcon:hover {
 	color: limegreen;
 }
 .loading {

@@ -1,3 +1,6 @@
+# Because Jonathan uses a mac
+.DS_Store
+
 # Logs
 logs
 *.log
@@ -35,3 +38,9 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# "Compiled" JavaScript
+bin
+
+# Package lock
+package-lock.json

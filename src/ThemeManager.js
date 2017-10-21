@@ -3,7 +3,7 @@ const _ = require('lodash');
 (function() {
 
   const cookieName = 'theme';
-  const defaultTheme = 'Default - Light';
+  const defaultTheme = 'Gradient - Light';
 
   var parseTimeRemainingString = function(time) {
     var parts = _.map(time.split(':'), _.parseInt);
@@ -39,6 +39,20 @@ const _ = require('lodash');
       ['yellow', 'white', 'black', '#555555'],
       ['orange', 'white', 'black', '#555555'],
       ['red', 'white', 'black', '#555555']
+    ]),
+    'Gradient - Light': _.partial(getCurrentColorDefaultTiming, [
+      ['black', 'black', {
+        'background': 'linear-gradient(to bottom right, cyan, lime)'
+      }, 'white'],
+      ['black', 'black', {
+        'background': 'linear-gradient(to bottom right, lime, yellow)'
+      }, 'white'],
+      ['black', 'black', {
+        'background': 'linear-gradient(to bottom right, yellow, orange)'
+      }, 'white'],
+      ['black', 'black', {
+        'background': 'linear-gradient(to bottom right, orange, red)'
+      }, 'white']
     ]),
     'Grays - Light': _.partial(getCurrentColorDefaultTiming, [
       ['black', 'black', 'darkgray', 'white'],
@@ -135,18 +149,31 @@ const _ = require('lodash');
   };
 
   ThemeManager.prototype.getCurrentTheme = function() {
-    return themes[this.getCurrentThemeName()];
+    var theme = themes[this.getCurrentThemeName()];
+    if (!theme) {
+      this.setCurrentTheme(this.getDefaultThemeName());
+      theme = themes[this.getCurrentThemeName()];
+    }
+    return theme;
   };
   ThemeManager.prototype.getCurrentThemeName = function() {
-    if (!this.cookieManager.get('theme'))
-      this.cookieManager.set('theme', defaultTheme);
-    return this.cookieManager.get('theme');
+    return this.cookieManager.get('theme', defaultTheme);
   };
   ThemeManager.prototype.setCurrentTheme = function(themeName) {
     return this.cookieManager.set('theme', themeName);
   };
   ThemeManager.prototype.getAvailableThemes = function() {
-    return themes;
+    var availableThemes = {};
+    for (var theme in themes) {
+      if (theme.toLowerCase().indexOf('secret') > -1) {
+        var enabledSecrets = this.cookieManager.get('secrets');
+        var themeName = theme.toLowerCase().substring(theme.toLowerCase().indexOf(': ') + 2);
+        if (!enabledSecrets || enabledSecrets.indexOf(themeName) < 0)
+          continue;
+      }
+      availableThemes[theme] = themes[theme];
+    }
+    return availableThemes;
   };
   ThemeManager.prototype.getDefaultThemeName = function() {
     return defaultTheme;

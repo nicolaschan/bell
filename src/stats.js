@@ -2,7 +2,7 @@ const $ = require('jquery');
 const Chart = require('chart.js');
 
 $(function() {
-  $.get('/api/stats', function(data) {
+  requestManager.getNoCache('/api/stats').then(function(data) {
     var hits = [];
     var devices = [];
 

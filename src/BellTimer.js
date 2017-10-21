@@ -2,6 +2,8 @@ const _ = require('lodash');
 const $ = require('jquery');
 const async = require('async');
 
+const requestManager = require('./RequestManager');
+
 var self;
 
 (function() {
@@ -33,9 +35,99 @@ var self;
   BellTimer.prototype.setDebugLogFunction = function(logger) {
     this.debug = logger;
   };
-  BellTimer.prototype.reloadData = function(callback) {
+  BellTimer.prototype.setBellCompensation = function(bellCompensation) {
+    this.bellCompensation = 0;
+  };
+  BellTimer.prototype.setSchedulesAndCalendar = function(schedules, calendar) {
+    var empty = true;
+    for (var day of calendar.defaultWeek) {
+      for (var period in schedules[day].periods) {
+        if (period.toLowerCase() != 'free') {
+          empty = false;
+          break;
+        }
+      }
+      if (!empty)
+        break;
+    }
+
+    if (empty) {
+      this.schedules = {
+        None: {
+          displayName: 'No schedules',
+          periods: [{
+            name: 'None',
+            time: [6, 0]
+          }]
+        }
+      };
+      this.calendar = {
+        defaultWeek: ['None', 'None', 'None', 'None', 'None', 'None', 'None'],
+        specialDays: {}
+      };
+      self.empty = true;
+    } else {
+      this.schedules = schedules;
+      this.calendar = calendar;
+    }
+  };
+  BellTimer.prototype.loadCustomCourses = function(callback) {
+    var courses = self.cookieManager.get('courses');
+
+    var calendar = {
+      defaultWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      specialDays: {}
+    };
+
+    var schedules = {};
+
+    for (var i in calendar.defaultWeek) {
+      schedules[calendar.defaultWeek[i]] = {
+        displayName: calendar.defaultWeek[i],
+        periods: []
+      };
+    }
+
+    for (var id in courses) {
+      var course = courses[id];
+      var name = course.name;
+      var sections = course.sections;
+      for (var section of sections) {
+        if (!schedules[section[0]])
+          schedules[section[0]] = {
+            displayName: section[0],
+            periods: []
+          };
+        schedules[section[0]].periods.push({
+          name: name,
+          time: section[1]
+        });
+        schedules[section[0]].periods.push({
+          name: 'Free',
+          time: section[2]
+        });
+        schedules[section[0]].periods
+          .sort((a, b) => {
+            var startDifference = (a.time[0] * 60 + a.time[1]) - (b.time[0] * 60 + b.time[1]);
+            return startDifference;
+          });
+      }
+    }
+
+    self.setBellCompensation(0);
+    self.setSchedulesAndCalendar(schedules, calendar);
+
+    if (callback)
+      return callback();
+  };
+  BellTimer.prototype.reloadData = async function(callback) {
+    var dataSource = self.cookieManager.get('source', 'lahs');
+    if (dataSource == 'custom')
+      return self.loadCustomCourses(callback);
+
     var parseData = function(data) {
       var rawSchedules = data.schedules;
+
       for (var key in rawSchedules) {
         var schedule = rawSchedules[key];
         for (var i = 0; i < schedule.periods.length; i++) {
@@ -46,7 +138,9 @@ var self;
             return a.concat(b);
           });
           for (var j = 1; j < nameSplit.length; j += 2) {
-            nameSplit[j] = self.classesManager.getClasses()[parseInt(nameSplit[j])];
+            var selectedName = self.cookieManager.get('periods', {})[nameSplit[j]];
+            nameSplit[j] = selectedName || nameSplit[j];
+            // nameSplit[j] = self.classesManager.getClasses()[parseInt(nameSplit[j])];
           }
           var name = nameSplit.reduce(function(a, b) {
             return a.concat(b);
@@ -65,8 +159,7 @@ var self;
         }
       }
 
-      self.schedules = rawSchedules;
-      self.calendar = data.calendar;
+      self.setSchedulesAndCalendar(rawSchedules, data.calendar);
 
       if (callback)
         callback();
@@ -74,7 +167,7 @@ var self;
     var parseSchedules = function(text) {
       var outputSchedules = {};
 
-      var lines = text.split('\n');
+      var lines = text.split('\n').map(s => s.replace('\r', ''));
 
       var currentScheduleName;
       var currentSchedule;
@@ -113,11 +206,11 @@ var self;
     };
     var parseCalendar = function(text, schedules) {
       var calendar = {
-        defaultWeek: [],
+        defaultWeek: [], // 0 is Sunday, 1 is Monday, etc.
         specialDays: {}
       };
 
-      var lines = text.split('\n');
+      var lines = text.split('\n').map(s => s.replace('\r', ''));
 
       for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
@@ -163,60 +256,25 @@ var self;
       return calendar;
     };
 
-    $.get('/api/version?v=' + Date.now())
-      .done(function(version) {
-        if (self.version && self.version != version)
-          $(window)[0].location.reload();
-        else
-          self.version = version;
-      });
+    var version = await requestManager.get('/api/version');
+    if (self.version && self.version != version)
+      $(window)[0].location.reload();
+    else
+      self.version = version;
 
-    var getSchedules = function(callback) {
-      $.get('/api/schedules?v=' + Date.now())
-        .done(function(schedules) {
-          self.cookieManager.setLong('schedules', schedules);
-          var schedules = parseSchedules(schedules);
-          callback(null, schedules);
-        })
-        .fail(function() {
-          var schedules = parseSchedules(self.cookieManager.getLong('schedules'));
-          callback(null, schedules);
-        });
-    };
-    var getCalendar = function(schedules, callback) {
-      $.get('/api/calendar?v=' + Date.now())
-        .done(function(calendar) {
-          self.cookieManager.setLong('calendar', calendar);
-          var calendar = parseCalendar(calendar, schedules);
-          callback(null, calendar)
-        })
-        .fail(function() {
-          var calendar = parseCalendar(self.cookieManager.getLong('calendar'), schedules);
-          callback(null, calendar);
-        });
-    };
-    var getCorrection = function(callback) {
-      $.get('/api/correction?v=' + Date.now())
-        .done(function(correction) {
-          correction = parseInt(correction);
-          self.bellCompensation = correction;
-          callback(null, correction);
-        })
-        .fail(function() {
-          self.bellCompensation = 0;
-          callback(null, 0);
-        });
-    };
-    getCorrection(function(err, correction) {
-      getSchedules(function(err, schedules) {
-        getCalendar(schedules, function(err, calendar) {
-          parseData({
-            schedules: schedules,
-            calendar: calendar
-          }, callback);
-        });
-      });
-    });
+    var correction = await requestManager.get(`/api/data/${dataSource}/correction`, '0');
+    self.setBellCompensation(parseInt(correction));
+
+    var schedules = await requestManager.get(`/api/data/${dataSource}/schedules`);
+    schedules = parseSchedules(schedules);
+
+    var calendar = await requestManager.get(`/api/data/${dataSource}/calendar`);
+    calendar = parseCalendar(calendar, schedules);
+
+    return parseData({
+      schedules: schedules,
+      calendar: calendar
+    }, callback);
   };
   BellTimer.prototype.initialize = function(callback) {
     async.series([
@@ -263,9 +321,9 @@ var self;
   BellTimer.prototype.getDate = function() {
     if (this.devMode)
       return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
-
-    return new Date(this.ts.now() + this.bellCompensation);
-    // return new Date(Date.now() + this.bellCompensation + this.synchronizationCorrection);
+    if (this.ts)
+      return new Date(this.ts.now() + this.bellCompensation);
+    return new Date(Date.now() + this.bellCompensation);
   };
   BellTimer.prototype.getTimeRemainingNumber = function() {
     var date = this.getDate();
@@ -309,6 +367,7 @@ var self;
     var date = this.getDate();
     return this.getPeriodByNumber(date, this.getCurrentPeriodNumber(date));
   };
+  var x = true;
   BellTimer.prototype.getPeriodByNumber = function(date, i) {
     var currentPeriods = this.getCurrentSchedule(date).periods;
     if (i == -1) {
@@ -399,16 +458,17 @@ var self;
   BellTimer.prototype.synchronize = function(n, callback) {
     var getTimeCorrection = function(callback) {
       var sentTime = Date.now();
-      $.get('/api/time', function(data) {
-        var serverTime = data.time;
-        var currentTime = Date.now();
+      requestManager.getNoCache('/api/time')
+        .then(data => {
+          var serverTime = data.time;
+          var currentTime = Date.now();
 
-        var delay = Math.floor((currentTime - sentTime) / 2);
-        var correctedTime = serverTime + delay;
-        var correction = correctedTime - currentTime;
+          var delay = Math.floor((currentTime - sentTime) / 2);
+          var correctedTime = serverTime + delay;
+          var correction = correctedTime - currentTime;
 
-        callback(null, correction);
-      });
+          callback(null, correction);
+        });
     };
 
     var synchronize = function(n, callback) {

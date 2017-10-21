@@ -1,11 +1,10 @@
 const async = require('async');
 const _ = require('lodash');
 const $ = require('jquery');
-const Cookies = require('js-cookie');
 const Visibility = require('visibilityjs');
 const BellTimer = require('./BellTimer.js');
 const SimpleLogger = require('./SimpleLogger.js');
-const CookieManager = require('./CookieManager.js');
+// const CookieManager = require('./CookieManager.js');
 const ThemeManager = require('./ThemeManager.js');
 const ClassesManager = require('./ClassesManager.js');
 const AnalyticsManager = require('./AnalyticsManager.js');
@@ -13,8 +12,9 @@ const UIManager = require('./UIManager.js');
 const IntervalManager = require('./IntervalManager.js');
 
 var logger = new SimpleLogger();
-logger.setLevel('warn');
-var cookieManager = new CookieManager(Cookies);
+logger.setLevel('info');
+// var cookieManager = new CookieManager(Cookies);
+var cookieManager = require('./CookieManager2.js');
 var themeManager = new ThemeManager(cookieManager);
 var classesManager = new ClassesManager(cookieManager);
 var analyticsManager = new AnalyticsManager(cookieManager, themeManager, logger);
@@ -50,15 +50,16 @@ var intervals = {
   },
   background: {
     start: function(func, callback) {
-      callback(setInterval(func, 4 * 60 * 1000));
+      callback(setInterval(func, 4 * 60 * 1000 /*4 * 60 * 1000*/ ));
     },
     func: function() {
       logger.info('Loading data and synchronizing...');
       bellTimer.reloadData(function() {
         logger.success('Bell timer reloaded');
-        logger.info('Synchronization correction: ' + bellTimer.synchronizationCorrection);
+        logger.info('Synchronization correction: ' + bellTimer.bellCompensation);
         intervalManager.restart('oneSecond');
       });
+      uiManager.loadPopup();
     }
   }
 };
@@ -69,6 +70,8 @@ global.bellTimer = bellTimer;
 global.logger = logger;
 global.cookieManager = cookieManager;
 global.$ = $;
+global.requestManager = require('./RequestManager');
+
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
 // bellTimer.enableDevMode(new Date('2017-05-23 8:00'), 60);
@@ -79,7 +82,7 @@ $(window).on('load', function() {
     // Initialize BellTimer
     async.asyncify(_.partial(logger.info, 'Loading data...')),
     async.asyncify(_.partial(uiManager.setLoadingMessage, 'Loading')),
-    _.partial(bellTimer.reloadData),
+    _.partial(bellTimer.initialize),
     async.asyncify(_.partial(logger.info, 'Synchronizing...')),
     async.asyncify(_.partial(uiManager.setLoadingMessage, 'Synchronizing')),
     _.partial(bellTimer.initializeTimesync),
@@ -95,7 +98,6 @@ $(window).on('load', function() {
     //async.asyncify(),
 
   ], function(err) {
-
     // Report analytics
     analyticsManager.reportAnalytics();
 

@@ -1,18 +1,23 @@
+const Promise = require('bluebird');
+
 const config = require('./config.json');
 const logger = require('loggy');
 const http = require('http');
 const express = require('express');
 const app = express();
 const server = http.createServer(app);
-const fs = require('fs');
+const fs = Promise.promisifyAll(require('fs'));
+const path = require('path');
 const shortid = require('shortid');
 const async = require('async');
 const redis = require('redis');
+const request = Promise.promisifyAll(require('request'));
 const _ = require('lodash');
 const Sniffr = require('sniffr');
 const crypto = require('crypto');
 var client; // redis client
 const timesyncServer = require('timesync/server');
+const base64Img = require('base64-img');
 
 var connectToRedis = function(callback) {
   if (!config['enable redis']) {
@@ -33,31 +38,96 @@ var connectToRedis = function(callback) {
   });
 };
 var startWebServer = function(callback) {
+  var cache = function(time, f) {
+    // takes a function and caches its result
+    // for a set number of seconds
+
+    var previousCheck = 0;
+    var cache = {};
+
+    return function() {
+      if (Date.now() - previousCheck > 1000 * time)
+        cache = {};
+
+      argumentString = JSON.stringify(arguments);
+
+      if (!cache[argumentString]) {
+        previousCheck = Date.now();
+        cache[argumentString] = f.apply(null, arguments);
+      }
+
+      return cache[argumentString];
+    };
+  };
+
   var previousCheck = 0;
   var currentVersion;
-  var getVersion = function() {
-    if (Date.now() - previousCheck < 1000 * 60 && currentVersion) return currentVersion;
-
-    previousCheck = Date.now();
+  var getVersion = cache(60, function() {
     var hash = crypto.createHash('md5');
     currentVersion = hash.update(fs.readFileSync('data/version.txt').toString()).digest('hex');
     return currentVersion;
-  };
-  var getCorrection = function() {
-    return _.parseInt(fs.readFileSync('data/correction.txt').toString());
-  };
-  var getSchedules = function() {
-    return fs.readFileSync('data/schedules.txt').toString();
-  };
-  var getCalendar = function() {
-    return fs.readFileSync('data/calendar.txt').toString();
-  };
+  });
+  var getMessage = cache(60, function() {
+    return JSON.parse(fs.readFileSync(`./data/message.json`).toString());
+  });
+
+  var getCorrection = cache(60, async function(source) {
+    var meta = await getLocalMeta(source);
+    if (meta.source == 'local') {
+      var correction = await fs.readFileAsync(`data/${source}/correction.txt`);
+      return _.parseInt(correction.toString());
+    }
+    var res = await request.getAsync(`${meta.source}/api/data/${source}/correction`);
+    return res.body;
+  });
+  var getSchedules = cache(60, async function(source) {
+    var meta = await getLocalMeta(source);
+    if (meta.source == 'local') {
+      var schedules = await fs.readFileAsync(`data/${source}/schedules.txt`);
+      return schedules.toString();
+    }
+    var res = await request.getAsync(`${meta.source}/api/data/${source}/schedules`);
+    return res.body;
+  });
+  var getCalendar = cache(60, async function(source) {
+    var meta = await getLocalMeta(source);
+    if (meta.source == 'local') {
+      var calendar = await fs.readFileAsync(`data/${source}/calendar.txt`);
+      return calendar.toString();
+    }
+    var res = await request.getAsync(`${meta.source}/api/data/${source}/calendar`);
+    return res.body;
+  });
+  var getLocalMeta = cache(60, async function(source) {
+    var meta = await fs.readFileAsync(`./data/${source}/meta.json`);
+    return JSON.parse(meta.toString());
+  });
+  var getMeta = cache(60, async function(source) {
+    var meta = await getLocalMeta(source);
+    if (meta.source == 'local')
+      return meta;
+    var res = await request.getAsync(`${meta.source}/api/data/${source}/meta`);
+    return res.body;
+  });
 
   app.get('/', (req, res) => {
     res.render('index', {
       version: getVersion(),
-      server_name: config['server name']
+      server_name: config['server name'],
+      message: getMessage()
     });
+  });
+  app.get('/periods', (req, res) => {
+    res.render('periods');
+  });
+  app.get('/classes', (req, res) => {
+    res.render('classes');
+  });
+  app.get('/enter', (req, res) => {
+    res.render('enter');
+  });
+  app.get('/settings', (req, res) => {
+    res.render('settings');
   });
   app.get('/blog', (req, res) => {
     res.render('blog');
@@ -74,7 +144,7 @@ var startWebServer = function(callback) {
     res.render('stats', {
       version: getVersion()
     });
-  })
+  });
   if (config['enable redis'])
     app.get('/api/stats', (req, res) => {
       var out = {};
@@ -124,21 +194,38 @@ var startWebServer = function(callback) {
         res.json(out);
       });
     });
-  app.get('/api/correction', (req, res) => {
-    res.set('Content-Type', 'text/plain');
-    res.send(getCorrection().toString());
+
+  app.get('/api/sources', (req, res) => {
+    var directories = fs.readdirSync('data').filter(name => fs.lstatSync(path.join('data', name)).isDirectory());
+    directories = directories.map(source => {
+      var meta = require(`./data/${source}/meta.json`);
+      meta.id = source;
+      return meta;
+    });
+    res.json(directories);
   });
-  app.get('/api/calendar', (req, res) => {
-    res.set('Content-Type', 'text/plain');
-    res.send(getCalendar());
+
+  app.get('/api/data/:source/meta', (req, res) => {
+    getMeta(req.params.source).then(meta => res.json(meta));
   });
-  app.get('/api/schedules', (req, res) => {
+  app.get('/api/data/:source/correction', (req, res) => {
     res.set('Content-Type', 'text/plain');
-    res.send(getSchedules());
+    getCorrection(req.params.source).then(correction => res.send(correction ? correction.toString() : '0'));
+  });
+  app.get('/api/data/:source/calendar', (req, res) => {
+    res.set('Content-Type', 'text/plain');
+    getCalendar(req.params.source).then(calendar => res.send(calendar));
+  });
+  app.get('/api/data/:source/schedules', (req, res) => {
+    res.set('Content-Type', 'text/plain');
+    getSchedules(req.params.source).then(schedules => res.send(schedules));
   });
   app.get('/api/version', (req, res) => {
     res.set('Content-Type', 'text/plain');
     res.send(getVersion());
+  });
+  app.get('/api/message', (req, res) => {
+    res.json(getMessage());
   });
   app.get('/api/uuid', (req, res) => {
     res.set('Content-Type', 'text/json');
@@ -151,6 +238,14 @@ var startWebServer = function(callback) {
       time: Date.now()
     });
   });
+
+  // For converting images
+  // app.get('/api/favicons/:color', (req, res) => {
+  //   base64Img.base64(`${__dirname}/favicons/${req.params.color}.png`, (err, data) => {
+  //     res.set('Content-Type', 'text/plain');
+  //     res.send(data);
+  //   });
+  // });
 
   var bodyParser = require('body-parser')
   app.use(bodyParser.json()); // to support JSON-encoded bodies
@@ -226,9 +321,12 @@ var startWebServer = function(callback) {
     res.set('Content-Type', 'text/json');
     res.sendFile(__dirname + '/data/themes.json');
   });
+  app.get('/css/clockpicker.css', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/clockpicker/dist/jquery-clockpicker.min.css')
+  });
 
   app.use('/favicons', express.static('favicons'));
-  app.use('/js', express.static('js'));
+  app.use('/bin', express.static('bin'));
   app.use('/css', express.static('css'));
   app.use('/img', express.static('img'));
 
