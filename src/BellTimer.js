@@ -321,9 +321,9 @@ var self;
   BellTimer.prototype.getDate = function() {
     if (this.devMode)
       return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
-
-    return new Date(this.ts.now() + this.bellCompensation);
-    // return new Date(Date.now() + this.bellCompensation + this.synchronizationCorrection);
+    if (this.ts)
+      return new Date(this.ts.now() + this.bellCompensation);
+    return new Date(Date.now() + this.bellCompensation);
   };
   BellTimer.prototype.getTimeRemainingNumber = function() {
     var date = this.getDate();

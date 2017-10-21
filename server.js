@@ -36,16 +36,33 @@ var connectToRedis = function(callback) {
   });
 };
 var startWebServer = function(callback) {
+  var cache = function(time, f) {
+    // takes a zero argument function and caches its result
+    // for a set number of seconds
+
+    var previousCheck = 0;
+    var cached;
+
+    return function() {
+      if (Date.now() - previousCheck < 1000 * time && cached)
+        return cached;
+      previousCheck = Date.now();
+      cached = f();
+      return cached;
+    };
+  };
+
   var previousCheck = 0;
   var currentVersion;
-  var getVersion = function() {
-    if (Date.now() - previousCheck < 1000 * 60 && currentVersion) return currentVersion;
-
-    previousCheck = Date.now();
+  var getVersion = cache(60, function() {
     var hash = crypto.createHash('md5');
     currentVersion = hash.update(fs.readFileSync('data/version.txt').toString()).digest('hex');
     return currentVersion;
-  };
+  });
+  var getMessage = cache(60, function() {
+    return JSON.parse(fs.readFileSync(`./data/message.json`).toString());
+  });
+
   var getCorrection = function(source, callback) {
     var meta = getLocalMeta(source);
     if (meta.source == 'local')
@@ -77,7 +94,8 @@ var startWebServer = function(callback) {
   app.get('/', (req, res) => {
     res.render('index', {
       version: getVersion(),
-      server_name: config['server name']
+      server_name: config['server name'],
+      message: getMessage()
     });
   });
   app.get('/periods', (req, res) => {
@@ -107,7 +125,7 @@ var startWebServer = function(callback) {
     res.render('stats', {
       version: getVersion()
     });
-  })
+  });
   if (config['enable redis'])
     app.get('/api/stats', (req, res) => {
       var out = {};
