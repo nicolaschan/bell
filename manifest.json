@@ -1,0 +1,34 @@
+{
+    "manifest_version": 2,
+    "name": "Countdown Extension",
+    "description": "An extension that displays the time remaining in classes.",
+    "version": "2.0.0",
+    "content_security_policy": "script-src 'self' https://bell.lahs.club; object-src 'self'",
+    "browser_action": {
+        "default_icon": "favicons/lime.png",
+        "default_popup": "chrome_extension/popup.html",
+        "default_title": "Countdown"
+    },
+    "background": {
+        "page": "chrome_extension/background.html"
+    },
+    "permissions": [
+        "background",
+        "cookies",
+        "alarms",
+        "https://bell.lahs.club/*",
+        "http://bell.lahs.club/*",
+        "http://localhost:8005/*",
+        "storage"
+    ],
+    "content_scripts": [{
+        "matches": ["http://localhost:8005/*"],
+        "js": ["chrome_extension/bin/contentScript.js"]
+    }],
+    "externally_connectable": {
+        "matches": ["http://localhost:8005/*"]
+    },
+    "icons": {
+        "128": "icons/icon128.png"
+    }
+}

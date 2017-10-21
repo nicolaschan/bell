@@ -1,10 +1,12 @@
 $ = require 'jquery'
 selectize = require 'selectize'
 
-cookieManager = require './CookieManager2'
-requestManager = require './RequestManager'
+CookieManager = require './CookieManager2'
+RequestManager = require './RequestManager'
 ThemeManager = require './ThemeManager'
 
+cookieManager = new CookieManager()
+requestManager = new RequestManager cookieManager
 themeManager = new ThemeManager cookieManager
 
 global.cookieManager = cookieManager

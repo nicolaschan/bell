@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!--
+ This page is shown when the extension button is clicked, because the
+ "browser_action" field in manifest.json contains the "default_popup" key with
+ value "popup.html".
+ -->
+ <!--
+Most stuff taken from the Google example page
+ -->
+<html>
+  <head>
+    <title>Bell Popup</title>
+    <link rel="shortcut icon" type="image/pug" href="../favicons/empty.png" id="favicon">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="css/xtstyle.css?v=undefined">
+    <!--
+      - JavaScript and HTML must be in separate files: see our Content Security
+      - Policy documentation[1] for details and explanation.
+      -
+      - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
+     -->
+  </head>
+  <body>
+    <div id="page1" class="container">
+      <div id="countdown" class="centered">
+        <span id="time">
+        </span>
+        <br>
+        <span class="subtitle">
+          <span id="subtitle">
+          </span>
+          <br>
+          <span id="scheduleName" class="subtitle">
+          </span>
+        </span>
+      </div>
+    </div>
+    <canvas id="circle" class="centered">
+      Could not load canvas.
+    </canvas>
+    <div class="centered loading"><i id="loadingIcon" class="material-icons">sync</i><br><span id="loadingMessage">Loading</span></div>
+    <script type="text/javascript" src="https://bell.lahs.club/timesync/timesync.js"></script>
+    <script src="bin/popup.js?v=undefined"></script>
+
+    <style type="text/css">
+      iframe {
+        display: none;
+      }
+    </style>
+    <iframe src="http://localhost:8005"></iframe>
+  </body>
+</html>
