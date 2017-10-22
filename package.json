@@ -11,7 +11,7 @@
         "test": "nyc --reporter=html --reporter=text --reporter=lcov --reporter=json mocha"
     },
     "author": "",
-    "license": "ISC",
+    "license": "MIT",
     "dependencies": {
         "async": "^2.5.0",
         "base64-img": "^1.0.3",
