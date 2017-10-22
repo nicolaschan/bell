@@ -1,8 +1,9 @@
 # Bell Schedule Countdown
-[![Build Status](https://travis-ci.org/nicolaschan/bell.png?branch=master)](https://travis-ci.org/nicolaschan/bell)
+[![Build Status](https://img.shields.io/travis/nicolaschan/bell.svg)](https://travis-ci.org/nicolaschan/bell)
 [![codecov.io](https://img.shields.io/codecov/c/github/nicolaschan/bell/master.svg)](http://codecov.io/github/nicolaschan/bell?branch=master)
 [![dependencies Status](https://david-dm.org/nicolaschan/bell/status.svg)](https://david-dm.org/nicolaschan/bell)
 [![devDependencies Status](https://david-dm.org/nicolaschan/bell/dev-status.svg)](https://david-dm.org/nicolaschan/bell?type=dev)
+[![GitHub stars](https://img.shields.io/github/stars/nicolaschan/bell.svg)](https://github.com/nicolaschan/bell/stargazers)
 
 Web application to synchronize a timer to indicate the end of the periods at school. A live copy of this program is currently running for Los Altos High school at [bell.lahs.club](https://bell.lahs.club).
 
