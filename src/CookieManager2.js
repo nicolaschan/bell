@@ -23,7 +23,8 @@ class CookieManager {
     }
 
     getAll() {
-        return JSON.parse(JSON.stringify(localStorage));
+        return cookieSerializer.deserializeAll(
+            JSON.parse(JSON.stringify(localStorage)));
     }
 }
 

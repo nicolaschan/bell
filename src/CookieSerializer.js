@@ -14,15 +14,17 @@ class Serializer {
     }
 
     serializeAll(obj) {
+        var serialized = {};
         for (var key in obj)
-            obj[key] = this.serialize(obj[key]);
-        return obj;
+            serialized[key] = this.serialize(obj[key]);
+        return serialized;
     }
 
     deserializeAll(obj) {
+        var deserialized = {};
         for (var key in obj)
-            obj[key] = this.deserialize(obj[key])
-        return obj;
+            deserialized[key] = this.deserialize(obj[key])
+        return deserialized;
     }
 }
 
