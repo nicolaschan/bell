@@ -4,7 +4,12 @@ const cache = 'requestCache';
 
 class RequestManager {
     constructor(cookieManager, host) {
-        this.host = host || '';
+        if (host) {
+            var lastChar = host.substring(host.length - 1);
+            this.host = (lastChar == '/') ? host.substring(0, host.length - 1) : host;
+        } else {
+            this.host = '';
+        }
         this.cookieManager = cookieManager;
     }
 
@@ -19,8 +24,12 @@ class RequestManager {
         return result || defaultValue;
     }
 
+    generateUrl(url) {
+        return `${this.host}${url}?_v=${Date.now()}`;
+    }
+
     getNoCache(url) {
-        return $.get(`${this.host}${url}?_v=${Date.now()}`);
+        return $.get(this.generateUrl(url));
     }
 
     getCached(url) {
@@ -40,6 +49,10 @@ class RequestManager {
         var cached = this.getAllCached();
         cached[url] = data;
         return this.setAllCached(cached);
+    }
+
+    clearCache() {
+        return this.cookieManager.remove(cache);
     }
 }
 

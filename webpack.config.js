@@ -22,14 +22,15 @@ module.exports = {
             test: /\.coffee$/,
             use: ['coffee-loader']
         }, {
-            test: /\.js$/,
-            exclude: /(node_modules|bower_components)/,
+            test: /\.js$|\.jsx$/,
             use: {
-                loader: 'babel-loader',
+                loader: 'istanbul-instrumenter-loader',
                 options: {
-                    presets: ['env']
+                    esModules: true
                 }
-            }
+            },
+            enforce: 'post',
+            exclude: /node_modules|\.spec\.js$/,
         }]
     }
 };
