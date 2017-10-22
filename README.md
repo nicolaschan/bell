@@ -1,5 +1,6 @@
 # Bell Schedule Countdown
 [![Build Status](https://travis-ci.org/nicolaschan/bell.png?branch=master)](https://travis-ci.org/nicolaschan/bell)
+[![codecov.io](https://img.shields.io/codecov/c/github/nicolaschan/bell/master.svg)](http://codecov.io/github/nicolaschan/bell?branch=master)
 [![dependencies Status](https://david-dm.org/nicolaschan/bell/status.svg)](https://david-dm.org/nicolaschan/bell)
 [![devDependencies Status](https://david-dm.org/nicolaschan/bell/dev-status.svg)](https://david-dm.org/nicolaschan/bell?type=dev)
 
