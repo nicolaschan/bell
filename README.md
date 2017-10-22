@@ -3,7 +3,8 @@
 [![codecov.io](https://img.shields.io/codecov/c/github/nicolaschan/bell/master.svg)](http://codecov.io/github/nicolaschan/bell?branch=master)
 [![dependencies Status](https://david-dm.org/nicolaschan/bell/status.svg)](https://david-dm.org/nicolaschan/bell)
 [![devDependencies Status](https://david-dm.org/nicolaschan/bell/dev-status.svg)](https://david-dm.org/nicolaschan/bell?type=dev)
-[![GitHub stars](https://img.shields.io/github/stars/nicolaschan/bell.svg)](https://github.com/nicolaschan/bell/stargazers)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/users/pkeeekfbjjpdkbijkjfljamglegfaikc.svg)](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc)
+[![GitHub last commit](https://img.shields.io/github/last-commit/nicolaschan/bell.svg)](https://github.com/nicolaschan/bell/commits/master)
 
 Web application to synchronize a timer to indicate the end of the periods at school. A live copy of this program is currently running for Los Altos High school at [bell.lahs.club](https://bell.lahs.club).
 
