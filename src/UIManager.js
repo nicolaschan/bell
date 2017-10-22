@@ -23,7 +23,7 @@ const $ = require('jquery');
         this.requestManager = requestManager;
     };
     UIManager.prototype.initialize = function() {
-        var manageSecrets = function() {
+        var manageSecrets = () => {
             // from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
             var getParameterByName = function(name, url) {
                 if (!url) url = window.location.href;
@@ -37,7 +37,7 @@ const $ = require('jquery');
             // end stackoverflow
 
             var secretParameter = getParameterByName('secret');
-            var enabledSecrets = this.cookieManager.get('secrets') || [];
+            var enabledSecrets = this.cookieManager.get('secrets', []);
             if (secretParameter && enabledSecrets.indexOf(secretParameter) < 0)
                 enabledSecrets.push(secretParameter);
 
@@ -55,36 +55,35 @@ const $ = require('jquery');
         };
 
         // themes
-        var loadThemes = function() {
-            var refreshTheme = function() {
-                var theme = self.themeManager.getCurrentThemeName();
-                currentTheme = theme;
+        var loadThemes = () => {
+            var refreshTheme = () => {
+                var theme = this.themeManager.getCurrentThemeName();
                 $('#themeSelect').val(theme);
             };
             $('#themeSelect').empty();
-            for (var i in self.themeManager.getAvailableThemes()) {
+            for (var i in this.themeManager.getAvailableThemes()) {
                 if (i.toLowerCase().indexOf('secret') == 0) {
                     var enabledSecrets = this.cookieManager.get('secrets');
                     var themeName = i.toLowerCase().substring(i.toLowerCase().indexOf(': ') + 2);
                     if (!enabledSecrets || enabledSecrets.indexOf(themeName) < 0) {
-                        if (self.themeManager.getCurrentThemeName() == i)
-                            self.themeManager.setCurrentTheme(self.themeManager.getDefaultThemeName());
+                        if (this.themeManager.getCurrentThemeName() == i)
+                            this.themeManager.setCurrentTheme(this.themeManager.getDefaultThemeName());
                         continue;
                     }
                 }
                 $('#themeSelect').append($('<option></option>').text(i));
             }
-            $('#themeSelect').on('change', function(e) {
+            $('#themeSelect').on('change', e => {
                 var theme = this.value;
-                self.themeManager.setCurrentTheme(theme);
+                this.themeManager.setCurrentTheme(theme);
                 if (theme.toLowerCase().indexOf('secret') != 0)
-                    self.analyticsManager.reportAnalytics();
+                    this.analyticsManager.reportAnalytics();
                 refreshTheme();
             });
             refreshTheme();
         };
         // show scroll indicator if they've never scrolled down before
-        var showScrollIndicator = function() {
+        var showScrollIndicator = () => {
             if (!self.cookieManager.get('has_scrolled')) {
                 $('.downArrow').show();
                 $('#downIcon').click(function(e) {
@@ -108,7 +107,7 @@ const $ = require('jquery');
             }
         };
         // set state of icons/settings panel
-        var setSettingsState = function() {
+        var setSettingsState = () => {
             $('#icons').hide();
             $('#doneIcon').hide();
             $('#scheduleEntry').hide();
@@ -214,7 +213,7 @@ const $ = require('jquery');
                 self.bellTimer.reloadData();
             });
         };
-        var showSettingsIcon = function() {
+        var showSettingsIcon = () => {
             $('#icons').hide();
             $('#doneIcon').hide();
             $('#scheduleEntry').hide();
@@ -229,7 +228,7 @@ const $ = require('jquery');
         };
 
         // set font size on load and resize
-        var dynamicallySetFontSize = function() {
+        var dynamicallySetFontSize = () => {
             $('#time').css('font-size', (Math.min($(window).innerHeight() * 0.3, $(window).innerWidth() * 0.2)) + 'px');
             $('.subtitle').css('font-size', (Math.min($(window).innerHeight() * 0.07, $(window).innerWidth() * 0.07)) + 'px');
 
@@ -249,7 +248,7 @@ const $ = require('jquery');
             $('#themeSelect').css('padding', padding);
         };
         // slide in extension ad
-        var slideExtension = function() {
+        var slideExtension = () => {
             if (self.cookieManager.get('popup') == $('#extension-text').text())
                 return $('.extension').hide();
 
@@ -276,7 +275,7 @@ const $ = require('jquery');
         // setSettingsState();
         showSettingsIcon();
         dynamicallySetFontSize();
-        self.loadPopup();
+        return self.loadPopup();
         // slideExtension();
     };
     UIManager.prototype.loadPopup = async function() {
@@ -366,9 +365,9 @@ const $ = require('jquery');
         $('.link').css('color', theme(time)[1]);
 
         if (color) {
-            if (currentTheme == 'Default - Dark')
+            if (theme == 'Default - Dark')
                 $('.time').css('color', color);
-            if (currentTheme == 'Default - Light')
+            if (theme == 'Default - Light')
                 $('#page1').css('background-color', color);
         }
 

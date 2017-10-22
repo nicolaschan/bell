@@ -90,7 +90,7 @@ $(window).on('load', async function() {
     logger.success('Bell timer initialized');
     uiManager.hideLoading();
 
-    uiManager.initialize();
+    await uiManager.initialize();
     uiManager.update();
     logger.success('UI initialized and updated');
 
