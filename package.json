@@ -21,7 +21,7 @@
         "express": "^4.16.2",
         "jquery": "^3.1.1",
         "lodash": "^4.17.2",
-        "loggy": "^0.3.5",
+        "loggy": "^1.0.2",
         "lzutf8": "^0.4.7",
         "pug": "^2.0.0-rc.4",
         "query-string": "^5.0.0",
@@ -30,15 +30,13 @@
         "selectize": "^0.12.4",
         "shortid": "^2.2.6",
         "sniffr": "^1.1.4",
-        "timesync": "^0.3.1",
+        "timesync": "^0.4.1",
         "visibilityjs": "^1.2.5"
     },
     "devDependencies": {
         "coffee-loader": "^0.8.0",
         "coffeescript": "^2.0.1",
-        "gulp": "^3.9.1",
-        "gulp-shell": "^0.5.2",
-        "mocha": "^3.5.3",
+        "mocha": "^4.0.1",
         "webpack": "^3.8.1"
     }
 }
