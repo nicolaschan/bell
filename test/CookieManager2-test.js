@@ -25,6 +25,11 @@ describe('CookieManager', function() {
             var val = cookieManager.get('not here', 'default');
             assert(val == 'default');
         });
+        it('get with no params is same as getAll', function() {
+            cookieManager.clear();
+            cookieManager.set('key1', 'val1');
+            assert(cookieManager.getAll()['key1'] == cookieManager.get()['key1']);
+        });
     });
 
     describe('#clear', function() {

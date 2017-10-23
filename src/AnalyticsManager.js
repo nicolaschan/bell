@@ -18,7 +18,7 @@ const $ = require('jquery');
             return callback();
 
         var setUuid = callback => {
-            $.get('/api/uuid', function(uuid) {
+            $.get('/api/uuid', uuid => {
                 var uuid = uuid.id;
                 this.cookieManager.set('id', uuid);
                 callback();
@@ -37,27 +37,27 @@ const $ = require('jquery');
         });
     };
     AnalyticsManager.prototype.reportAnalytics = function(callback) {
-        var newPageLoad = self.newPageLoad;
-        self.newPageLoad = false;
+        var newPageLoad = this.newPageLoad;
+        this.newPageLoad = false;
 
-        var report = function(callback) {
+        var report = callback => {
             $.ajax({
                 type: 'POST',
                 url: '/api/analytics',
                 data: {
-                    id: self.cookieManager.get('id'),
+                    id: this.cookieManager.get('id'),
                     newPageLoad: newPageLoad,
                     source: 'web',
-                    theme: self.themeManager.getCurrentThemeName(),
+                    theme: this.themeManager.getCurrentThemeName(),
                     userAgent: $(window)[0].navigator.userAgent
                 },
-                success: function(res) {
-                    self.newPageLoad = false;
+                success: res => {
+                    this.newPageLoad = false;
 
                     if (!res.success)
-                        self.logger.warn('Analytics are disabled');
+                        this.logger.warn('Analytics are disabled');
                     else
-                        self.logger.success('Analytics data sent successfully');
+                        this.logger.success('Analytics data sent successfully');
 
                     if (callback)
                         callback();
@@ -65,7 +65,7 @@ const $ = require('jquery');
             })
         };
 
-        return self.initialize(function() {
+        return this.initialize(function() {
             report(callback);
         });
     };

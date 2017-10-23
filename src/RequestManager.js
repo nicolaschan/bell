@@ -3,7 +3,7 @@ const $ = require('jquery');
 const cache = 'requestCache';
 
 class RequestManager {
-    constructor(cookieManager, host) {
+    constructor(cookieManager, host, request) {
         if (host) {
             var lastChar = host.substring(host.length - 1);
             this.host = (lastChar == '/') ? host.substring(0, host.length - 1) : host;
@@ -11,16 +11,17 @@ class RequestManager {
             this.host = '';
         }
         this.cookieManager = cookieManager;
+        this.request = request || $.get;
     }
 
     async get(url, defaultValue) {
         var result;
         try {
             result = await this.getNoCache(url);
-            this.cache(url, result);
         } catch (e) {
             result = this.getCached(url);
         }
+        this.cache(url, result);
         return result || defaultValue;
     }
 
@@ -28,8 +29,14 @@ class RequestManager {
         return `${this.host}${url}?_v=${Date.now()}`;
     }
 
-    getNoCache(url) {
-        return $.get(this.generateUrl(url));
+    async getNoCache(url) {
+        var result;
+        try {
+            result = await this.request(this.generateUrl(url));
+        } catch (e) {
+            throw new Error('Request failed');
+        }
+        return result;
     }
 
     getCached(url) {

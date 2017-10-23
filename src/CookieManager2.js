@@ -3,6 +3,8 @@ const cookieSerializer = new CookieSerializer();
 
 class CookieManager {
     get(key, defaultValue) {
+        if (!key)
+            return this.getAll();
         var raw = localStorage.getItem(key);
         if (!raw)
             return defaultValue;
