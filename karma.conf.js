@@ -65,7 +65,6 @@ module.exports = function(config) {
             require("karma-mocha"),
             require("karma-coverage"),
             require("karma-coverage-istanbul-reporter"),
-            require("karma-phantomjs-launcher"),
             require("karma-spec-reporter"),
             require("karma-firefox-launcher"),
             require("karma-chrome-launcher")
