@@ -282,6 +282,7 @@ class BellTimer {
     async initializeTimesync() {
         if (typeof timesync == 'undefined') {
             this.ts = Date;
+            console.warn('Timesync not found');
             return this.ts;
         }
 
