@@ -3,7 +3,7 @@
     "name": "Countdown Extension",
     "description": "An extension that displays the time remaining in classes.",
     "version": "2.0.0",
-    "content_security_policy": "script-src 'self' http://localhost:8005; object-src 'self';",
+    "content_security_policy": "script-src 'self' https://countdown.zone; object-src 'self';",
     "browser_action": {
         "default_icon": "favicons/lime.png",
         "default_popup": "chrome_extension/popup.html",
@@ -14,14 +14,12 @@
     },
     "permissions": [
         "alarms",
-        "https://bell.lahs.club/*",
-        "http://bell.lahs.club/*",
-        "http://localhost:8005/*",
-        "storage",
-        "webview"
+        "https://countdown.zone/*",
+        "http://countdown.zone/*",
+        "storage"
     ],
     "externally_connectable": {
-        "matches": ["http://localhost:8005/*"]
+        "matches": ["http://countdown.zone/*", "https://countdown.zone/*"]
     },
     "icons": {
         "128": "icons/icon128.png"
