@@ -11,7 +11,16 @@ class RequestManager {
             this.host = '';
         }
         this.cookieManager = cookieManager;
-        this.request = request || $.get;
+
+        $.ajaxSetup({
+            timeout: 1000
+        });
+        this.request = request || (url => {
+            if (navigator.onLine) // Saves time waiting if offline
+                return $.get(url);
+            else
+                throw new Error('Request failed');
+        });
     }
 
     async get(url, defaultValue) {

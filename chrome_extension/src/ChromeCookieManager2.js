@@ -31,20 +31,29 @@ class CookieManager {
 }
 
 var CookieManagerFactory = async function() {
-    if (window.countdownOnline) {
-        var port = await new Promise((resolve, reject) =>
-            chrome.runtime.onConnectExternal.addListener(resolve));
-
-        var cookies = await new Promise((resolve, reject) => {
-            port.onMessage.addListener(msg => resolve(msg.value));
-        });
-        return new CookieManager(cookies);
-    }
-
     // Offline => get cookies from local storage
     var items = await new Promise((resolve, reject) =>
         chrome.storage.local.get(resolve));
-    return new CookieManager(items);
+    var cookieManager = new CookieManager(items);
+
+    (async() => {
+        // Load data in the background (so it opens faster)
+        var frame = $('<iframe src="http://localhost:8005"></iframe>');
+        $('#iframe').append(frame);
+
+        var port = await new Promise((resolve, reject) =>
+            chrome.runtime.onConnectExternal.addListener(resolve));
+        var cookies = await new Promise((resolve, reject) => {
+            port.onMessage.addListener(msg => resolve(msg.value));
+        });
+
+        cookies = cookieSerializer.serializeAll(cookies);
+        cookieManager.cookies = cookies;
+        chrome.storage.local.clear(() =>
+            chrome.storage.local.set(cookies));
+    })();
+
+    return cookieManager;
 };
 
 module.exports = CookieManagerFactory;

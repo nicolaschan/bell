@@ -9,6 +9,9 @@
         "default_popup": "chrome_extension/popup.html",
         "default_title": "Countdown"
     },
+    "background": {
+        "page": "chrome_extension/background.html"
+    },
     "permissions": [
         "alarms",
         "https://bell.lahs.club/*",
