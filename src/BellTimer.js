@@ -12,7 +12,7 @@ var timeArrayToDate = function(date, timeArray, resetMilliseconds) {
     return date;
 };
 var dateToString = function(date) {
-    return date.getYear() + '-' + date.getMonth() + '-' + date.getDate();
+    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 };
 
 class BellTimer {
