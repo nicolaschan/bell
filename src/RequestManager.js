@@ -3,7 +3,7 @@ const $ = require('jquery');
 const cache = 'requestCache';
 
 class RequestManager {
-    constructor(cookieManager, host, request) {
+    constructor(cookieManager, host, request, online) {
         if (host) {
             var lastChar = host.substring(host.length - 1);
             this.host = (lastChar == '/') ? host.substring(0, host.length - 1) : host;
@@ -16,10 +16,9 @@ class RequestManager {
             timeout: 1000
         });
         this.request = request || (url => {
-            if (navigator.onLine) // Saves time waiting if offline
+            if ((online || navigator).onLine) // Saves time waiting if offline
                 return $.get(url);
-            else
-                throw new Error('Request failed');
+            throw new Error('Request failed');
         });
     }
 

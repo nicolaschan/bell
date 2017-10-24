@@ -74,6 +74,17 @@ describe('RequestManager', function() {
             var requestManager = new RequestManager(this.cookieManager);
             await requestManager.getNoCache('https://___.com/this/should/fail').should.be.rejected;
         });
+        it('test with default with cache to work', async function() {
+            var requestManager = new RequestManager(this.cookieManager);
+            requestManager.cache('/api/hello', 'world');
+            await requestManager.get('/api/hello').should.eventually.equal('world');
+        });
+        it('test with default with navigator offline to reject', async function() {
+            var requestManager = new RequestManager(this.cookieManager, '', undefined, {
+                onLine: false
+            });
+            await requestManager.getNoCache('https://___.com/this/should/fail').should.be.rejected;
+        });
     });
 
     describe('#cache', function() {
