@@ -12,7 +12,7 @@ var timeArrayToDate = function(date, timeArray, resetMilliseconds) {
     return date;
 };
 var dateToString = function(date) {
-    return date.getYear() + '-' + date.getMonth() + '-' + date.getDate();
+    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 };
 
 class BellTimer {
@@ -33,10 +33,6 @@ class BellTimer {
 
     setDebugLogFunction(logger) {
         this.debug = logger;
-    }
-
-    setBellCompensation(bellCompensation) {
-        this.bellCompensation = 0;
     }
 
     setSchedulesAndCalendar(schedules, calendar) {
@@ -259,7 +255,7 @@ class BellTimer {
             this.version = version;
 
         var correction = await this.requestManager.get(`/api/data/${dataSource}/correction`, '0');
-        this.setBellCompensation(parseInt(correction));
+        this.setCorrection(parseInt(correction));
 
         var schedules = await this.requestManager.get(`/api/data/${dataSource}/schedules`);
         schedules = parseSchedules(schedules);
@@ -301,11 +297,11 @@ class BellTimer {
     }
 
     setCorrection(correction) {
-        this.bellCompensation = correction;
+        this.correction = correction;
     }
 
     getCorrection() {
-        return this.bellCompensation;
+        return this.correction;
     }
 
     enableDevMode(startDate, scale) {
@@ -330,10 +326,10 @@ class BellTimer {
 
     getDate() {
         if (this.devMode)
-            return new Date(this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale));
+            return new Date((this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale) + this.correction));
         if (this.ts)
-            return new Date(this.ts.now() + this.bellCompensation);
-        return new Date(Date.now() + this.bellCompensation);
+            return new Date(this.ts.now() + this.correction);
+        return new Date(Date.now() + this.correction);
     }
 
     getTimeRemainingNumber() {

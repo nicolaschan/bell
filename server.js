@@ -107,7 +107,7 @@ var startWebServer = function(callback) {
         if (meta.source == 'local')
             return meta;
         var res = await request.getAsync(`${meta.source}/api/data/${source}/meta`);
-        return res.body;
+        return JSON.parse(res.body);
     });
 
     app.get('/', (req, res) => {

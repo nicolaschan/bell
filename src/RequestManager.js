@@ -18,7 +18,7 @@ class RequestManager {
         this.request = request || (url => {
             if ((online || navigator).onLine) // Saves time waiting if offline
                 return $.get(url);
-            throw new Error('Request failed');
+            throw new Error('Request failed because not online');
         });
     }
 
