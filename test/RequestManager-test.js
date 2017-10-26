@@ -42,6 +42,11 @@ describe('RequestManager', function() {
     describe('#get', function() {
         beforeEach(function() {
             this.requestManager = new RequestManager(this.cookieManager, '', {
+                post: (url, data) => {
+                    return {
+                        success: true
+                    };
+                },
                 get: url => {
                     url = url.split('?')[0];
                     var data = {
@@ -73,20 +78,36 @@ describe('RequestManager', function() {
             var requestManager = new RequestManager(this.cookieManager);
             await requestManager.get('https://___.com/this/should/fail').should.eventually.be.undefined;
         });
-        it('test with default with no cache to reject', async function() {
+        it('get with default with no cache to reject', async function() {
             var requestManager = new RequestManager(this.cookieManager);
             await requestManager.getNoCache('https://___.com/this/should/fail').should.be.rejected;
         });
-        it('test with default with cache to work', async function() {
+        it('get with default with cache to work', async function() {
             var requestManager = new RequestManager(this.cookieManager);
             requestManager.cache('/api/hello', 'world');
             await requestManager.get('/api/hello').should.eventually.equal('world');
         });
-        it('test with default with navigator offline to reject', async function() {
+        it('get with default with navigator offline to reject', async function() {
             var requestManager = new RequestManager(this.cookieManager, '', undefined, {
                 onLine: false
             });
             await requestManager.getNoCache('https://___.com/this/should/fail').should.be.rejected;
+        });
+        it('post returns received data', async function() {
+            var response = await this.requestManager.post('/api/some_path');
+            response.should.deep.equal({
+                success: true
+            });
+        });
+        it('post with default with bad url to reject', async function() {
+            var requestManager = new RequestManager(this.cookieManager);
+            await requestManager.post('https://___.com/this/should/fail').should.be.rejected;
+        });
+        it('post with default with navigator offline to reject', async function() {
+            var requestManager = new RequestManager(this.cookieManager, '', undefined, {
+                onLine: false
+            });
+            await requestManager.post('https://___.com/this/should/fail').should.be.rejected;
         });
     });
 

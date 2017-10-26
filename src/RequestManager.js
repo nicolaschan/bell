@@ -29,8 +29,14 @@ class RequestManager {
         };
     }
 
-    post(url, data) {
-        return this.request.post(url, data);
+    async post(url, data) {
+        var result;
+        try {
+            result = await this.request.post(this.generateUrl(url), data);
+        } catch (e) {
+            throw new Error('Post failed');
+        }
+        return result;
     }
 
     async get(url, defaultValue) {
