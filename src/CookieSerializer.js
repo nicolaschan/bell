@@ -1,5 +1,7 @@
 const LZUTF8 = require('lzutf8');
 
+global.LZUTF8 = LZUTF8;
+
 class Serializer {
     serialize(value) {
         return LZUTF8.compress(JSON.stringify(value), {

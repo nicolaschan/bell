@@ -2,9 +2,10 @@ const async = require('async');
 const _ = require('lodash');
 const $ = require('jquery');
 const Visibility = require('visibilityjs');
+const CookieManager3 = require('./CookieManager3.js');
 const BellTimer = require('./BellTimer.js');
 const SimpleLogger = require('./SimpleLogger.js');
-const CookieManager = require('./CookieManager2.js');
+const CookieManager2 = require('./CookieManager2.js');
 const RequestManager = require('./RequestManager');
 const ThemeManager = require('./ThemeManager.js');
 const AnalyticsManager = require('./AnalyticsManager.js');
@@ -14,8 +15,10 @@ const ChromeExtensionMessenger = require('./ChromeExtensionMessenger');
 
 var logger = new SimpleLogger();
 logger.setLevel('info');
-// var cookieManager = new CookieManager(Cookies);
-var cookieManager = new CookieManager();
+
+var cookieManager = new CookieManager3();
+var cookieManager2 = new CookieManager2();
+
 var requestManager = new RequestManager(cookieManager);
 var themeManager = new ThemeManager(cookieManager);
 var analyticsManager = new AnalyticsManager(cookieManager, themeManager, logger);
@@ -79,23 +82,25 @@ logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 // bellTimer.enableDevMode(new Date('2017-05-23 8:00'), 60);
 
 $(window).on('load', async function() {
-
-    logger.info('Loading data...');
     uiManager.setLoadingMessage('Loading');
+    await cookieManager.initialize();
+    await cookieManager.convertLegacy(cookieManager2, 2);
+
+    logger.debug('Initializing BellTimer');
+    uiManager.setLoadingMessage('Synchronizing');
     await bellTimer.initialize();
 
-    logger.info('Synchronizing...');
-    uiManager.setLoadingMessage('Synchronizing');
-    await bellTimer.initializeTimesync();
-    logger.success('Bell timer initialized');
-    uiManager.hideLoading();
-
     await uiManager.initialize();
-    uiManager.update();
-    logger.success('UI initialized and updated');
+    logger.debug('UI initialized');
 
+    uiManager.update();
+    logger.debug('UI updated');
+
+    logger.debug('Reporting analytics');
     analyticsManager.reportAnalytics();
 
+    logger.debug('Starting intervals');
     intervalManager.startAll();
     logger.success('Ready!');
+    uiManager.hideLoading();
 });

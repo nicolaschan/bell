@@ -1,7 +1,7 @@
 const $ = require('jquery');
 const queryString = require('query-string');
 const shortid = require('shortid');
-const CookieManager = require('./CookieManager2.js');
+const CookieManager = require('./CookieManager3.js');
 const Structures = require('./DataStructures.js');
 
 const cookieManager = new CookieManager();
@@ -137,8 +137,9 @@ var saveCourse = function() {
         name: courseName,
         sections: sections
     };
-    cookieManager.set('courses', courses);
-    window.location.href = '/classes';
+    cookieManager.set('courses', courses).then(
+        () => window.location.href = '/classes');
+
 };
 
 var padNumber = function(number, padding) {
@@ -178,7 +179,9 @@ var setFormState = function(courseId) {
     }
 };
 
-$(function() {
+$(async function() {
+    await cookieManager.initialize();
+
     $('#add-section-button').click(function() {
         $('#enter-section').append(generateSectionInputField('Monday', '', ''));
     });

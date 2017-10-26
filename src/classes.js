@@ -1,5 +1,5 @@
 const $ = require('jquery');
-const CookieManager = require('./CookieManager2.js');
+const CookieManager = require('./CookieManager3.js');
 
 const cookieManager = new CookieManager();
 
@@ -53,6 +53,7 @@ var reloadCourses = function() {
     }
 };
 
-$(function() {
+$(async function() {
+    await cookieManager.initialize();
     reloadCourses();
 });

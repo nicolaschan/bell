@@ -1,7 +1,7 @@
 {
-  "enable redis": false,
-  "redis host": "localhost",
-  "redis password": null,
-  "port": 8005,
-  "server name": "bell-0"
+    "enable redis": true,
+    "redis host": "localhost",
+    "redis password": null,
+    "port": 8005,
+    "server name": "bell-0"
 }
