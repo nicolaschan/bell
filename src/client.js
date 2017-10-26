@@ -8,7 +8,7 @@ const SimpleLogger = require('./SimpleLogger.js');
 const CookieManager2 = require('./CookieManager2.js');
 const RequestManager = require('./RequestManager');
 const ThemeManager = require('./ThemeManager.js');
-const AnalyticsManager = require('./AnalyticsManager.js');
+const AnalyticsManager = require('./AnalyticsManager2.js');
 const UIManager = require('./UIManager.js');
 const IntervalManager = require('./IntervalManager.js');
 const ChromeExtensionMessenger = require('./ChromeExtensionMessenger');
@@ -96,8 +96,9 @@ $(window).on('load', async function() {
     uiManager.update();
     logger.debug('UI updated');
 
+    // uiManager.setLoadingMessage('Analyzing');
     logger.debug('Reporting analytics');
-    analyticsManager.reportAnalytics();
+    await analyticsManager.reportAnalytics();
 
     logger.debug('Starting intervals');
     intervalManager.startAll();
