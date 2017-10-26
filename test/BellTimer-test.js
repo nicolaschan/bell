@@ -53,7 +53,10 @@ describe('BellTimer', function() {
                     throw new Error('Request failed');
             };
             var cookieManager = new CookieManager();
-            var requestManager = new RequestManager(cookieManager, '', fakeRequester);
+            var requestManager = new RequestManager(cookieManager, '', {
+                get: fakeRequester,
+                post: () => {}
+            });
             cookieManager.set('source', 'school');
             cookieManager.set('periods', {
                 'Period 1': 'First Period'

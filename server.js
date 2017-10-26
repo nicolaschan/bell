@@ -11,6 +11,8 @@ const path = require('path');
 const shortid = require('shortid');
 const async = require('async');
 const redis = require('redis');
+Promise.promisifyAll(redis.RedisClient.prototype);
+Promise.promisifyAll(redis.Multi.prototype);
 const request = Promise.promisifyAll(require('request'));
 const _ = require('lodash');
 const Sniffr = require('sniffr');
@@ -146,53 +148,46 @@ var startWebServer = function(callback) {
         });
     });
     if (config['enable redis'])
-        app.get('/api/stats', (req, res) => {
-            var out = {};
-            async.parallel([
-                function(callback) {
-                    out.dailyStats = {};
-                    client.hgetall('dates', (err, dates) => {
-                        async.forEachOf(dates, (id, date, callback) => {
-                            client.get(`totalDailyHits:${id}`, (err, totalHits) => {
-                                client.scard(`deviceConnections:${id}`, (err, devices) => {
-                                    out.dailyStats[date] = {
-                                        totalHits: parseInt(totalHits),
-                                        devices: devices
-                                    };
-                                    callback(null);
-                                });
-                            });
-                        }, callback);
-                    });
-                },
-                function(callback) {
-                    out.userStats = {
-                        browser: {},
-                        os: {},
-                        theme: {}
-                    };
-                    client.hgetall('users', (err, users) => {
-                        async.forEachOf(users, (id, user, callback) => {
-                            client.hgetall(`users:${id}`, (err, data) => {
-                                if (!data)
-                                    return callback();
-                                if (!out.userStats.browser[data.browser])
-                                    out.userStats.browser[data.browser] = 0;
-                                out.userStats.browser[data.browser]++;
-                                if (!out.userStats.os[data.os])
-                                    out.userStats.os[data.os] = 0;
-                                out.userStats.os[data.os]++;
-                                if (!out.userStats.theme[data.theme])
-                                    out.userStats.theme[data.theme] = 0;
-                                out.userStats.theme[data.theme]++;
-                                callback();
-                            });
-                        }, callback);
-                    });
+        app.get('/api/stats', async(req, res) => {
+            var out = {
+                dailyStats: {},
+                userStats: {
+                    browser: {},
+                    os: {},
+                    theme: {}
                 }
-            ], function(err) {
-                res.json(out);
-            });
+            };
+
+            var dates = await client.hgetallAsync('dates');
+            for (let date in dates) {
+                var id = dates[date];
+                var totalHits = await client.getAsync(`totalDailyHits:${id}`);
+                var devices = await client.scardAsync(`deviceConnections:${id}`);
+
+                out.dailyStats[date] = {
+                    totalHits: parseInt(totalHits),
+                    devices: devices
+                };
+            }
+
+            var users = await client.hgetallAsync('users');
+            for (let user in users) {
+                var id = users[user];
+                var data = await client.hgetallAsync(`users:${id}`);
+                if (!data)
+                    continue;
+                if (!out.userStats.browser[data.browser])
+                    out.userStats.browser[data.browser] = 0;
+                out.userStats.browser[data.browser]++;
+                if (!out.userStats.os[data.os])
+                    out.userStats.os[data.os] = 0;
+                out.userStats.os[data.os]++;
+                if (!out.userStats.theme[data.theme])
+                    out.userStats.theme[data.theme] = 0;
+                out.userStats.theme[data.theme]++;
+            }
+
+            return res.json(out);
         });
 
     app.get('/api/sources', (req, res) => {

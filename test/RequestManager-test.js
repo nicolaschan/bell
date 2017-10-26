@@ -34,23 +34,26 @@ describe('RequestManager', function() {
             requestManager.request.should.equal(request);
         });
         it('there is some default request function', function() {
-            this.requestManager.request.should.be.a('function');
+            this.requestManager.request.get.should.be.a('function');
+            this.requestManager.request.post.should.be.a('function');
         });
     });
 
     describe('#get', function() {
         beforeEach(function() {
-            this.requestManager = new RequestManager(this.cookieManager, '', url => {
-                url = url.split('?')[0];
-                var data = {
-                    '/api/data': 'some data',
-                    '/api/data2': 'two datas'
-                };
-                var result = data[url];
-                if (result)
-                    return result;
-                else
-                    throw new Error('not found');
+            this.requestManager = new RequestManager(this.cookieManager, '', {
+                get: url => {
+                    url = url.split('?')[0];
+                    var data = {
+                        '/api/data': 'some data',
+                        '/api/data2': 'two datas'
+                    };
+                    var result = data[url];
+                    if (result)
+                        return result;
+                    else
+                        throw new Error('not found');
+                }
             });
         });
 

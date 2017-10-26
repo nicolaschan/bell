@@ -15,11 +15,22 @@ class RequestManager {
         $.ajaxSetup({
             timeout: 1000
         });
-        this.request = request || (url => {
-            if ((online || navigator).onLine) // Saves time waiting if offline
-                return $.get(url);
-            throw new Error('Request failed because not online');
-        });
+        this.request = request || {
+            post: (url, data) => {
+                if ((online || navigator).onLine) // Saves time waiting if offline
+                    return $.post(url, data);
+                throw new Error('Request failed because not online');
+            },
+            get: url => {
+                if ((online || navigator).onLine) // Saves time waiting if offline
+                    return $.get(url);
+                throw new Error('Request failed because not online');
+            }
+        };
+    }
+
+    post(url, data) {
+        return this.request.post(url, data);
     }
 
     async get(url, defaultValue) {
@@ -40,7 +51,7 @@ class RequestManager {
     async getNoCache(url) {
         var result;
         try {
-            result = await this.request(this.generateUrl(url));
+            result = await this.request.get(this.generateUrl(url));
         } catch (e) {
             throw new Error('Request failed');
         }
