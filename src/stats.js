@@ -9,11 +9,10 @@ var requestManager = new RequestManager(cookieManager);
 
 global.requestManager = requestManager;
 global.cookieManager = cookieManager;
-
-$(async function() {
+$(window).on('load', async function() {
     await cookieManager.initialize();
     var data = await requestManager.getNoCache('/api/stats');
-
+    console.log(data);
 
     var hits = [];
     var devices = [];
