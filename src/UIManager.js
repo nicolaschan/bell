@@ -2,7 +2,6 @@ const _ = require('lodash');
 const $ = require('jquery');
 
 (function() {
-
     var helpers = {
         updateTitle: _.throttle(function(text) {
             $('#title').text(text);
@@ -450,7 +449,11 @@ const $ = require('jquery');
         $('#loadingMessage').text(message);
     };
     UIManager.prototype.hideLoading = function() {
-        $('.loading').hide();
+        $('.loading').css('opacity', 0);
+        setTimeout(() => {
+            $('.loading').hide();
+            $('.loading').css('opacity', 0.3);
+        }, 350);
     };
     UIManager.prototype.showAlert = function(message, time) {
         time = (time) ? time : 3000;
