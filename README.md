@@ -6,7 +6,7 @@
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/users/pkeeekfbjjpdkbijkjfljamglegfaikc.svg)](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc)
 [![GitHub last commit](https://img.shields.io/github/last-commit/nicolaschan/bell.svg)](https://github.com/nicolaschan/bell/commits/master)
 
-Web application to synchronize a timer to indicate the end of the periods at school. A live copy of this program is currently running for Los Altos High school at [bell.lahs.club](https://bell.lahs.club). Also features [a Chrome extension](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc).
+Web application to synchronize a timer to indicate the end of the periods at school. A live instance of this program is currently running at [countdown.zone](https://countdown.zone) (formerly [bell.lahs.club](https://bell.lahs.club)). It also features [a Chrome extension](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc) originally developed by [nolerino](https://github.com/noloerino/bell).
 
 ## Features
 - Support for weekly schedules
