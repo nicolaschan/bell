@@ -3,7 +3,7 @@ const _ = require('lodash');
 (function() {
 
     const cookieName = 'theme';
-    const defaultTheme = 'Gradient - Light';
+    const defaultTheme = 'Default - Light';
 
     var parseTimeRemainingString = function(time) {
         var parts = _.map(time.split(':'), _.parseInt);

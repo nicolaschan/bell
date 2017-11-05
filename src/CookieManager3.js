@@ -65,7 +65,7 @@ class CookieManager {
             try {
                 all = cookieManager.getAll();
             } catch (e) {
-                console.log('Cookies were corrupted');
+                console.error('Cookies were corrupted');
             }
             for (let key in all) {
                 await this.set(key, all[key]);
