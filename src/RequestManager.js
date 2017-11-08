@@ -3,7 +3,7 @@ const $ = require('jquery');
 const cache = 'requestCache';
 
 class RequestManager {
-    constructor(cookieManager, host, request, online) {
+    constructor(cookieManager, host, request, online, timeout = 1000) {
         if (host) {
             var lastChar = host.substring(host.length - 1);
             this.host = (lastChar == '/') ? host.substring(0, host.length - 1) : host;
@@ -13,7 +13,7 @@ class RequestManager {
         this.cookieManager = cookieManager;
 
         $.ajaxSetup({
-            timeout: 1000
+            timeout: timeout
         });
         this.request = request || {
             post: (url, data) => {

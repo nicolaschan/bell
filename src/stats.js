@@ -5,7 +5,7 @@ const CookieManager = require('./CookieManager3');
 const RequestManager = require('./RequestManager');
 
 var cookieManager = new CookieManager();
-var requestManager = new RequestManager(cookieManager);
+var requestManager = new RequestManager(cookieManager, null, null, null, 10000);
 
 global.requestManager = requestManager;
 global.cookieManager = cookieManager;
