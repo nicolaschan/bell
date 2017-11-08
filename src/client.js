@@ -85,6 +85,7 @@ $(window).on('load', async function() {
     uiManager.setLoadingMessage('Loading');
     await cookieManager.initialize();
     await cookieManager.convertLegacy(cookieManager2, 2);
+    chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc');
 
     logger.debug('Initializing BellTimer');
     uiManager.setLoadingMessage('Synchronizing');

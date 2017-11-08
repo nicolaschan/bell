@@ -36,13 +36,8 @@ class CookieManager {
         return this.storage.keys();
     }
 
-    async getAll() {
-        var keys = await this.keys;
-        var all = {};
-        for (let key of keys) {
-            all[key] = await this.get(key);
-        }
-        return all;
+    getAll() {
+        return this.cache;
     }
 
     converted(version) {

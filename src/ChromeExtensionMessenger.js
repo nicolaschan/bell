@@ -1,9 +1,10 @@
 class ChromeExtensionMessenger {
     constructor(cookieManager) {
         this.cookieManager = cookieManager;
+    }
 
+    connect(extensionId) {
         if (window.chrome && window.chrome.runtime) {
-            var extensionId = 'pkeeekfbjjpdkbijkjfljamglegfaikc';
             var port = chrome.runtime.connect(extensionId);
             port.postMessage({
                 type: 'all_cookies',
