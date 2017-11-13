@@ -112,7 +112,7 @@ class BellTimer {
             }
         }
 
-        this.setBellCompensation(0);
+        this.setCorrection(0);
         this.setSchedulesAndCalendar(schedules, calendar);
     }
 
