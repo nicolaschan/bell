@@ -2,13 +2,13 @@ const webpack = require('webpack');
 
 module.exports = {
     entry: {
-        client: ['babel-polyfill', './src/client.js'],
-        stats: ['babel-polyfill', './src/stats.js'],
-        enter: ['babel-polyfill', './src/enter.js'],
-        classes: ['babel-polyfill', './src/classes.js'],
-        settings: ['babel-polyfill', './src/settings.coffee'],
-        periods: ['babel-polyfill', './src/periods.coffee'],
-        online: ['babel-polyfill', './src/online.js']
+        client: ['./src/client.js'],
+        stats: ['./src/stats.js'],
+        enter: ['./src/enter.js'],
+        classes: ['./src/classes.js'],
+        settings: ['./src/settings.coffee'],
+        periods: ['./src/periods.coffee'],
+        online: ['./src/online.js']
     },
     resolve: {
         alias: {}

@@ -24,6 +24,12 @@ $ ->
       options: [
         {name: 'Custom', id: 'custom'}
       ]
+      create: (input) ->
+        split = input.split(':')
+        {
+          name: split[split.length - 1],
+          id: input
+        }
       load: (query, callback) ->
         requestManager.get("/api/sources?query=#{query}").then callback
       preload: yes

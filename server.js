@@ -73,44 +73,47 @@ var startWebServer = function(callback) {
         return JSON.parse(fs.readFileSync(`./data/message.json`).toString());
     });
 
-    var getCorrection = cache(60, async function(source) {
-        var meta = await getLocalMeta(source);
-        if (meta.source == 'local') {
-            var correction = await fs.readFileAsync(`data/${source}/correction.txt`);
-            return _.parseInt(correction.toString());
+    var fetch = async function(source, file) {
+        var sourceData = await getSource(source);
+        switch (sourceData.location) {
+            case 'local':
+                var res = await fs.readFileAsync(`data/${source}/${file}`);
+                return res.toString();
+            case 'web':
+                var res = await request.getAsync(`${sourceData.url}/api/data/${source}/${file.split('.')[0]}`);
+                return res.body;
+            case 'github':
+                var pieces = sourceData.repo.split('/');
+                var usernameRepo = pieces.slice(0, 2).join('/');
+                var path = pieces.slice(2).join('/');
+                var res = await request.getAsync(`https://raw.githubusercontent.com/${usernameRepo}/master/${path}/${file}`);
+                return res.body;
         }
-        var res = await request.getAsync(`${meta.source}/api/data/${source}/correction`);
-        return res.body;
+    };
+    var getCorrection = cache(60, async function(source) {
+        return fetch(source, 'correction.txt');
     });
     var getSchedules = cache(60, async function(source) {
-        var meta = await getLocalMeta(source);
-        if (meta.source == 'local') {
-            var schedules = await fs.readFileAsync(`data/${source}/schedules.txt`);
-            return schedules.toString();
-        }
-        var res = await request.getAsync(`${meta.source}/api/data/${source}/schedules`);
-        return res.body;
+        return fetch(source, 'schedules.txt');
     });
     var getCalendar = cache(60, async function(source) {
-        var meta = await getLocalMeta(source);
-        if (meta.source == 'local') {
-            var calendar = await fs.readFileAsync(`data/${source}/calendar.txt`);
-            return calendar.toString();
-        }
-        var res = await request.getAsync(`${meta.source}/api/data/${source}/calendar`);
-        return res.body;
-    });
-    var getLocalMeta = cache(60, async function(source) {
-        var meta = await fs.readFileAsync(`./data/${source}/meta.json`);
-        return JSON.parse(meta.toString());
+        return fetch(source, 'calendar.txt');
     });
     var getMeta = cache(60, async function(source) {
-        var meta = await getLocalMeta(source);
-        if (meta.source == 'local')
-            return meta;
-        var res = await request.getAsync(`${meta.source}/api/data/${source}/meta`);
-        return JSON.parse(res.body);
+        var meta = await fetch(source, 'meta.json');
+        return JSON.parse(meta);
     });
+    var getSource = cache(60, async function(source) {
+        // if (source.substring(0, 3) == 'gh:') {
+        //     return {
+        //         location: 'github',
+        //         repo: source.substring(3).split(':').join('/')
+        //     };
+        // }
+        var source = await fs.readFileAsync(`data/${source}/source.json`);
+        return JSON.parse(source.toString());
+    });
+
 
     app.get('/', (req, res) => {
         res.render('index', {
@@ -154,7 +157,8 @@ var startWebServer = function(callback) {
                 userStats: {
                     browser: {},
                     os: {},
-                    theme: {}
+                    theme: {},
+                    source: {}
                 }
             };
 
@@ -185,19 +189,25 @@ var startWebServer = function(callback) {
                 if (!out.userStats.theme[data.theme])
                     out.userStats.theme[data.theme] = 0;
                 out.userStats.theme[data.theme]++;
+                if (!out.userStats.source[data.source])
+                    out.userStats.source[data.source] = 0;
+                out.userStats.source[data.source]++;
             }
 
             return res.json(out);
         });
 
-    app.get('/api/sources', (req, res) => {
+    app.get('/api/sources', async(req, res) => {
         var directories = fs.readdirSync('data').filter(name => fs.lstatSync(path.join('data', name)).isDirectory());
-        directories = directories.map(source => {
-            var meta = require(`./data/${source}/meta.json`);
-            meta.id = source;
-            return meta;
-        });
-        res.json(directories);
+
+        var sources = [];
+        for (let directory of directories) {
+            var source = await getMeta(directory);
+            source.id = directory;
+            sources.push(source);
+        }
+
+        res.json(sources);
     });
 
     app.get('/api/data/:source/meta', (req, res) => {
@@ -302,7 +312,7 @@ var startWebServer = function(callback) {
         var updateUserInfo = function(id, callback) {
             var s = new Sniffr();
             s.sniff(req.body.userAgent)
-            client.hmset(`users:${id}`, 'userAgent', req.body.userAgent, 'browser', s.browser.name, 'os', s.os.name, 'theme', req.body.theme, 'last seen', Date.now(), callback);
+            client.hmset(`users:${id}`, 'source', req.body.source, 'userAgent', req.body.userAgent, 'browser', s.browser.name, 'os', s.os.name, 'theme', req.body.theme, 'last seen', Date.now(), callback);
         };
         ensureUserId(function(err, id) {
             updateUserInfo(id);

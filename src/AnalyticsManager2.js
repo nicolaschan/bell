@@ -27,9 +27,9 @@ class AnalyticsManager {
             send = await requestManager.post('/api/analytics', {
                 id: this.cookieManager.get('id'),
                 newPageLoad: this.newPageLoad,
-                source: 'web',
                 theme: this.themeManager.getCurrentThemeName(),
-                userAgent: $(window)[0].navigator.userAgent
+                userAgent: $(window)[0].navigator.userAgent,
+                source: this.cookieManager.get('source')
             });
         } catch (e) {
             this.logger.warn('Analytics sending failed');
