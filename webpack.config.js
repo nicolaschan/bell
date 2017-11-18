@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -32,5 +33,8 @@ module.exports = {
             enforce: 'post',
             exclude: /node_modules|\.spec\.js$/,
         }]
-    }
+    },
+    plugins: [new UglifyJsPlugin({
+        cache: true
+    })]
 };

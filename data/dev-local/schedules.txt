@@ -1,2 +1,2 @@
-* dev (Developer)
-19:10 {0}
+* dev / Developer
+19:10 Hello world
