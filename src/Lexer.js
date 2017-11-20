@@ -37,11 +37,16 @@ var concat = function(arr) {
     return arr.reduce((a, b) => a.concat(b), '');
 };
 
+var remove = function(char, str) {
+    return concat(str.split(char));
+};
+
 module.exports = {
     lex: lex,
     drop: drop,
     dropEnd: dropEnd,
     trim: trim,
     splitAndPreserve: splitAndPreserve,
-    concat: concat
+    concat: concat,
+    remove
 };

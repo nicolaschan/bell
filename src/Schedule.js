@@ -1,3 +1,5 @@
+const Period = require('./Period');
+
 class Schedule {
     constructor(name, display, periods) {
         this.name = name;
@@ -15,7 +17,12 @@ class Schedule {
         this.periods.push(period);
     }
 
-    getCurrentPeriodIndex(time) {
+    getCurrentPeriodIndex(date) {
+        var time = {
+            hour: date.getHours(),
+            min: date.getMinutes()
+        };
+
         for (let i in this.periods) {
             let period = this.periods[i];
             if (period.time.hour > time.hour)
@@ -23,28 +30,29 @@ class Schedule {
             if (period.time.hour >= time.hour && period.time.min > time.min)
                 return i - 1;
         }
+        return this.periods.length - 1;
     }
 
-    getCurrentPeriod(time) {
-        try {
-            return this.periods[this.getCurrentPeriodIndex(time)];
-        } catch (e) {
-            return null;
-        }
+    getPeriodByIndex(i, date) {
+        var period = this.periods[i];
+        if (period)
+            return period.addTimestamp(date);
     }
-    getNextPeriod(time) {
-        try {
-            return this.periods[this.getCurrentPeriodIndex(time) + 1];
-        } catch (e) {
-            return null;
-        }
+
+    getCurrentPeriod(date) {
+        var period = this.getPeriodByIndex(this.getCurrentPeriodIndex(date), date);
+        if (!period)
+            return new Period({
+                hour: 0,
+                min: 0
+            }, 'None').addTimestamp(date);
+        return period;
     }
-    getPreviousPeriod(time) {
-        try {
-            return this.periods[this.getCurrentPeriodIndex(time) - 1];
-        } catch (e) {
-            return null;
-        }
+    getNextPeriod(date) {
+        return this.getPeriodByIndex(this.getCurrentPeriodIndex(date) + 1, date);
+    }
+    getPreviousPeriod(date) {
+        return this.getPeriodByIndex(this.getCurrentPeriodIndex(date) - 1, date);
     }
 }
 

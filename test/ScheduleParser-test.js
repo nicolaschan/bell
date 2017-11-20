@@ -142,20 +142,23 @@ describe('ScheduleParser', function() {
             result['tutorial'].name.should.equal('tutorial');
             result['tutorial'].display.should.equal('Tutorial Schedule');
 
-            result['normal'].getCurrentPeriod({
-                hour: 8,
-                min: 10
-            }).display().should.equal('Period 1');
-            result['tutorial'].getCurrentPeriod({
-                hour: 11,
-                min: 0
-            }).display().should.equal('Tutorial');
-            result['tutorial'].getCurrentPeriod({
-                hour: 11,
-                min: 25
-            }).display({
+            result['normal'].getCurrentPeriod(new Date('2017-11-20 8:10')).display().should.equal('Period 1');
+            result['tutorial'].getCurrentPeriod(new Date('2017-11-20 11:00')).display().should.equal('Tutorial');
+            result['tutorial'].getCurrentPeriod(new Date('2017-11-20 11:25')).display({
                 'Period 4': 'Film Analysis'
             }).should.equal('Passing to Film Analysis');
+            result['tutorial'].getPreviousPeriod(new Date('2017-11-20 11:25')).display({
+                'Period 4': 'Film Analysis'
+            }).should.equal('Tutorial');
+            result['tutorial'].getNextPeriod(new Date('2017-11-20 11:25')).display({
+                'Period 4': 'Film Analysis'
+            }).should.equal('Film Analysis');
+            result['tutorial'].getCurrentPeriod(new Date('2017-11-20 6:25')).display({
+                'Period 4': 'Film Analysis'
+            }).should.equal('None');
+            result['tutorial'].getCurrentPeriod(new Date('2017-11-20 22:25')).display({
+                'Period 4': 'Film Analysis'
+            }).should.equal('After School');
         });
     });
 });

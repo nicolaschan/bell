@@ -310,8 +310,10 @@ const $ = require('jquery');
         });
     };
     UIManager.prototype.update = function() {
+        var bindings = this.cookieManager.get('periods');
+
         var time = self.bellTimer.getTimeRemainingString();
-        var name = self.bellTimer.getCurrentPeriod().name;
+        var name = self.bellTimer.getCurrentPeriod().display(bindings);
         var schedule = self.bellTimer.getCurrentSchedule();
         var color = schedule.color;
 
@@ -324,7 +326,7 @@ const $ = require('jquery');
         $('#time').text(time);
         helpers.updateTitle(time);
         $('#subtitle').text(name);
-        $('#scheduleName').text(schedule.displayName);
+        $('#scheduleName').text(schedule.display);
         var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
         if (time.split(':').length > 2)
             min = 60;
@@ -346,22 +348,22 @@ const $ = require('jquery');
             favicon.href = faviconColors.lime;
         }
 
-        var theme = self.themeManager.getCurrentTheme();
+        var theme = self.themeManager.getCurrentTheme()(time);
 
-        $('.time').css('color', theme(time)[0]);
-        $('.subtitle').css('color', theme(time)[1]);
-        if (typeof theme(time)[2] == 'string') {
-            $('#page1').css('background-color', theme(time)[2]);
+        $('.time').css('color', theme[0]);
+        $('.subtitle').css('color', theme[1]);
+        if (typeof theme[2] == 'string') {
+            $('#page1').css('background-color', theme[2]);
             $('#page1').css('background-image', '');
             $('#page1').css('background-size', '');
         } else {
-            for (var prop in theme(time)[2])
-                $('#page1').css(prop, theme(time)[2][prop]);
+            for (var prop in theme[2])
+                $('#page1').css(prop, theme[2][prop]);
         }
 
         // popup stuff
-        $('.extension').css('background-color', theme(time)[3]);
-        $('.link').css('color', theme(time)[1]);
+        $('.extension').css('background-color', theme[3]);
+        $('.link').css('color', theme[1]);
 
         if (color) {
             if (theme == 'Default - Dark')
@@ -372,6 +374,8 @@ const $ = require('jquery');
 
 
         var displayTimeArray = function(timeArray) {
+            timeArray = [timeArray.hour, timeArray.min];
+
             var hours = ((timeArray[0] == 0) ? 12 : (timeArray[0] > 12) ? timeArray[0] % 12 : timeArray[0]).toString();
             var minutes = timeArray[1].toString();
             if (minutes.length < 2)
@@ -398,12 +402,15 @@ const $ = require('jquery');
         $('#scheduleTable').empty();
         for (var i in completed) {
             if (completed[i].name != 'None')
-                $('#scheduleTable').append($('<tr class="period completed"></tr>').append($('<td class="time"></td>').text(displayTimeArray(completed[i].time))).append($('<td></td>').text(completed[i].name)));
+                $('#scheduleTable').append($('<tr class="period completed"></tr>').append($('<td class="time"></td>').text(displayTimeArray(completed[i].time))).append($('<td></td>').text(completed[i].display(bindings))));
         }
-        if (current && current.name != 'None')
-            $('#scheduleTable').append($('<tr class="period current"></tr>').append($('<td class="time"></td>').text(displayTimeArray([self.bellTimer.getDate().getHours(), self.bellTimer.getDate().getMinutes()]))).append($('<td></td>').text(current.name)));
+        if (current && current.display(bindings) != 'None')
+            $('#scheduleTable').append($('<tr class="period current"></tr>').append($('<td class="time"></td>').text(displayTimeArray({
+                hour: self.bellTimer.getDate().getHours(),
+                min: self.bellTimer.getDate().getMinutes()
+            }))).append($('<td></td>').text(current.display(bindings))));
         for (var i in future) {
-            $('#scheduleTable').append($('<tr class="period"></tr>').append($('<td class="time"></td>').text(displayTimeArray(future[i].time))).append($('<td></td>').text(future[i].name)));
+            $('#scheduleTable').append($('<tr class="period"></tr>').append($('<td class="time"></td>').text(displayTimeArray(future[i].time))).append($('<td></td>').text(future[i].display(bindings))));
         }
         if ($('#scheduleTable').children().length == 0)
             $('#noClasses').text('No classes today');

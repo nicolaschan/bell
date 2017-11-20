@@ -2,6 +2,8 @@ const _ = require('lodash');
 const $ = require('jquery');
 const async = require('async');
 
+const Period = require('./Period');
+
 var timeArrayToDate = function(date, timeArray, resetMilliseconds) {
     var date = new Date(date.getTime());
     date.setHours(timeArray[0]);
@@ -121,133 +123,6 @@ class BellTimer {
         if (dataSource == 'custom')
             return this.loadCustomCourses();
 
-        var parseData = data => {
-            var rawSchedules = data.schedules;
-
-            for (var key in rawSchedules) {
-                var schedule = rawSchedules[key];
-                for (var i = 0; i < schedule.periods.length; i++) {
-                    var period = schedule.periods[i];
-                    var nameSplit = period.name.split('{').map(function(a) {
-                        return a.split('}');
-                    }).reduce(function(a, b) {
-                        return a.concat(b);
-                    });
-                    for (var j = 1; j < nameSplit.length; j += 2) {
-                        var selectedName = this.cookieManager.get('periods', {})[nameSplit[j]];
-                        nameSplit[j] = selectedName || nameSplit[j];
-                    }
-                    var name = nameSplit.reduce(function(a, b) {
-                        return a.concat(b);
-                    });
-                    period.name = name;
-                    if (name == 'Passing to Free') {
-                        period.name = 'Free';
-                    } else if (name == 'Free') {
-                        schedule.periods.splice(i, 1);
-                        i--;
-                    }
-                    if (i == 0 && name == 'Free') {
-                        schedule.periods.splice(i, 1);
-                        i--;
-                    }
-                }
-            }
-
-            this.setSchedulesAndCalendar(rawSchedules, data.calendar);
-        };
-        var parseSchedules = function(text) {
-            var outputSchedules = {};
-
-            var lines = text.split('\n').map(s => s.replace('\r', ''));
-
-            var currentScheduleName;
-            var currentSchedule;
-            for (var i in lines) {
-                var line = lines[i];
-                if (line[0] == '*') {
-                    if (currentSchedule)
-                        outputSchedules[currentScheduleName] = currentSchedule;
-                    currentScheduleName = line.substring(2).split(' (')[0];
-                    currentSchedule = {
-                        displayName: line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')),
-                        periods: []
-                    };
-                    if (line.indexOf('[') > -1)
-                        currentSchedule.color = line.split('[')[1].substring(0, line.split('[')[1].indexOf(']'));
-                } else {
-                    if (!line)
-                        continue;
-                    var time = line.substring(0, line.indexOf(' '));
-                    var hour = time.split(':')[0];
-                    var minute = time.split(':')[1];
-                    var periodName = line.substring(line.indexOf(' ') + 1);
-
-                    currentSchedule.periods.push({
-                        name: periodName,
-                        time: [parseInt(hour), parseInt(minute)]
-                    });
-                }
-            }
-
-            if (currentSchedule) {
-                outputSchedules[currentScheduleName] = currentSchedule;
-            }
-
-            return outputSchedules;
-        };
-        var parseCalendar = function(text, schedules) {
-            var calendar = {
-                defaultWeek: [], // 0 is Sunday, 1 is Monday, etc.
-                specialDays: {}
-            };
-
-            var lines = text.split('\n').map(s => s.replace('\r', ''));
-
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i];
-                if (line == '* Default Week') {
-                    line = lines[++i];
-                    while (line && line[0] != '*') {
-                        calendar.defaultWeek.push(line.substring(2));
-                        line = lines[++i];
-                    }
-                }
-                if (line == '* Special Days') {
-                    line = lines[++i];
-
-                    while (line && line[0] != '*') {
-                        if (line.split(' ')[0].indexOf('-') > -1) {
-                            // is a range
-                            var date = new Date(line.split(' ')[0].split('-')[0]);
-                            var endDate = new Date(line.split(' ')[0].split('-')[1]);
-                            var scheduleName = line.split(' ')[1];
-                            var schedule = {
-                                scheduleName: scheduleName,
-                                customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
-                            };
-                            while (dateToString(date) != dateToString(endDate)) {
-                                calendar.specialDays[dateToString(date)] = schedule;
-                                date.setDate(date.getDate() + 1);
-                            }
-                            calendar.specialDays[dateToString(endDate)] = schedule;
-                        } else {
-                            // is not a range
-                            var date = new Date(line.split(' ')[0]);
-                            var scheduleName = line.split(' ')[1];
-                            calendar.specialDays[dateToString(date)] = {
-                                scheduleName: scheduleName,
-                                customName: (line.indexOf('(') > -1) ? line.split('(')[1].substring(0, line.split('(')[1].indexOf(')')) : schedules[scheduleName].displayName
-                            };
-                        }
-                        line = lines[++i];
-                    }
-                }
-            }
-
-            return calendar;
-        };
-
         var version = await this.requestManager.get('/api/version');
         if (this.version && this.version != version)
             $(window)[0].location.reload();
@@ -257,16 +132,16 @@ class BellTimer {
         var correction = await this.requestManager.get(`/api/data/${dataSource}/correction`, '0');
         this.setCorrection(parseInt(correction));
 
+        var parseSchedules = require('./ScheduleParser');
+        var parseCalendar = require('./CalendarParser');
+
         var schedules = await this.requestManager.get(`/api/data/${dataSource}/schedules`);
         schedules = parseSchedules(schedules);
 
         var calendar = await this.requestManager.get(`/api/data/${dataSource}/calendar`);
         calendar = parseCalendar(calendar, schedules);
 
-        return parseData({
-            schedules: schedules,
-            calendar: calendar
-        });
+        return this.calendar = calendar;
     }
 
     async initialize() {
@@ -372,12 +247,22 @@ class BellTimer {
 
     getNextPeriod() {
         var date = this.getDate();
+        var period = this.calendar.getSchedule(date).getNextPeriod(date);
+        while (!period) {
+            var date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0, 0, 0, 0);
+            period = this.calendar.getSchedule(date).getCurrentPeriod(date);
+        }
+        return period;
+
         return this.getPeriodByNumber(date, this.getCurrentPeriodNumber(date) + 1);
     }
 
     getCurrentPeriod() {
         var date = this.getDate();
-        return this.getPeriodByNumber(date, this.getCurrentPeriodNumber(date));
+        return this.calendar.getSchedule(date).getCurrentPeriod(date) || new Period({
+            hour: 0,
+            min: 0
+        }, 'None').addTimestamp(date);
     }
 
     getPeriodByNumber(date, i) {
@@ -404,16 +289,7 @@ class BellTimer {
 
     getCurrentPeriodNumber() {
         var date = this.getDate();
-        var schedule = this.getCurrentSchedule(date);
-        var periods = schedule.periods;
-        for (var i = 0; i < periods.length; i++) {
-            if (periods[i].time[0] > date.getHours())
-                return i - 1;
-            if (periods[i].time[0] == date.getHours())
-                if (periods[i].time[1] > date.getMinutes())
-                    return i - 1;
-        }
-        return i - 1;
+        return this.calendar.getSchedule(date).getCurrentPeriodIndex(date);
     }
 
     getCompletedPeriods() {
@@ -454,23 +330,7 @@ class BellTimer {
 
     getCurrentSchedule(date) {
         if (!date) date = this.getDate();
-        var dateString = dateToString(date);
-        var specialDay = this.calendar.specialDays[dateString];
-
-        var schedule;
-        if (specialDay) {
-            schedule = this.schedules[specialDay.scheduleName];
-            schedule.displayName = specialDay.customName;
-        } else {
-            schedule = this.schedules[this.calendar.defaultWeek[date.getDay()]];
-        }
-
-        for (var i in schedule.periods) {
-            var timestamp = timeArrayToDate(date, schedule.periods[i].time, true);
-            schedule.periods[i].timestamp = timestamp;
-        }
-
-        return schedule;
+        return this.calendar.getSchedule(date);
     }
 }
 

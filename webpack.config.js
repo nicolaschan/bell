@@ -34,7 +34,7 @@ module.exports = {
             exclude: /node_modules|\.spec\.js$/,
         }]
     },
-    plugins: [new UglifyJsPlugin({
-        cache: true
-    })]
+    // plugins: [new UglifyJsPlugin({
+    //     cache: true
+    // })]  
 };

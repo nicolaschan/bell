@@ -3,7 +3,8 @@ const {
     drop,
     dropEnd,
     trim,
-    concat
+    concat,
+    remove
 } = require('./Lexer');
 
 const Schedule = require('./Schedule');
@@ -35,6 +36,7 @@ var parseLine = function(line) {
     }
 };
 var parse = function(str) {
+    str = remove('\r', str);
     var lines = str.split('\n').filter(line => line.length > 0);
     lines = lines.map(parseLine);
     var schedules = {};
