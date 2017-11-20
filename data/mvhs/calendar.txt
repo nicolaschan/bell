@@ -1,0 +1,14 @@
+* Default Week
+Mon weekend
+Tue normal
+Wed tutorial
+Thu even
+Fri odd
+Sat normal
+Sun weekend
+
+* Special Days
+11/21/2017 dc-hk # Digital Culture/Healthy Kids Survey
+11/22/2017 holiday # Teacher Service Day
+11/23/2017 holiday # Thanksgiving Day
+11/24/2017 holiday

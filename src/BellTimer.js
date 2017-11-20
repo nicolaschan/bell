@@ -123,11 +123,19 @@ class BellTimer {
         if (dataSource == 'custom')
             return this.loadCustomCourses();
 
+        var sources = await this.requestManager.get('/api/sources/names');
+        if (sources.indexOf(dataSource) < 0) {
+            this.cookieManager.remove('source');
+            return this.reloadData();
+        }
+
         var version = await this.requestManager.get('/api/version');
-        if (this.version && this.version != version)
-            $(window)[0].location.reload();
-        else
+        if (this.version && this.version != version) {
+            // Give IndexedDB time to write (TODO: make more robust)
+            setTimeout(() => $(window)[0].location.reload(), 1000);
+        } else {
             this.version = version;
+        }
 
         var correction = await this.requestManager.get(`/api/data/${dataSource}/correction`, '0');
         this.setCorrection(parseInt(correction));
@@ -253,8 +261,6 @@ class BellTimer {
             period = this.calendar.getSchedule(date).getCurrentPeriod(date);
         }
         return period;
-
-        return this.getPeriodByNumber(date, this.getCurrentPeriodNumber(date) + 1);
     }
 
     getCurrentPeriod() {

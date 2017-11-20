@@ -25,6 +25,7 @@ class CookieManager {
     }
 
     remove(key) {
+        delete this.cache[key];
         return this.storage.removeItem(key);
     }
 

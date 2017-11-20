@@ -1,0 +1,73 @@
+* normal # Schedule A
+7:10 Passing to {Period 0}
+7:15 {Period 0}
+8:05 Passing to {Period 1}
+8:10 {Period 1}
+9:00 Passing to {Period 2}
+9:05 {Period 2}
+10:00 Brunch
+10:10 Passing to {Period 3}
+10:15 {Period 3}
+11:05 Passing to {Period 4}
+11:10 {Period 4}
+12:00 Lunch
+12:45 Passing to {Period 5}
+12:50 {Period 5}
+13:40 Passing to {Period 6}
+13:45 {Period 6}
+14:35 Passing to {Period 7}
+14:40 {Period 7}
+15:30 After School
+
+* tutorial # Tutorial Schedule
+7:15 Passing to {Period 0}
+7:20 {Period 0}
+8:05 Passing to {Period 1}
+8:10 {Period 1}
+8:55 Passing to {Period 2}
+9:00 {Period 2}
+9:50 Brunch
+10:00 Passing to {Period 3}
+10:05 {Period 3}
+10:50 Passing to tutorial
+10:55 Tutorial
+11:25 Passing to {Period 4}
+11:30 {Period 4}
+12:15 Lunch
+13:00 Passing to {Period 5}
+13:05 {Period 5}
+13:50 Passing to {Period 6}
+13:55 {Period 6}
+14:40 Passing to {Period 7}
+14:45 {Period 7}
+15:30 After School
+
+* even # Schedule B
+7:10 Passing to {Period 0}
+7:15 {Period 0}
+8:45 Passing to {Period 2}
+8:50 {Period 2}
+10:25 Brunch
+10:40 Passing to {Period 4}
+10:45 {Period 4}
+12:15 Lunch
+13:00 Passing to {Period 6}
+13:05 {Period 6}
+14:35 After School
+
+* odd # Schedule C
+8:05 Passing to {Period 1}
+8:10 {Period 1}
+9:45 Brunch
+10:00 Passing to {Period 3}
+10:05 {Period 3}
+11:35 Lunch
+12:20 Passing to {Period 5}
+12:25 {Period 5}
+13:55 Passing to {Period 7}
+14:00 {Period 7}
+15:30 After School
+
+* weekend # Weekend [lightskyblue]
+
+* holiday # Holiday [lightskyblue]

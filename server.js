@@ -209,6 +209,10 @@ var startWebServer = function(callback) {
 
         res.json(sources);
     });
+    app.get('/api/sources/names', async(req, res) => {
+        var directories = fs.readdirSync('data').filter(name => fs.lstatSync(path.join('data', name)).isDirectory());
+        res.json(directories);
+    });
 
     app.get('/api/data/:source/meta', (req, res) => {
         getMeta(req.params.source).then(meta => res.json(meta));
