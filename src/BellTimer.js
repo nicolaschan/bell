@@ -140,7 +140,14 @@ class BellTimer {
             return this.loadCustomCourses();
         }
 
-        var sources = await this.requestManager.get('/api/sources/names');
+        var [sources, version, correction, schedules, calendar] = await Promise.all([
+            this.requestManager.get('/api/sources/names'),
+            this.requestManager.get('/api/version'),
+            this.requestManager.get(`/api/data/${dataSource}/correction`, '0'),
+            this.requestManager.get(`/api/data/${dataSource}/schedules`),
+            this.requestManager.get(`/api/data/${dataSource}/calendar`)
+        ]);
+
         if (sources.indexOf(dataSource) < 0) {
             this.cookieManager.remove('source');
             return this.reloadData();
@@ -148,23 +155,18 @@ class BellTimer {
 
         this.source = dataSource;
 
-        var version = await this.requestManager.get('/api/version');
         if (this.version && this.version != version)
         // Give IndexedDB time to write (TODO: make more robust)
             setTimeout(() => $(window)[0].location.reload(), 1000);
         else
             this.version = version;
 
-        var correction = await this.requestManager.get(`/api/data/${dataSource}/correction`, '0');
         this.setCorrection(parseInt(correction));
 
         var parseSchedules = require('./ScheduleParser');
         var parseCalendar = require('./CalendarParser');
 
-        var schedules = await this.requestManager.get(`/api/data/${dataSource}/schedules`);
         schedules = parseSchedules(schedules, this.cookieManager.get('periods'));
-
-        var calendar = await this.requestManager.get(`/api/data/${dataSource}/calendar`);
         calendar = parseCalendar(calendar, schedules);
 
         return this.calendar = calendar;
