@@ -21,9 +21,7 @@ $ ->
     sourceSelector = $('select#source').selectize
       valueField: 'id'
       searchField: ['name', 'id']
-      options: [
-        {name: 'Custom', id: 'custom'}
-      ]
+      options: []
       create: (input) ->
         split = input.split(':')
         {

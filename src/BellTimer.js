@@ -3,6 +3,8 @@ const $ = require('jquery');
 const async = require('async');
 
 const Period = require('./Period');
+const Schedule = require('./Schedule');
+const Calendar = require('./Calendar');
 
 var timeArrayToDate = function(date, timeArray, resetMilliseconds) {
     var date = new Date(date.getTime());
@@ -74,54 +76,69 @@ class BellTimer {
     loadCustomCourses() {
         var courses = this.cookieManager.get('courses');
 
-        var calendar = {
-            defaultWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-            specialDays: {}
+        var week = {
+            Sun: {
+                name: 'Sunday'
+            },
+            Mon: {
+                name: 'Monday'
+            },
+            Tue: {
+                name: 'Tuesday'
+            },
+            Wed: {
+                name: 'Wednesday'
+            },
+            Thu: {
+                name: 'Thursday'
+            },
+            Fri: {
+                name: 'Friday'
+            },
+            Sat: {
+                name: 'Saturday'
+            }
         };
-
+        var special = {};
         var schedules = {};
 
-        for (var i in calendar.defaultWeek) {
-            schedules[calendar.defaultWeek[i]] = {
-                displayName: calendar.defaultWeek[i],
-                periods: []
-            };
+        for (let day in week) {
+            day = week[day].name;
+            schedules[day] = new Schedule(day, day, []);
         }
 
-        for (var id in courses) {
+
+        for (let id in courses) {
             var course = courses[id];
             var name = course.name;
             var sections = course.sections;
-            for (var section of sections) {
-                if (!schedules[section[0]])
-                    schedules[section[0]] = {
-                        displayName: section[0],
-                        periods: []
-                    };
-                schedules[section[0]].periods.push({
-                    name: name,
-                    time: section[1]
-                });
-                schedules[section[0]].periods.push({
-                    name: 'Free',
-                    time: section[2]
-                });
-                schedules[section[0]].periods
-                    .sort((a, b) => {
-                        var startDifference = (a.time[0] * 60 + a.time[1]) - (b.time[0] * 60 + b.time[1]);
-                        return startDifference;
-                    });
+
+            for (let section of sections) {
+                var [day, start, end] = section;
+
+                schedules[day].addPeriod(new Period({
+                    hour: start[0],
+                    min: start[1]
+                }, name));
+                schedules[day].addPeriod(new Period({
+                    hour: end[0],
+                    min: end[1]
+                }, 'Free'));
             }
         }
 
+        var calendar = new Calendar(week, special, schedules, this.cookieManager.get('periods'));
+
         this.setCorrection(0);
-        this.setSchedulesAndCalendar(schedules, calendar);
+        this.calendar = calendar;
     }
 
     async reloadData() {
         var dataSource = this.cookieManager.get('source', 'lahs');
-        if (dataSource == 'custom')
+        if (dataSource == 'custom') {
+            this.source = dataSource;
             return this.loadCustomCourses();
+        }
 
         var sources = await this.requestManager.get('/api/sources/names');
         if (sources.indexOf(dataSource) < 0) {
@@ -129,13 +146,14 @@ class BellTimer {
             return this.reloadData();
         }
 
+        this.source = dataSource;
+
         var version = await this.requestManager.get('/api/version');
-        if (this.version && this.version != version) {
-            // Give IndexedDB time to write (TODO: make more robust)
+        if (this.version && this.version != version)
+        // Give IndexedDB time to write (TODO: make more robust)
             setTimeout(() => $(window)[0].location.reload(), 1000);
-        } else {
+        else
             this.version = version;
-        }
 
         var correction = await this.requestManager.get(`/api/data/${dataSource}/correction`, '0');
         this.setCorrection(parseInt(correction));
@@ -144,7 +162,7 @@ class BellTimer {
         var parseCalendar = require('./CalendarParser');
 
         var schedules = await this.requestManager.get(`/api/data/${dataSource}/schedules`);
-        schedules = parseSchedules(schedules);
+        schedules = parseSchedules(schedules, this.cookieManager.get('periods'));
 
         var calendar = await this.requestManager.get(`/api/data/${dataSource}/calendar`);
         calendar = parseCalendar(calendar, schedules);
@@ -257,18 +275,27 @@ class BellTimer {
         var date = this.getDate();
         var period = this.calendar.getSchedule(date).getNextPeriod(date);
         while (!period) {
-            var date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0, 0, 0, 0);
-            period = this.calendar.getSchedule(date).getCurrentPeriod(date);
+            date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0, 0, 0, 0);
+            period = this.calendar.getSchedule(date).getNextPeriod(date);
         }
         return period;
     }
 
-    getCurrentPeriod() {
-        var date = this.getDate();
+    getCurrentPeriodX() {
         return this.calendar.getSchedule(date).getCurrentPeriod(date) || new Period({
             hour: 0,
             min: 0
         }, 'None').addTimestamp(date);
+    }
+
+    getCurrentPeriod() {
+        var date = this.getDate();
+        var period = this.calendar.getSchedule(date).getCurrentPeriod(date);
+        while (!period) {
+            date = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1, 23, 59, 59, 999);
+            period = this.calendar.getSchedule(date).getCurrentPeriod(date);
+        }
+        return period;
     }
 
     getPeriodByNumber(date, i) {
@@ -299,22 +326,20 @@ class BellTimer {
     }
 
     getCompletedPeriods() {
+        var date = this.getDate();
         var completedPeriods = [];
         var schedule = this.getCurrentSchedule();
-        var periods = schedule.periods;
-        for (var i = 0; i < this.getCurrentPeriodNumber(); i++) {
-            completedPeriods.push(periods[i]);
-        }
+        for (var i = 0; i < this.getCurrentPeriodNumber(); i++)
+            completedPeriods.push(schedule.getPeriodByIndex(i, date));
         return completedPeriods;
     }
 
     getFuturePeriods() {
+        var date = this.getDate();
         var futurePeriods = [];
         var schedule = this.getCurrentSchedule();
-        var periods = schedule.periods;
-        for (var i = this.getCurrentPeriodNumber() + 1; i < periods.length; i++) {
-            futurePeriods.push(periods[i]);
-        }
+        for (var i = this.getCurrentPeriodNumber() + 1; i < schedule.length; i++)
+            futurePeriods.push(schedule.getPeriodByIndex(i, date));
         return futurePeriods;
     }
 

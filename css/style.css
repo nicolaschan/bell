@@ -4,6 +4,7 @@ body {
 	margin: 0;
 	cursor: default;
 	user-select: none;
+	-moz-user-select: none;
 	// overflow-x: hidden;
 }
 
@@ -233,6 +234,20 @@ p.signature {
 }
 .right {
 	right: 0px;
+}
+.left {
+	left: 0px;
+}
+.source {
+	position: absolute;
+	margin: 10px;
+	opacity: 0;
+	transition: opacity 2s ease;
+}
+.sourceName {
+	padding: 10px;
+	padding-top: 13px;
+	cursor: pointer;
 }
 
 .extension {

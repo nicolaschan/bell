@@ -179,16 +179,17 @@ var setFormState = function(courseId) {
     }
 };
 
-$(async function() {
-    await cookieManager.initialize();
+$(function() {
+    cookieManager.initialize().then(function() {
+        $('#add-section-button').click(function() {
+            console.log('hi');
+            $('#enter-section').append(generateSectionInputField('Monday', '', ''));
+        });
+        $('#done-button').click(function() {
+            saveCourse();
+        });
 
-    $('#add-section-button').click(function() {
-        $('#enter-section').append(generateSectionInputField('Monday', '', ''));
+        courseId = queryString.parse(location.search)['course'] || shortid.generate();
+        setFormState(courseId);
     });
-    $('#done-button').click(function() {
-        saveCourse();
-    });
-
-    courseId = queryString.parse(location.search)['course'] || shortid.generate();
-    setFormState(courseId);
 });

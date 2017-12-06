@@ -10,16 +10,14 @@ class Period {
         return format(this.formatString, bindings);
     }
 
-    addTimestamp(date) {
-        var period = new Period(this.time, this.formatString);
-        period.timestamp = new Date(
+    getTimestamp(date) {
+        return new Date(
             date.getFullYear(),
             date.getMonth(),
             date.getDate(),
             this.time.hour,
             this.time.min,
             0, 0);
-        return period;
     }
 }
 

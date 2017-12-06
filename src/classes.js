@@ -53,7 +53,6 @@ var reloadCourses = function() {
     }
 };
 
-$(async function() {
-    await cookieManager.initialize();
-    reloadCourses();
+$(function() {
+    cookieManager.initialize().then(reloadCourses);
 });

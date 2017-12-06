@@ -1,11 +1,11 @@
 * Default Week
-Mon weekend
-Tue normal
-Wed tutorial
-Thu even
-Fri odd
-Sat normal
 Sun weekend
+Mon normal
+Tue tutorial
+Wed even
+Thu odd
+Fri normal
+Sat weekend
 
 * Special Days
 11/21/2017 dc-hk # Digital Culture/Healthy Kids Survey

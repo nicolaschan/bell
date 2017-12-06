@@ -17,7 +17,7 @@
 13:45 {Period 6}
 14:35 Passing to {Period 7}
 14:40 {Period 7}
-15:30 After School
+15:30 Free
 
 * tutorial # Tutorial Schedule
 7:15 Passing to {Period 0}
@@ -29,7 +29,7 @@
 9:50 Brunch
 10:00 Passing to {Period 3}
 10:05 {Period 3}
-10:50 Passing to tutorial
+10:50 Passing to Tutorial
 10:55 Tutorial
 11:25 Passing to {Period 4}
 11:30 {Period 4}
@@ -40,7 +40,7 @@
 13:55 {Period 6}
 14:40 Passing to {Period 7}
 14:45 {Period 7}
-15:30 After School
+15:30 Free
 
 * even # Even Block
 7:10 Passing to {Period 0}
@@ -53,7 +53,7 @@
 12:15 Lunch
 13:00 Passing to {Period 6}
 13:05 {Period 6}
-14:35 After School
+14:35 Free
 
 * odd # Odd Block
 8:05 Passing to {Period 1}
@@ -66,11 +66,11 @@
 12:25 {Period 5}
 13:55 Passing to {Period 7}
 14:00 {Period 7}
-15:30 After School
+15:30 Free
 
-* weekend # Weekend [lightskyblue]
+* weekend # Weekend
 
-* holiday # Holiday [lightskyblue]
+* holiday # Holiday
 
 * finals-wed # Wednesday Finals
 8:05 Passing to {Period 2}
@@ -81,7 +81,7 @@
 11:45 Lunch
 12:30 Passing to {Period 7}
 12:35 {Period 7}
-14:10 After School
+14:10 Free
 
 * finals-thu # Thursday Finals
 8:05 Passing to {Period 0}
@@ -92,7 +92,7 @@
 11:45 Lunch
 12:30 Passing to {Period 5}
 12:35 {Period 5}
-14:10 After School
+14:10 Free
 
 * finals-fri # Friday Finals
 8:05 Passing to {Period 3}
@@ -100,7 +100,7 @@
 9:45 Brunch
 10:05 Passing to {Period 4}
 10:10 {Period 4}
-11:45 After School
+11:45 Free
 
 * modified-even # Modified Even Block
 7:10 Passing to {Period 0}
@@ -112,7 +112,7 @@
 9:35 {Period 4}
 10:35 Passing to {Period 6}
 10:40 {Period 6}
-11:40 After School
+11:40 Free
 
 * modified-odd # Modified Odd Block
 8:05 Passing to {Period 1}
@@ -124,7 +124,7 @@
 10:30 {Period 5}
 11:30 Passing to {Period 7}
 11:35 {Period 7}
-12:35 After School
+12:35 Free
 
 * minimum-day # Minimum Day
 7:25 Passing to {Period 0}
@@ -144,7 +144,7 @@
 11:10 {Period 6}
 11:40 Passing to {Period 7}
 11:45 {Period 7}
-12:15 After School
+12:15 Free
 
 * communication-even # Communication Even Block
 7:15 Passing to {Period 0}
@@ -161,7 +161,7 @@
 12:30 Assembly/Tutorial #2
 13:30 Passing to {Period 6}
 13:35 {Period 6}
-14:35 After School
+14:35 Free
 
 * communication-odd # Communication Odd Block
 8:05 Passing to {Period 1}
@@ -178,7 +178,7 @@
 13:25 {Period 5}
 14:25 Passing to {Period 7}
 14:30 {Period 7}
-15:30 After School
+15:30 Free
 
 * sbac-even-a # SBAC Even Block Tuesday
 8:05 Passing to Junior SBAC Testing
@@ -192,7 +192,7 @@
 13:35 {Period 6}
 14:30 Passing to {Period 0}
 14:35 {Period 0}
-15:30 After School
+15:30 Free
 
 * sbac-even-b # SBAC Even Block Thursday
 8:05 Passing to Junior SBAC Testing
@@ -206,7 +206,7 @@
 13:25 {Period 6}
 14:25 Passing to {Period 0}
 14:30 {Period 0}
-15:30 After School
+15:30 Free
 
 * sbac-odd # SBAC Odd Block
 8:05 Passing to Junior SBAC Testing
@@ -220,7 +220,7 @@
 13:25 {Period 5}
 14:25 Passing to {Period 7}
 14:30 {Period 7}
-15:30 After School
+15:30 Free
 
 * assembly # Assembly
 7:15 Passing to {Period 0}
@@ -242,7 +242,7 @@
 13:55 {Period 6}
 14:40 Passing to {Period 7}
 14:45 {Period 7}
-15:30 After School
+15:30 Free
 
 * eclipse # Eclipse
 7:15 Passing to {Period 0}
@@ -264,4 +264,4 @@
 13:55 {Period 6}
 14:40 Passing to {Period 7}
 14:45 {Period 7}
-15:30 After School
+15:30 Free

@@ -61,7 +61,7 @@ var intervals = {
             logger.info('Loading data and synchronizing...');
             bellTimer.reloadData().then(function() {
                 logger.success('Bell timer reloaded');
-                logger.info('Synchronization correction: ' + bellTimer.bellCompensation);
+                logger.info(`Synchronization correction: ${bellTimer.correction} ms`);
                 intervalManager.restart('oneSecond');
             });
             uiManager.loadPopup();

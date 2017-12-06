@@ -17,7 +17,7 @@
 13:45 {Period 6}
 14:35 Passing to {Period 7}
 14:40 {Period 7}
-15:30 After School
+15:30 Free
 
 * tutorial # Tutorial Schedule
 7:15 Passing to {Period 0}
@@ -40,7 +40,7 @@
 13:55 {Period 6}
 14:40 Passing to {Period 7}
 14:45 {Period 7}
-15:30 After School
+15:30 Free
 
 * even # Schedule B
 7:10 Passing to {Period 0}
@@ -53,7 +53,7 @@
 12:15 Lunch
 13:00 Passing to {Period 6}
 13:05 {Period 6}
-14:35 After School
+14:35 Free
 
 * odd # Schedule C
 8:05 Passing to {Period 1}
@@ -66,8 +66,31 @@
 12:25 {Period 5}
 13:55 Passing to {Period 7}
 14:00 {Period 7}
-15:30 After School
+15:30 Free
 
-* weekend # Weekend [lightskyblue]
+* dc-hk # Digital Culture/Healthy Kids Survey
+7:20 Passing to {Period 0}
+7:25 {Period 0}
+8:05 Passing to {Period 1}
+8:10 {Period 1}
+8:45 Passing to {Period 2}
+8:50 {Period 2}
+9:25 Healthy Kids
+10:05 Brunch
+10:15 Passing to {Period 3}
+10:20 {Period 3}
+10:55 Digital Culture Activity
+11:40 Passing to {Period 4}
+11:45 {Period 4}
+12:20 Lunch
+13:05 Passing to {Period 5}
+13:10 {Period 5}
+13:45 Passing to {Period 6}
+13:50 {Period 6}
+14:25 Passing to {Period 7}
+14:30 {Period 7}
+15:05 Free
 
-* holiday # Holiday [lightskyblue]
+* weekend # Weekend
+
+* holiday # Holiday

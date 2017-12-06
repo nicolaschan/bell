@@ -125,7 +125,8 @@ describe('CalendarParser', function() {
                 \n\
                 * Special Days\n\
                 11/22/2017 holiday\n\
-                11/23/2017 holiday # Thanksgiving', {});
+                11/23/2017 holiday # Thanksgiving\n\
+                12/30/2017-01/01/2018 holiday', {});
             result.week.should.deep.equal({
                 Mon: {
                     name: 'normal'
@@ -156,6 +157,15 @@ describe('CalendarParser', function() {
                 '11/23/2017': {
                     name: 'holiday',
                     display: 'Thanksgiving'
+                },
+                '12/30/2017': {
+                    name: 'holiday'
+                },
+                '12/31/2017': {
+                    name: 'holiday'
+                },
+                '01/01/2018': {
+                    name: 'holiday'
                 }
             });
         });

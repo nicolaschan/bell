@@ -41,6 +41,7 @@ describe('BellTimer', function() {
                 url = url.split('?')[0];
 
                 var data = {
+                    '/api/sources/names': ['school'],
                     '/api/data/school/calendar': '* Default Week\nMon normal\nTue normal\nWed normal\nThu normal\nFri normal\nSat normal\nSun normal\n* Special Days\n10/21/2017 special\n10/22/2017 special # Event Day',
                     '/api/data/school/correction': '20000',
                     '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 {Period 1}\n* special # Special Schedule\n10:00 {Period 0}\n11:00 Special Event'
@@ -59,7 +60,7 @@ describe('BellTimer', function() {
             });
             cookieManager.set('source', 'school');
             cookieManager.set('periods', {
-                'Period 1': 'First Period'
+                'Period 0': 'First Period'
             });
             var bellTimer = new BellTimer(cookieManager, requestManager);
             await bellTimer.initialize();
@@ -78,13 +79,11 @@ describe('BellTimer', function() {
         });
         it('custom period names should replace default', function() {
             this.bellTimer.enableDevMode('2017-10-20 8:30:00', 0);
-            this.bellTimer.getCurrentPeriod().display({
-                'Period 0': 'First Period'
-            }).should.equal('First Period');
+            this.bellTimer.getCurrentPeriod().name.should.equal('First Period');
         });
         it('default period name is in curly braces', function() {
-            this.bellTimer.enableDevMode('2017-10-20 8:30:00', 0);
-            this.bellTimer.getCurrentPeriod().display().should.equal('Period 0');
+            this.bellTimer.enableDevMode('2017-10-20 9:30:00', 0);
+            this.bellTimer.getCurrentPeriod().name.should.equal('Period 1');
         });
         it('calendar should be set correctly', function() {
             this.bellTimer.enableDevMode('2017-10-20 8:30:00', 0);

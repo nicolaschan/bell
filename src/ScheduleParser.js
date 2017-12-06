@@ -35,23 +35,25 @@ var parseLine = function(line) {
         return new Period(time, formatString);
     }
 };
-var parse = function(str) {
+var parse = function(str, bindings = {}) {
     str = remove('\r', str);
     var lines = str.split('\n').filter(line => line.length > 0);
     lines = lines.map(parseLine);
+
     var schedules = {};
-    var currentSchedule;
+    var schedule;
+    var periods = [];
     for (let line of lines)
         if (line instanceof Period) {
-            schedules[currentSchedule].addPeriod(line);
+            periods.push(line);
         } else {
-            var {
-                name,
-                display
-            } = line;
-            schedules[name] = new Schedule(name, display, []);
-            currentSchedule = name;
+            if (schedule)
+                schedules[schedule.name] = new Schedule(schedule.name, schedule.display, periods, bindings);
+            schedule = line;
+            periods = [];
         }
+    if (schedule)
+        schedules[schedule.name] = new Schedule(schedule.name, schedule.display, periods, bindings);
     return schedules;
 };
 

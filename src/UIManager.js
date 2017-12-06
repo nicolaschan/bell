@@ -7,7 +7,13 @@ const $ = require('jquery');
             $('#title').text(text);
         }, 500, {
             leading: true
-        })
+        }),
+        updateText: function(selector, value) {
+            // Make sure we are not changing stuff that doesn't
+            // need to be changed.
+            if ($(selector).text() != value)
+                $(selector).text(value);
+        }
     };
 
     var self;
@@ -21,7 +27,7 @@ const $ = require('jquery');
         this.analyticsManager = analyticsManager;
         this.requestManager = requestManager;
     };
-    UIManager.prototype.initialize = function() {
+    UIManager.prototype.initialize = async function() {
         var manageSecrets = () => {
             // from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
             var getParameterByName = function(name, url) {
@@ -265,6 +271,24 @@ const $ = require('jquery');
                 // $('#extension').css('transform', 'translateX(120%)');
             });
         };
+        var showSource = async() => {
+            var source = this.bellTimer.source;
+            var displayName = (await this.requestManager.get(`/api/data/${source}/meta`)).name;
+            helpers.updateText('#sourceName', displayName);
+            $('.source').hover(function() {
+                $(this).css('opacity', '0.5');
+            }, function() {
+                $(this).css('opacity', '0');
+            });
+            $('.source').click(function() {
+                window.location.href = '/settings';
+            });
+
+            $('.source').css('opacity', 0.5);
+            return setTimeout(function() {
+                $('.source').css('opacity', '0');
+            }, 3000);
+        };
 
         $(window).on('load resize', dynamicallySetFontSize);
 
@@ -274,6 +298,7 @@ const $ = require('jquery');
         // setSettingsState();
         showSettingsIcon();
         dynamicallySetFontSize();
+        await showSource();
         return self.loadPopup();
         // slideExtension();
     };
@@ -309,11 +334,10 @@ const $ = require('jquery');
             }, 1050);
         });
     };
-    UIManager.prototype.update = function() {
-        var bindings = this.cookieManager.get('periods');
 
+    UIManager.prototype.update = function() {
         var time = self.bellTimer.getTimeRemainingString();
-        var name = self.bellTimer.getCurrentPeriod().display(bindings);
+        var name = self.bellTimer.getCurrentPeriod().name;
         var schedule = self.bellTimer.getCurrentSchedule();
         var color = schedule.color;
 
@@ -323,10 +347,10 @@ const $ = require('jquery');
 
         var proportionElapsed = self.bellTimer.getProportionElapsed();
 
-        $('#time').text(time);
+        helpers.updateText('#time', time);
         helpers.updateTitle(time);
-        $('#subtitle').text(name);
-        $('#scheduleName').text(schedule.display);
+        helpers.updateText('#subtitle', name);
+        helpers.updateText('#scheduleName', schedule.display);
         var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
         if (time.split(':').length > 2)
             min = 60;
@@ -338,15 +362,14 @@ const $ = require('jquery');
             orange: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAALcSURBVHhe7ZqxThtBEIbPYFlBIjgOBSQNadKkSR7BbkKDLHoaGhoaSBRqTB0UJ02aNG7SR1YaaOxHIE0aGmhAFICxLdmyuDgz5zkpQiQ7u7d3t5vbT7Jm5yTwv3Mze3ve8RwOh8PhcGSWHNlEqK0XlsBUd9cLK2Bx/BSvA2fwOd1rjL6DbdYao9PgagLEHoDxt5n33qPpd+TK0fH3c6uDHfJiIZYA1NamF3Y3Zo5h+HByJTK9vS+D57Wv/gX52tAagPLLfL716cElDOcmV7TTrWwN59s/bm/Jj4y2AECqf4BUf0NuvHT8OpTGW/IioSUA4/bsFZjSxEuM61y5/5jGykyRVaL8wsvB5McwTHrySAm/GzWQr4TyH+MXtz7P/iI3VSqb/an2Tw9vhDTKAaA7bwxQDkpzUSoBqnmjUNUkHYBgtU+n5kWUSJsUUgEov8rnE3vUqQDaAo0SSNUNpNkNmLg2ObrownpQpLEQdgbg9haM6ZNH5kgrC3YGwN3vgtG1t4+bHmQB62bJrAG2TB5ha2UFIHiltQyuZlYJmLbp4cLZHEnvA/43hAGgn7GshKOdkwFVsjYi1C6sEaj/AzCvJ551HMI6sEzje+FkwDOyNiLUzgnAE7I2ItTungJk/wUeWtiKUDsnAImd0sSAULswAHRcZSUc7ZwMaJK1EaF29y5ANrPwAtDx92lkD0zNrBJAbCsDTvojMiXQI2sDbK3sAOD5PA2NR0YruwQQKIPs/iyOYHMCDY1FVqNUAILOjI5fJ9c8QJts94hUCYRAKaTRECFCqWFCKQCIaY9F7mPvLlIl8CfYlEDD1ImiRTkDEBO6RKJ0hyCRAhCS0pqQfpNUSCAkyacDtslpmDyiJQNCsDmh9THmRsnt4Xz7SF+jpNaFDIXBnSnCVnQRXJ3vDtgqu4j/W+fkEa0ZcB/BKW3WmqX/xp12eTy0CH+3P4fPSRrt8g6Hw+FwOLKK5/0GBprnoamgn5kAAAAASUVORK5CYII='
         };
 
-        if (min < 2) {
+        if (min < 2)
             favicon.href = faviconColors.red;
-        } else if (min < 5) {
+        else if (min < 5)
             favicon.href = faviconColors.orange;
-        } else if (min < 15) {
+        else if (min < 15)
             favicon.href = faviconColors.yellow;
-        } else {
+        else
             favicon.href = faviconColors.lime;
-        }
 
         var theme = self.themeManager.getCurrentTheme()(time);
 
@@ -364,6 +387,8 @@ const $ = require('jquery');
         // popup stuff
         $('.extension').css('background-color', theme[3]);
         $('.link').css('color', theme[1]);
+
+        $('#sourceName').css('color', theme[1]);
 
         if (color) {
             if (theme == 'Default - Dark')
@@ -401,16 +426,16 @@ const $ = require('jquery');
 
         $('#scheduleTable').empty();
         for (var i in completed) {
-            if (completed[i].name != 'None')
-                $('#scheduleTable').append($('<tr class="period completed"></tr>').append($('<td class="time"></td>').text(displayTimeArray(completed[i].time))).append($('<td></td>').text(completed[i].display(bindings))));
+            // if (completed[i].name != 'Free')
+            $('#scheduleTable').append($('<tr class="period completed"></tr>').append($('<td class="time"></td>').text(displayTimeArray(completed[i].time))).append($('<td></td>').text(completed[i].name)));
         }
-        if (current && current.display(bindings) != 'None')
+        if (current)
             $('#scheduleTable').append($('<tr class="period current"></tr>').append($('<td class="time"></td>').text(displayTimeArray({
                 hour: self.bellTimer.getDate().getHours(),
                 min: self.bellTimer.getDate().getMinutes()
-            }))).append($('<td></td>').text(current.display(bindings))));
+            }))).append($('<td></td>').text(current.name)));
         for (var i in future) {
-            $('#scheduleTable').append($('<tr class="period"></tr>').append($('<td class="time"></td>').text(displayTimeArray(future[i].time))).append($('<td></td>').text(future[i].display(bindings))));
+            $('#scheduleTable').append($('<tr class="period"></tr>').append($('<td class="time"></td>').text(displayTimeArray(future[i].time))).append($('<td></td>').text(future[i].name)));
         }
         if ($('#scheduleTable').children().length == 0)
             $('#noClasses').text('No classes today');
