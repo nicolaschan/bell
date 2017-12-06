@@ -26,6 +26,7 @@ var bellTimer = new BellTimer(cookieManager, requestManager);
 var uiManager = new UIManager(bellTimer, cookieManager, themeManager, analyticsManager, requestManager);
 var chromeExtensionMessenger = new ChromeExtensionMessenger(cookieManager);
 
+var previousRestart = 0;
 var intervals = {
     fast: {
         start: function(func, callback) {
@@ -42,9 +43,12 @@ var intervals = {
 
                     // This function should be called every second, on the second.
                     // Detect if it is more than 100 ms off, and if so, restart interval.
+                    // (Do not restart if it has restarted in the past 10 sec)
                     var waitUntilNextTick = bellTimer.getWaitUntilNextTick();
                     var offset = Math.min(waitUntilNextTick, 1000 - waitUntilNextTick);
-                    if (offset > 100 && (Visibility.state() == 'visible')) {
+                    if (offset > 100 && (Visibility.state() == 'visible') &&
+                        (Date.now() - previousRestart > 10000)) {
+                        previousRestart = Date.now();
                         logger.debug('Tick offset was ' + offset + ' ms, restarting interval...');
                         intervalManager.restart('oneSecond');
                     }
