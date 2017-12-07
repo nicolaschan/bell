@@ -122,7 +122,7 @@ body {
 .popup {
     margin: 1em;
     font-size: 0.8em;
-    padding: 0.4em;
+    padding: 0.2em;
 }
 .link:link, .link:visited {
     text-decoration: none;
@@ -131,6 +131,8 @@ body {
     text-decoration: underline;
 }
 .dismiss-icon {
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
     font-size: 1em;
 }
 .dismiss {
