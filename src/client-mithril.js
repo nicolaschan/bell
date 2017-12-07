@@ -41,7 +41,9 @@ global.mithrilUI = mithrilUI;
 
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging');
 
-window.requestAnimationFrame(() => mithrilUI.redraw());
+setInterval(function() {
+    mithrilUI.redraw();
+}, 1000 / 30);
 setInterval(function() {
     logger.debug('Refreshing data');
     bellTimer.reloadData();
@@ -53,7 +55,7 @@ $(window).on('load', async function() {
     uiModel.setLoadingMessage('Loading');
     await cookieManager.initialize();
     await cookieManager.convertLegacy(cookieManager2, 2);
-    chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc');
+    chromeExtensionMessenger.connect('emceconbnmphfeekdjinombmmladicmn');
 
     uiModel.setLoadingMessage('Synchronizing');
     await Promise.all([
