@@ -116,7 +116,13 @@ var startWebServer = function(callback) {
 
 
     app.get('/', (req, res) => {
-        res.render('client-mithril');
+        res.sendFile(__dirname + '/index.html');
+    });
+    app.get('/m', (req, res) => {
+        res.render('client-mithril', {
+            version: getVersion(),
+            server: config['server name']
+        });
     });
     app.get('/legacy', (req, res) => {
         res.render('index', {

@@ -48,23 +48,24 @@ setInterval(function() {
     popupModel.refresh();
 }, 4 * 60 * 1000);
 
+
 $(window).on('load', async function() {
     uiModel.setLoadingMessage('Loading');
     await cookieManager.initialize();
     await cookieManager.convertLegacy(cookieManager2, 2);
     chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc');
 
-    logger.debug('Initializing BellTimer');
     uiModel.setLoadingMessage('Synchronizing');
-    await bellTimer.initialize();
-    logger.debug('BellTimer initialized');
+    await Promise.all([
+        popupModel.refresh(),
+        bellTimer.initialize()
+    ]);
 
     uiModel.initialize();
     logger.success('Ready!');
-    uiModel.hideLoading();
 
     logger.debug('Reporting analytics');
-    analyticsManager.reportAnalytics();
+    await analyticsManager.reportAnalytics();
 });
 
 var greetings = ['Hello', 'Hi there', 'Greetings', 'Howdy'];

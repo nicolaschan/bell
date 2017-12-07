@@ -2,7 +2,6 @@ class PopupModel {
     constructor(cookieManager, requestManager) {
         this.cookieManager = cookieManager;
         this.requestManager = requestManager;
-        this.refresh();
     }
 
     get visible() {

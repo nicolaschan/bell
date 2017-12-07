@@ -6,7 +6,12 @@ class UIModel {
         this.analyticsManager = analyticsManager;
         this.requestManager = requestManager;
         this.popupModel = popupModel;
-        this.state = {};
+        this.state = {
+            loadingMessage: {
+                visible: true,
+                value: ''
+            }
+        };
     }
 
     setLoadingMessage(message) {

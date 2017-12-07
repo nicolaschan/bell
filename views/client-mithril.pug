@@ -1,8 +1,16 @@
-head
-  title#title Bell Countdown
-  link(rel="shortcut icon", type="image/png", href="/favicons/empty.png")#favicon
-  link(rel="stylesheet", href="/css/style-mithril.css?v=" + version)
-  script(type="text/javascript", src="/timesync/timesync.js")
-body
-  script(type="text/javascript", src="/bin/client-mithril.js")
+//
+  Copyright (c) 2017 Nicolas Chan <nicolas@nicolaschan.com>
+  MIT License (https://github.com/nicolaschan/bell)
+  Version: #{version}
+  Served by: #{server}
+
+doctype html
+html
+  head
+    title#title Bell Countdown
+    link(rel="shortcut icon", type="image/png", href="/favicons/empty.png")#favicon
+    link(rel="stylesheet", href="/css/style-mithril.css?_v=" + version)
+    script(type="text/javascript", src="/timesync/timesync.js")
+  body
+    script(type="text/javascript", src="/bin/client-mithril.js?_v=" + version)
   

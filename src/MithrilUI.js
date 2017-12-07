@@ -1,5 +1,6 @@
 const m = require('mithril');
 const root = document.body;
+const $ = require('jquery');
 
 var Timer = {
     view: function(vnode) {
@@ -220,45 +221,50 @@ class MithrilUI {
 
         m.mount(root, {
             view: function() {
-                if (uiModel.state.ready)
-                    return [m('span', {
-                        style: {
-                            'font-size': (Math.min(window.innerHeight * 0.3, window.innerWidth * 0.2) * 0.1) + 'px'
-                        }
-                    }, [m(Page1, {
-                        model: uiModel
-                    }), m('.container#page2', [
-                        m('.centered', [
-                            m(ScheduleDisplay, {
-                                model: uiModel
-                            })
-                        ]),
-                        m('.footer-right', m('a[href=/settings]',
-                            m('i.settings-icon.material-icons', 'settings')))
-                    ]), m(Popup, {
-                        model: uiModel
-                    }), m(SchoolIndicator, {
-                        model: uiModel
-                    }), m('i.down-arrow.pulse.material-icons', {
-                        onclick: function() {
-                            $('body, html').animate({
-                                scrollTop: $('#page2').offset().top
-                            }, 1500);
-                        },
-                        oninit: function() {
-                            if (uiModel.cookieManager.get('has_scrolled'))
-                                return;
-                            $(window).on('scroll', function(e) {
-                                if ($(window).scrollTop() > 250) {
-                                    $(window).off('scroll');
-                                    uiModel.cookieManager.set('has_scrolled', true);
-                                }
-                            });
-                        },
-                        style: {
-                            visibility: uiModel.cookieManager.get('has_scrolled') ? 'hidden' : 'visible'
-                        }
-                    }, 'keyboard_arrow_down')])];
+                if (!uiModel.state.ready)
+                    return m('.centered.loading', [
+                        m('i.material-icons.loading-icon.spin', 'sync'),
+                        m('br'),
+                        m('.loading-message', uiModel.state.loadingMessage.value)
+                    ]);
+                return [m('span', {
+                    style: {
+                        'font-size': (Math.min(window.innerHeight * 0.3, window.innerWidth * 0.2) * 0.1) + 'px'
+                    }
+                }, [m(Page1, {
+                    model: uiModel
+                }), m('.container#page2', [
+                    m('.centered', [
+                        m(ScheduleDisplay, {
+                            model: uiModel
+                        })
+                    ]),
+                    m('.footer-right', m('a[href=/settings]',
+                        m('i.settings-icon.material-icons', 'settings')))
+                ]), m(Popup, {
+                    model: uiModel
+                }), m(SchoolIndicator, {
+                    model: uiModel
+                }), m('i.down-arrow.pulse.material-icons', {
+                    onclick: function() {
+                        $('body, html').animate({
+                            scrollTop: $('#page2').offset().top
+                        }, 1500);
+                    },
+                    oninit: function() {
+                        if (uiModel.cookieManager.get('has_scrolled'))
+                            return;
+                        $(window).on('scroll', function(e) {
+                            if ($(window).scrollTop() > 250) {
+                                $(window).off('scroll');
+                                uiModel.cookieManager.set('has_scrolled', true);
+                            }
+                        });
+                    },
+                    style: {
+                        visibility: uiModel.cookieManager.get('has_scrolled') ? 'hidden' : 'visible'
+                    }
+                }, 'keyboard_arrow_down')])];
             }
         });
     }
