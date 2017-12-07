@@ -271,7 +271,6 @@ class MithrilUI {
 
     redraw() {
         m.redraw();
-        return window.requestAnimationFrame(() => this.redraw());
     }
 }
 
