@@ -2,9 +2,11 @@ body {
 	font-family: 'Roboto', sans-serif;
 	transition: background-color 3s ease;
 	margin: 0;
-	cursor: default;
-	user-select: none;
-	-moz-user-select: none;
+	// cursor: default;
+	// -webkit-touch-callout: none;
+	// -webkit-user-select: none;
+	// -moz-user-select: none;
+	// user-select: none;
 	// overflow-x: hidden;
 }
 

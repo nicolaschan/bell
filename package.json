@@ -25,6 +25,8 @@
         "lodash": "^4.17.2",
         "loggy": "^1.0.2",
         "lzutf8": "^0.4.7",
+        "material-design-icons": "^3.0.1",
+        "mithril": "^1.1.6",
         "pug": "^2.0.0-rc.4",
         "query-string": "^5.0.0",
         "redis": "^2.8.0",

@@ -40,13 +40,14 @@ class RequestManager {
     }
 
     async get(url, defaultValue) {
+        this.logRequest(url, Date.now());
         var result;
         try {
             result = await this.getNoCache(url);
+            this.cache(url, result);
         } catch (e) {
             result = this.getCached(url);
         }
-        this.cache(url, result);
         return result || defaultValue;
     }
 
@@ -64,9 +65,32 @@ class RequestManager {
         return result;
     }
 
-    getCached(url) {
+    logRequest(url, time) {
+        var logged = this.cookieManager.get('requestTimes', {});
+        logged[url] = time;
+        return this.cookieManager.set('requestTimes', logged);
+    }
+
+    getAllLogs() {
+        return this.cookieManager.get('requestTimes', {});
+    }
+
+    async getThrottled(url, defaultValue, timeout = 4 * 60 * 1000) {
+        var requests = this.getAllLogs();
+        var lastTime = requests[url];
+        if (!lastTime || Date.now() > lastTime + timeout)
+            return this.get(url, defaultValue);
+        return this.getCached(url, defaultValue);
+    }
+
+    getSync(url, defaultValue) {
+        this.getThrottled(url, defaultValue);
+        return this.getCached(url, defaultValue);
+    }
+
+    getCached(url, defaultValue) {
         var cached = this.getAllCached();
-        return cached[url];
+        return cached[url] || defaultValue;
     }
 
     getAllCached() {

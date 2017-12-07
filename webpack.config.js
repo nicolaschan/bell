@@ -9,7 +9,8 @@ module.exports = {
         classes: ['./src/classes.js'],
         settings: ['./src/settings.coffee'],
         periods: ['./src/periods.coffee'],
-        online: ['./src/online.js']
+        online: ['./src/online.js'],
+        'client-mithril': ['./src/client-mithril.js']
     },
     resolve: {
         alias: {}

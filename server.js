@@ -116,6 +116,9 @@ var startWebServer = function(callback) {
 
 
     app.get('/', (req, res) => {
+        res.render('client-mithril');
+    });
+    app.get('/legacy', (req, res) => {
         res.render('index', {
             version: getVersion(),
             server_name: config['server name'],
@@ -333,11 +336,16 @@ var startWebServer = function(callback) {
     app.get('/css/clockpicker.css', (req, res) => {
         res.sendFile(__dirname + '/node_modules/clockpicker/dist/jquery-clockpicker.min.css')
     });
+    app.get('/css/selectize.css', (req, res) => {
+        res.sendFile(__dirname + '/node_modules/selectize/dist/css/selectize.default.css');
+    });
 
     app.use('/favicons', express.static('favicons'));
     app.use('/bin', express.static('bin'));
     app.use('/css', express.static('css'));
     app.use('/img', express.static('img'));
+    app.use('/icons', express.static('node_modules/material-design-icons'));
+    app.use('/fonts', express.static('node_modules/roboto-fontface/fonts'));
 
     server.listen(config.port, function() {
         logger.success('Web server listening on *:' + config.port);
