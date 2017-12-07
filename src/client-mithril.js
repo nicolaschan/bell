@@ -13,6 +13,7 @@ const MithrilUI = require('./MithrilUI.js');
 const UIModel = require('./UIModel.js');
 const ChromeExtensionMessenger = require('./ChromeExtensionMessenger');
 const PopupModel = require('./PopupModel');
+const processQuery = require('./QueryManager');
 
 var logger = new SimpleLogger();
 logger.setLevel('info');
@@ -50,12 +51,12 @@ setInterval(function() {
     popupModel.refresh();
 }, 4 * 60 * 1000);
 
-
 $(window).on('load', async function() {
     uiModel.setLoadingMessage('Loading');
     await cookieManager.initialize();
     await cookieManager.convertLegacy(cookieManager2, 2);
-    chromeExtensionMessenger.connect('emceconbnmphfeekdjinombmmladicmn');
+    processQuery(window.location.href, cookieManager);
+    chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc');
 
     uiModel.setLoadingMessage('Synchronizing');
     await Promise.all([

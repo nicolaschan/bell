@@ -9,7 +9,7 @@ const RequestManager = require("../../src/RequestManager.js");
 const $ = require("jquery"); // forgive my inconsitent usage of jquery
 const _ = require("lodash"); // must use this instead of js-cookie because this isn't the website
 
-const hostname = 'countdown.zone';
+const hostname = 'https://countdown.zone';
 
 var cookman;
 var thememan;
@@ -54,7 +54,7 @@ var setup = function() {
         $('#time').text(time);
         helpers.updateTitle(time);
         $('#subtitle').text(name);
-        $('#scheduleName').text(schedule.displayName);
+        $('#scheduleName').text(schedule.display);
         $('#countdown').css('opacity', 1);
     };
 
@@ -135,7 +135,7 @@ var setup = function() {
 
 var initializePopup = function() {
     thememan = new ThemeManager(cookman);
-    reqman = new RequestManager(cookman, "https://" + hostname);
+    reqman = new RequestManager(cookman, hostname);
     bellTimer = new BellTimer(cookman, reqman);
 
     bellTimer.initialize().then(setup);

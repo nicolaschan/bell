@@ -81,6 +81,12 @@ body {
     overflow-y: hidden;
 }
 
+.no-classes {
+    color: #999999;
+    font-style: italic;
+    font-size: 1.5em;
+}
+
 .school-indicator {
     animation: fade-out-school-indicator 4s;
     opacity: 0;

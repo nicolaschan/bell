@@ -90,6 +90,9 @@ var ScheduleDisplay = {
         completed = completed.slice(completed.length - numberOfCompletedPeriods);
         future = future.slice(0, numberOfFuturePeriods);
 
+        if (!completed.length && !future.length && current.name == 'Free')
+            return m('.no-classes', 'No classes today');
+
         rows = [];
         for (let period of completed)
             rows.push(m('tr.completed', [m('td.time', displayTimeArray(period.time)), m('td', period.name)]));

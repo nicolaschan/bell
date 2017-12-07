@@ -76,6 +76,27 @@ class BellTimer {
     loadCustomCourses() {
         var courses = this.cookieManager.get('courses');
 
+        // Make sure there is at least one section, otherwise it will infinite loop
+        var foundSection = false;
+        for (let id in courses) {
+            var course = courses[id];
+            if (course.sections.length) {
+                foundSection = true;
+                break;
+            }
+        }
+        if (!foundSection)
+            courses = {
+                'none': {
+                    name: 'No sections',
+                    sections: [
+                        ['Wednesday', [0, 0],
+                            [24, 0]
+                        ]
+                    ]
+                }
+            };
+
         var week = {
             Sun: {
                 name: 'Sunday'
@@ -102,11 +123,7 @@ class BellTimer {
         var special = {};
         var schedules = {};
 
-        for (let day in week) {
-            day = week[day].name;
-            schedules[day] = new Schedule(day, day, []);
-        }
-
+        var periods = {};
 
         for (let id in courses) {
             var course = courses[id];
@@ -115,16 +132,23 @@ class BellTimer {
 
             for (let section of sections) {
                 var [day, start, end] = section;
+                if (!periods[day])
+                    periods[day] = [];
 
-                schedules[day].addPeriod(new Period({
+                periods[day].push(new Period({
                     hour: start[0],
                     min: start[1]
                 }, name));
-                schedules[day].addPeriod(new Period({
+                periods[day].push(new Period({
                     hour: end[0],
                     min: end[1]
                 }, 'Free'));
             }
+        }
+
+        for (let day in week) {
+            day = week[day].name;
+            schedules[day] = new Schedule(day, day, periods[day] || []);
         }
 
         var calendar = new Calendar(week, special, schedules, this.cookieManager.get('periods'));
