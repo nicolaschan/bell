@@ -29,12 +29,12 @@
         "mithril": "^1.1.6",
         "pug": "^2.0.0-rc.4",
         "query-string": "^5.0.0",
-        "redis": "^2.8.0",
         "request": "^2.83.0",
         "selectize": "^0.12.4",
         "shortid": "^2.2.6",
-        "sniffr": "^1.1.4",
+        "sqlite3": "^3.1.13",
         "timesync": "^0.4.1",
+        "ua-parser-js": "^0.7.17",
         "visibilityjs": "^1.2.5"
     },
     "devDependencies": {

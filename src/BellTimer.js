@@ -146,7 +146,7 @@ class BellTimer {
             }
         }
 
-        for (let day in week) {
+        for (var day in week) {
             day = week[day].name;
             schedules[day] = new Schedule(day, day, periods[day] || []);
         }

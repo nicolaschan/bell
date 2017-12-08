@@ -10,35 +10,18 @@ const fs = Promise.promisifyAll(require('fs'));
 const path = require('path');
 const shortid = require('shortid');
 const async = require('async');
-const redis = require('redis');
-Promise.promisifyAll(redis.RedisClient.prototype);
-Promise.promisifyAll(redis.Multi.prototype);
 const request = Promise.promisifyAll(require('request'));
 const _ = require('lodash');
-const Sniffr = require('sniffr');
 const crypto = require('crypto');
-var client; // redis client
 const timesyncServer = require('timesync/server');
 const base64Img = require('base64-img');
 
-var connectToRedis = function(callback) {
-    if (!config['enable redis']) {
-        logger.warn('Redis disabled');
-        return callback();
-    }
-    client = (config['redis password']) ? redis.createClient({
-        host: config['redis host'],
-        password: config['redis password']
-    }) : redis.createClient();
+const ServerAnalyticsHandler = require('./ServerAnalyticsHandler');
 
-    client.on('ready', function() {
-        logger.success('Redis connected');
-        callback();
-    });
-    client.on('error', function(err) {
-        logger.error(err);
-    });
-};
+(async function() {
+    await ServerAnalyticsHandler.initialize();
+})();
+
 var startWebServer = function(callback) {
     var cache = function(time, f) {
         // takes a function and caches its result
@@ -159,52 +142,17 @@ var startWebServer = function(callback) {
             version: getVersion()
         });
     });
-    if (config['enable redis'])
-        app.get('/api/stats', async(req, res) => {
-            var out = {
-                dailyStats: {},
-                userStats: {
-                    browser: {},
-                    os: {},
-                    theme: {},
-                    source: {}
-                }
-            };
-
-            var dates = await client.hgetallAsync('dates');
-            for (let date in dates) {
-                var id = dates[date];
-                var totalHits = await client.getAsync(`totalDailyHits:${id}`);
-                var devices = await client.scardAsync(`deviceConnections:${id}`);
-
-                out.dailyStats[date] = {
-                    totalHits: parseInt(totalHits),
-                    devices: devices
-                };
-            }
-
-            var users = await client.hgetallAsync('users');
-            for (let user in users) {
-                var id = users[user];
-                var data = await client.hgetallAsync(`users:${id}`);
-                if (!data)
-                    continue;
-                if (!out.userStats.browser[data.browser])
-                    out.userStats.browser[data.browser] = 0;
-                out.userStats.browser[data.browser]++;
-                if (!out.userStats.os[data.os])
-                    out.userStats.os[data.os] = 0;
-                out.userStats.os[data.os]++;
-                if (!out.userStats.theme[data.theme])
-                    out.userStats.theme[data.theme] = 0;
-                out.userStats.theme[data.theme]++;
-                if (!out.userStats.source[data.source])
-                    out.userStats.source[data.source] = 0;
-                out.userStats.source[data.source]++;
-            }
-
-            return res.json(out);
+    app.get('/api/stats', async(req, res) => {
+        res.json({
+            totalHits: await ServerAnalyticsHandler.getTotalDailyHits(),
+            uniqueHits: await ServerAnalyticsHandler.getUniqueDailyHits(),
+            browserStats: await ServerAnalyticsHandler.getBrowserStats(),
+            osStats: await ServerAnalyticsHandler.getOSStats(),
+            deviceStats: await ServerAnalyticsHandler.getDeviceStats(),
+            themeStats: await ServerAnalyticsHandler.getThemeStats(),
+            sourceStats: await ServerAnalyticsHandler.getSourceStats()
         });
+    });
 
     app.get('/api/sources', async(req, res) => {
         var directories = fs.readdirSync('data').filter(name => fs.lstatSync(path.join('data', name)).isDirectory());
@@ -273,65 +221,16 @@ var startWebServer = function(callback) {
     app.set('view engine', 'pug');
     app.use('/timesync', timesyncServer.requestHandler);
 
-    app.post('/api/analytics', (req, res) => {
-        if (!config['enable redis'])
-            return res.json({
-                success: false
-            });
-        var dateString = new Date().toLocaleDateString();
-        //var dateString = '' + date.getFullYear() + date.getMonth() + date.getDate();
-        var ensureDateId = function(callback) {
-            client.hget('dates', dateString, (err, res) => {
-                if (!res) {
-                    client.incr('date_id', (err, id) => {
-                        client.hset('dates', dateString, id);
-                        callback(id);
-                    });
-                } else {
-                    callback(res);
-                }
-            });
-        };
-        var addId = function(id) {
-            if (req.body.newPageLoad != 'true')
-                return;
-
-            //var now = Date.now();
-            client.sismember(`deviceConnections:${id}`, req.body.id, (err, res) => {
-                if (!res) {
-                    client.sadd(`deviceConnections:${id}`, req.body.id);
-                    //client.rpush(`deviceConnectionsTimes:${id}`, now);
-                }
-            });
-
-            client.incr(`totalDailyHits:${id}`);
-            //client.rpush(`totalHitsTimes:${id}`, now);
-        };
-        ensureDateId(addId);
-
-
-        var ensureUserId = function(callback) {
-            client.hget('users', req.body.id, (err, res) => {
-                if (!res) {
-                    client.incr('user_id', (err, id) => {
-                        client.hset('users', req.body.id, id);
-                        callback(null, id);
-                    });
-                } else {
-                    callback(null, res);
-                }
-            });
-        };
-        var updateUserInfo = function(id, callback) {
-            var s = new Sniffr();
-            s.sniff(req.body.userAgent)
-            client.hmset(`users:${id}`, 'source', req.body.source, 'userAgent', req.body.userAgent, 'browser', s.browser.name, 'os', s.os.name, 'theme', req.body.theme, 'last seen', Date.now(), callback);
-        };
-        ensureUserId(function(err, id) {
-            updateUserInfo(id);
+    app.post('/api/analytics', async(req, res) => {
+        await ServerAnalyticsHandler.recordHit({
+            id: req.body.id,
+            userAgent: req.body.userAgent,
+            theme: req.body.theme,
+            source: req.body.source,
+            // https://stackoverflow.com/a/10849772/
+            ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
         });
-
-        res.json({
+        return res.json({
             success: true
         });
     });
@@ -359,9 +258,4 @@ var startWebServer = function(callback) {
     });
 };
 
-async.parallel([
-    connectToRedis,
-    startWebServer
-], function(err) {
-    logger.success('Ready!');
-});
+startWebServer(err => logger.success('Ready'));

@@ -25,7 +25,7 @@ class Schedule {
         // Calculate number of periods
         var count = 0;
         var previous;
-        for (let i = 0; i < this.periods.length; i++) {
+        for (var i = 0; i < this.periods.length; i++) {
             var period = this.getPeriodByIndex(i, new Date());
             if (period != previous) {
                 count++;
