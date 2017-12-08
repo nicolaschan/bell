@@ -93,7 +93,7 @@ var ScheduleDisplay = {
         if (!completed.length && !future.length && current.name == 'Free')
             return m('.no-classes', 'No classes today');
 
-        rows = [];
+        var rows = [];
         for (let period of completed)
             rows.push(m('tr.completed', [m('td.time', displayTimeArray(period.time)), m('td', period.name)]));
         if (current)

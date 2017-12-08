@@ -30,6 +30,7 @@
         "pug": "^2.0.0-rc.4",
         "query-string": "^5.0.0",
         "request": "^2.83.0",
+        "roboto-fontface": "^0.8.0",
         "selectize": "^0.12.4",
         "shortid": "^2.2.6",
         "sqlite3": "^3.1.13",
@@ -38,6 +39,10 @@
         "visibilityjs": "^1.2.5"
     },
     "devDependencies": {
+        "babel-core": "^6.26.0",
+        "babel-loader": "^7.1.2",
+        "babel-polyfill": "^6.26.0",
+        "babel-preset-env": "^1.6.1",
         "chai": "^4.1.2",
         "chai-as-promised": "^7.1.1",
         "codecov": "^3.0.0",

@@ -3,14 +3,14 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     entry: {
-        client: ['./src/client.js'],
-        stats: ['./src/stats.js'],
-        enter: ['./src/enter.js'],
-        classes: ['./src/classes.js'],
-        settings: ['./src/settings.coffee'],
-        periods: ['./src/periods.coffee'],
-        online: ['./src/online.js'],
-        'client-mithril': ['./src/client-mithril.js']
+        client: ['babel-polyfill', './src/client.js'],
+        stats: ['babel-polyfill', './src/stats.js'],
+        enter: ['babel-polyfill', './src/enter.js'],
+        classes: ['babel-polyfill', './src/classes.js'],
+        settings: ['babel-polyfill', './src/settings.coffee'],
+        periods: ['babel-polyfill', './src/periods.coffee'],
+        online: ['babel-polyfill', './src/online.js'],
+        'client-mithril': ['babel-polyfill', './src/client-mithril.js']
     },
     resolve: {
         alias: {}
@@ -33,9 +33,13 @@ module.exports = {
             },
             enforce: 'post',
             exclude: /node_modules|\.spec\.js$/,
+        }, {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: "babel-loader"
         }]
     },
-    // plugins: [new UglifyJsPlugin({
-    //     cache: true
-    // })]
+    plugins: [new UglifyJsPlugin({
+        cache: true
+    })]
 };

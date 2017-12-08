@@ -31,7 +31,7 @@ var parseLine = function(line) {
             hour: parseInt(hour),
             min: parseInt(min)
         };
-        formatString = concat(trim(' ', tokens));
+        var formatString = concat(trim(' ', tokens));
         return new Period(time, formatString);
     }
 };

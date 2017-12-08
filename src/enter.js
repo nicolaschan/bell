@@ -128,7 +128,7 @@ var saveCourse = function() {
 
     var sectionDoms = $('#enter-section').children();
     var sections = [];
-    for (s of sectionDoms) {
+    for (var s of sectionDoms) {
         sections.push(readSection(s));
     }
 
@@ -182,7 +182,6 @@ var setFormState = function(courseId) {
 $(function() {
     cookieManager.initialize().then(function() {
         $('#add-section-button').click(function() {
-            console.log('hi');
             $('#enter-section').append(generateSectionInputField('Monday', '', ''));
         });
         $('#done-button').click(function() {
