@@ -1,3 +1,6 @@
+# Ignore database file
+analytics.sqlite
+
 # Because Jonathan uses a mac
 .DS_Store
 =======
