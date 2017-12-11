@@ -232,7 +232,7 @@ class BellTimer {
     }
 
     enableDevMode(startDate, scale) {
-        console.warn('You are in Developer Mode! Disable with `bellTimer.disableDevMode()`')
+        console.warn('You are in Developer Mode, at ' + scale + 'x speed! Disable with `bellTimer.disableDevMode()`')
 
         this.devMode = true;
         this.startTime = new Date(startDate).getTime();
@@ -263,7 +263,7 @@ class BellTimer {
         var date = this.getDate();
         if (!this.getNextPeriod().timestamp.getTime)
             console.log(this.getNextPeriod());
-        return this.getNextPeriod().timestamp.getTime() - (Math.floor(date.getTime() / 1000) * 1000);
+        return this.getNextPeriod().timestamp.getTime() - date.getTime();
     }
 
     getTimeRemainingString() {

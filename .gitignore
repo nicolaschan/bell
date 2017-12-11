@@ -58,5 +58,3 @@ jspm_packages
 bin
 chrome_extension/bin
 
-# Package lock
-package-lock.json
