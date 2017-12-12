@@ -3,9 +3,12 @@ analytics.sqlite
 
 # Because Jonathan uses a mac
 .DS_Store
-=======
+
 # Chrome app zip
 bellxt.zip
+
+# Chrome app distribution
+xt_distr
 
 # Bundle
 js/*.bundle.*
