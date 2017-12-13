@@ -116,7 +116,7 @@ var setup = function() {
         updateGraphics();
         updateColors();
         handle = window.requestAnimationFrame(updateAll);
-    }
+    };
 
     dynamicallySetFontSize = function() {
         $('#time').css('font-size', (Math.min($(window).innerHeight() * 0.3, $(window).innerWidth() * 0.2)) + 'px');

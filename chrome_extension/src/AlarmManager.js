@@ -50,8 +50,8 @@ class AlarmManager {
     }
 
     start() {
-    	this.started = true;
-		var min = this.bellTimer.getTimeRemainingNumber() / 60000;
+        this.started = true;
+        var min = msToMin(this.bellTimer.getTimeRemainingNumber());
         // initialize color properly
         browserAction.setIcon({ path: getIconImage(min), });
 
@@ -63,12 +63,12 @@ class AlarmManager {
         	browserAction.setIcon({ path: faviconColors[self.nextColor], });
         	self.setNextAlarm();
         });
-        logger.log("Alarms started.", "ALARM");
+        logger.log("Alarms started.", "ALARMS");
     }
 
     setNextAlarm() {
         var msToEnd = this.bellTimer.getTimeRemainingNumber();
-        var min = msToEnd / 60000;
+        var min = msToMin(msToEnd);
         if (min < 2) {
             this.msToNext = msToEnd;
             this.nextColor = "lime";
@@ -82,10 +82,16 @@ class AlarmManager {
             this.msToNext = msToEnd - minToMs(15);
             this.nextColor = "yellow";
         }
-        alarms.create(this.nextColor, { when: this.msToNext / this.timeScale + Date.now() });
+        var nextTime = this.msToNext / this.timeScale + Date.now();
+        alarms.create("Next alarm", { when: nextTime });
 
-        console.log(alarms.getAll((a) => a));
-        logger.log(`Next color is ${this.nextColor} in ${this.msToNext / this.timeScale} ms`, "ALARM");
+        self = this;
+        alarms.getAll(function(alarms) {
+            for (let a of alarms) {
+                logger.log(`${a.name} fires at ${new Date(a.scheduledTime)} and will change the color to ${self.nextColor}`, "ALARMS");
+                logger.log(`The current correction is ${self.bellTimer.getCorrection()} ms`, "ALARMS");
+            }
+        });
     }
 }
 

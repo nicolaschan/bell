@@ -263,7 +263,7 @@ class BellTimer {
         var date = this.getDate();
         if (!this.getNextPeriod().timestamp.getTime)
             console.log(this.getNextPeriod());
-        return this.getNextPeriod().timestamp.getTime() - date.getTime();
+        return this.getNextPeriod().timestamp.getTime() - (Math.floor(date.getTime() / 1000) * 1000);
     }
 
     getTimeRemainingString() {

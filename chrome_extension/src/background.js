@@ -9,8 +9,10 @@ const hostname = "https://countdown.zone";
 	const cookman = await ChromeCookieManagerFactory();
 	const reqman = new RequestManager(cookman, hostname);
 	const bellTimer = new BellTimer(cookman, reqman);
+	global.bellTimer = bellTimer;
 	await bellTimer.initialize();
 	const alarmManager = new AlarmManager(bellTimer, cookman);
+	global.alarmManager = alarmManager;
 
 	if (alarmManager) {
 		alarmManager.start();
