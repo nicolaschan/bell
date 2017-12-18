@@ -188,7 +188,7 @@ var Popup = {
                 'background-color': theme[3]
             }
         }, m('table', m('tr', [
-            m('td', m('a.link.center-vertical[target=_blank]', {
+            m('td', m(`${model.popupModel.href ? 'a.link' : 'span'}.center-vertical[target=_blank]`, {
                 href: model.popupModel.href,
                 style: {
                     color: theme[1]
