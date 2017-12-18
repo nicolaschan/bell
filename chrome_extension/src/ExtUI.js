@@ -1,7 +1,13 @@
 const m = require('mithril');
 const root = document.getElementById('root');
 
-const hostname = 'http://localhost:8005'//'https://countdown.zone';
+const hostname = 'https://countdown.zone';
+
+var openSettingsTab = function() {
+    chrome.tabs.create({
+        url: `${hostname}/settings`
+    });
+};
 
 // Below code is almost all from MithrilUI.js, with some modification
 var getIconImage = function(min) {
@@ -100,7 +106,8 @@ var SchoolIndicator = {
                 href: `${hostname}/settings`,
                 style: {
                     color: theme[1]
-                }
+                },
+                onclick: openSettingsTab
             }, meta.name))
         ])));
     }
@@ -156,9 +163,7 @@ class ExtUI {
                 }), m('.centered'),
                     m('.footer-right', m(`a[href=${hostname}/settings]`,
                         m('i.settings-icon.material-icons', {
-                        	onclick: function() {
-                        		chrome.tabs.create({url: `${hostname}/settings`})
-                        	}
+                        	onclick: openSettingsTab
                         }, 'settings')))
                 ]), m(SchoolIndicator, {
                     model: uiModel

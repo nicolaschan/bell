@@ -1,17 +1,25 @@
+const logger = new (require('./SimpleLogger.js'))();
+
 class ChromeExtensionMessenger {
     constructor(cookieManager) {
         this.cookieManager = cookieManager;
     }
 
     connect(extensionId) {
+        logger.log("Attempting to connect to host...", "ChromeExtensionMessenger");
         if (window.chrome && window.chrome.runtime) {
             var port = chrome.runtime.connect(extensionId);
             port.postMessage({
                 type: 'all_cookies',
                 value: this.cookieManager.getAll()
             });
+            // TODO add client success/failure messages
+            logger.success("Connection success.");
             port.onMessage.addListener(
                 msg => port.postMessage(this.respond(msg)));
+        }
+        else {
+            logger.warn("Connection failed.");
         }
     }
 

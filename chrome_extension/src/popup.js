@@ -5,7 +5,8 @@ const ThemeManager = require("../../src/ThemeManager.js");
 const RequestManager = require("../../src/RequestManager.js");
 const ExtUI = require('./ExtUI.js');
 const ExtUIModel = require('./ExtUIModel.js');
-const hostname = 'http://localhost:8005';//https://countdown.zone';
+
+const hostname = 'https://countdown.zone';
 
 var cookman;
 var thememan;
@@ -14,8 +15,6 @@ var bellTimer;
 var handle;
 var extUIModel; 
 var extUI;
-
-const beta = false;
 
 var setup = function() {
     global.cookman = cookman;
@@ -36,11 +35,6 @@ var initializePopup = async function() {
     global.cookman = cookman;
     global.bellTimer = bellTimer;
 
-    /*var c = document.getElementById("circle");
-    var ctx = c.getContext('2d');
-    var side = 400;
-    c.height = c.width = side;*/
-
     extUIModel.setLoadingMessage('Synchronizing');
     await bellTimer.initialize();
     extUIModel.initialize();
@@ -55,22 +49,9 @@ var somethingWentWrong = function(err) {
     ctx.fillText("Something went really wrong.", 0, 20);
     ctx.fillText("Whoops.", 0, 40);
 };
-/*
-window.onload = function() {
-    var ld = document.getElementById("page1");
-    // Apparently this depends on the browser?
-    // Mozilla says Chrome uses "transitioned", but apparently mine doesn't.
-    ld.addEventListener("webkitTransitionEnd", function(event) {
-        hideLoading();
-    });
-    ld.addEventListener("transitioned", function(event) {
-        hideLoading();
-    });
-};*/
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {
-        // not supposed to be https
         cookman = await ChromeCookieManagerFactory();
         initializePopup();
     } catch (e) {

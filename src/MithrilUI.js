@@ -17,7 +17,7 @@ var getIconImage = function(min) {
         return faviconColors.yellow;
     else
         return faviconColors.lime;
-}
+};
 
 var Timer = {
     view: function(vnode) {

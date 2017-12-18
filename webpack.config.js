@@ -3,7 +3,6 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     entry: {
-        client: ['babel-polyfill', './src/client.js'],
         stats: ['babel-polyfill', './src/stats.js'],
         enter: ['babel-polyfill', './src/enter.js'],
         classes: ['babel-polyfill', './src/classes.js'],

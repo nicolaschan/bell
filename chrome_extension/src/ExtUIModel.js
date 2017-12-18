@@ -9,7 +9,7 @@ class ExtUIModel {
         this.state = {
             loadingMessage: {
                 visible: true,
-                value: ''
+                value: "Loading..."
             }
         };
     }

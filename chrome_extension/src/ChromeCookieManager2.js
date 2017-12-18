@@ -38,8 +38,7 @@ var CookieManagerFactory = async function() {
 
     (async() => {
         // Load data in the background (so it opens faster)
-        var frame = $('<iframe src="http://localhost:8005"></iframe>');
-        //var frame = $('<iframe src="https://countdown.zone"></iframe>');
+        var frame = $('<iframe src="https://countdown.zone"></iframe>');
         $('#iframe').append(frame);
 
         var port = await new Promise((resolve, reject) =>
@@ -47,7 +46,6 @@ var CookieManagerFactory = async function() {
         var cookies = await new Promise((resolve, reject) => {
             port.onMessage.addListener(msg => resolve(msg.value));
         });
-
         cookies = cookieSerializer.serializeAll(cookies);
         cookieManager.cookies = cookies;
         chrome.storage.local.clear(() =>

@@ -4,9 +4,6 @@
  "browser_action" field in manifest.json contains the "default_popup" key with
  value "popup.html".
  -->
- <!--
-Most stuff taken from the Google example page
- -->
 <html>
   <head>
     <title>Bell Chrome Extension</title>
@@ -22,10 +19,9 @@ Most stuff taken from the Google example page
      -->
   </head>
   <body>
-    <span id="root"></span>
+    <span id="root"></span> <!-- Necessary to ensure that Mithril doesn't overwrite the iframe -->
     <script type="text/javascript" src="https://countdown.zone/timesync/timesync.js"></script>
     <script src="bin/popup.js?v=undefined"></script>
-
     <style type="text/css">
       #iframe {
         display: none;
