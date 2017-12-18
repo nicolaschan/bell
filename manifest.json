@@ -16,10 +16,11 @@
         "alarms",
         "https://countdown.zone/*",
         "http://countdown.zone/*",
+        "http://localhost:8005/*",
         "storage"
     ],
     "externally_connectable": {
-        "matches": ["http://countdown.zone/*", "https://countdown.zone/*"]
+        "matches": ["http://countdown.zone/*", "https://countdown.zone/*", "http://localhost:8005/*"]
     },
     "icons": {
         "128": "icons/icon128.png"

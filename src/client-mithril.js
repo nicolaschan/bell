@@ -56,7 +56,7 @@ $(window).on('load', async function() {
     await cookieManager.initialize();
     await cookieManager.convertLegacy(cookieManager2, 2);
     processQuery(window.location.href, cookieManager);
-    chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc');
+    chromeExtensionMessenger.connect('kddcefooajajmbacdkgbjgnaalplgpmb');
 
     uiModel.setLoadingMessage('Synchronizing');
     await Promise.all([

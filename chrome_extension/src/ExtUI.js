@@ -1,5 +1,5 @@
 const m = require('mithril');
-const root = document.body;
+const root = document.getElementById('root');
 
 const hostname = 'http://localhost:8005'//'https://countdown.zone';
 

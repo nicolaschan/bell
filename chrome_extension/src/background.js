@@ -3,7 +3,7 @@ const ChromeCookieManagerFactory = require("./ChromeCookieManager2.js");
 const BellTimer = require("../../src/BellTimer.js");
 const RequestManager = require("../../src/RequestManager.js");
 
-const hostname = "https://countdown.zone";
+const hostname = "http://localhost:8005";
 
 (async function() {
 	const cookman = await ChromeCookieManagerFactory();
