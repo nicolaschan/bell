@@ -27,6 +27,7 @@
         "lzutf8": "^0.4.7",
         "material-design-icons": "^3.0.1",
         "mithril": "^1.1.6",
+        "pg": "^7.4.0",
         "pug": "^2.0.0-rc.4",
         "query-string": "^5.0.0",
         "request": "^2.83.0",

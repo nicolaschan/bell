@@ -1,4 +1,12 @@
 {
-    "port": 8005,
-    "server name": "bell-0"
+    "port": 8080,
+    "server name": "bell-0",
+    "postgres": {
+        "enabled": true,
+        "user": "postgres",
+        "host": "localhost",
+        "database": "bell",
+        "password": "pass",
+        "port": 5432
+    }
 }
