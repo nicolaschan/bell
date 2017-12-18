@@ -6,19 +6,6 @@ const Period = require('./Period');
 const Schedule = require('./Schedule');
 const Calendar = require('./Calendar');
 
-var timeArrayToDate = function(date, timeArray, resetMilliseconds) {
-    var date = new Date(date.getTime());
-    date.setHours(timeArray[0]);
-    date.setMinutes(timeArray[1]);
-    date.setSeconds(0);
-    if (resetMilliseconds)
-        date.setMilliseconds(0);
-    return date;
-};
-var dateToString = function(date) {
-    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-};
-
 class BellTimer {
     constructor(cookieManager, requestManager) {
         this.cookieManager = cookieManager;
@@ -197,9 +184,10 @@ class BellTimer {
     }
 
     async initialize() {
-        var loaded = await this.reloadData();
-        var ts = await this.initializeTimesync();
-        return;
+        return Promise.all([
+            this.reloadData(),
+            this.initializeTimesync()
+        ]);
     }
 
     async initializeTimesync() {

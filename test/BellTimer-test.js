@@ -35,7 +35,6 @@ describe('BellTimer', function () {
       bellTimer.timeScale.should.equal(2)
     })
   })
-
   describe('#initialize', function () {
     beforeEach(async function () {
       var fakeRequester = async url => {
@@ -119,7 +118,41 @@ describe('BellTimer', function () {
       })
     })
   })
+  describe('custom schedules', function () {
+    beforeEach(async function () {
+      var fakeRequester = async url => {
+        url = url.split('?')[0]
 
+        var data = {
+          '/api/sources/names': ['school'],
+          '/api/data/school/calendar': '* Default Week\nMon normal\nTue normal\nWed normal\nThu normal\nFri normal\nSat normal\nSun normal\n* Special Days\n10/21/2017 special\n10/22/2017 special # Event Day',
+          '/api/data/school/correction': '20000',
+          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 {Period 1}\n* special # Special Schedule\n10:00 {Period 0}\n11:00 Special Event'
+        }
+
+        var result = data[url]
+        if (result) { return result } else { throw new Error('Request failed') }
+      }
+      var cookieManager = new CookieManager()
+      var requestManager = new RequestManager(cookieManager, '', {
+        get: fakeRequester,
+        post: () => {}
+      })
+      cookieManager.set('source', 'custom')
+      cookieManager.set('courses', {'S1KxwpVzM': {'name': 'Slavic R5A', 'sections': [['Monday', [8, 0], [9, 0]]]}})
+      cookieManager.set('periods', {
+        'Period 0': 'First Period'
+      })
+      var bellTimer = new BellTimer(cookieManager, requestManager)
+      await bellTimer.initialize()
+      this.bellTimer = bellTimer
+    })
+
+    it('should get custom course correctly', function () {
+      this.bellTimer.enableDevMode('2017-12-18 8:00', 0)
+      this.bellTimer.getCurrentPeriod().name.should.equal('Slavic R5A')
+    })
+  })
   describe('time calculations', function () {
     beforeEach(async function () {
       var fakeRequester = async url => {
@@ -168,7 +201,6 @@ describe('BellTimer', function () {
       this.bellTimer.getProportionElapsed().should.equal(0.5)
     })
   })
-
   describe('period selection', function () {
     beforeEach(async function () {
       var fakeRequester = async url => {
@@ -257,6 +289,10 @@ describe('BellTimer', function () {
       it('should get current period over multiple days', function () {
         this.bellTimer.enableDevMode('2017-10-20 7:00', 0)
         this.bellTimer.getCurrentPeriod().name.should.equal('Special Event')
+      })
+      it('should give something without dev mode', function () {
+        this.bellTimer.disableDevMode()
+        this.bellTimer.getCurrentPeriod().name.should.not.equal(null)
       })
     })
   })
