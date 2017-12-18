@@ -69,6 +69,13 @@ class Schedule {
             };
     }
 
+    getFirstPeriod(date) {
+        return this.getPeriodByIndex(0, date);
+    }
+    getLastPeriod(date) {
+        return this.getPeriodByIndex(this.length - 1, date)
+    }
+
     getCurrentPeriod(date) {
         return this.getPeriodByIndex(this.getCurrentPeriodIndex(date), date);
     }

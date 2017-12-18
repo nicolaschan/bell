@@ -261,9 +261,7 @@ class BellTimer {
 
     getTimeRemainingNumber() {
         var date = this.getDate();
-        if (!this.getNextPeriod().timestamp.getTime)
-            console.log(this.getNextPeriod());
-        return this.getNextPeriod().timestamp.getTime() - (Math.floor(date.getTime() / 1000) * 1000);
+        return this.getNextPeriod().timestamp.getTime() - (date.getTime() / 1000) * 1000;
     }
 
     getTimeRemainingString() {
@@ -279,10 +277,6 @@ class BellTimer {
             return (hours < 1) ? minutes + ':' + seconds : hours + ':' + minutes + ':' + seconds;
         };
         return displayTimeNumber(this.getTimeRemainingNumber());
-    }
-
-    getWaitUntilNextTick() {
-        return this.getDate().getMilliseconds();
     }
 
     getProportionElapsed() {
@@ -302,16 +296,18 @@ class BellTimer {
         var period = this.calendar.getSchedule(date).getNextPeriod(date);
         while (!period) {
             date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0, 0, 0, 0);
-            period = this.calendar.getSchedule(date).getNextPeriod(date);
+            period = this.calendar.getSchedule(date).getFirstPeriod(date);
         }
         return period;
     }
-
-    getCurrentPeriodX() {
-        return this.calendar.getSchedule(date).getCurrentPeriod(date) || new Period({
-            hour: 0,
-            min: 0
-        }, 'None').addTimestamp(date);
+    getPreviousPeriod() {
+        var date = this.getDate();
+        var period = this.calendar.getSchedule(date).getPreviousPeriod(date);
+        while (!period) {
+            date = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1, 0, 0, 0, 0);
+            period = this.calendar.getSchedule(date).getLastPeriod(date);
+        }
+        return period;
     }
 
     getCurrentPeriod() {
@@ -322,28 +318,6 @@ class BellTimer {
             period = this.calendar.getSchedule(date).getCurrentPeriod(date);
         }
         return period;
-    }
-
-    getPeriodByNumber(date, i) {
-        var currentPeriods = this.getCurrentSchedule(date).periods;
-        if (i == -1) {
-            return {
-                name: 'None',
-                time: this.getPreviousPeriod().time,
-                timestamp: this.getPreviousPeriod().timestamp
-            };
-        }
-        if (i == currentPeriods.length) {
-            var newDate = new Date(date.getTime());
-            newDate.setSeconds(0);
-            newDate.setMinutes(0);
-            newDate.setHours(0);
-            newDate.setDate(newDate.getDate() + 1);
-            var period = _.cloneDeep(this.getPeriodByNumber(newDate, 0));
-
-            return period;
-        }
-        return currentPeriods[i];
     }
 
     getCurrentPeriodNumber() {
@@ -367,22 +341,6 @@ class BellTimer {
         for (var i = this.getCurrentPeriodNumber() + 1; i < schedule.length; i++)
             futurePeriods.push(schedule.getPeriodByIndex(i, date));
         return futurePeriods;
-    }
-
-    getPreviousPeriod(date) {
-        var completedPeriods = this.getCompletedPeriods();
-        if (this.getCompletedPeriods().length > 0)
-            return _.last(this.getCompletedPeriods());
-
-        if (!date) date = this.getDate();
-        var date = new Date(date.getTime());
-        date.setDate(date.getDate() - 1);
-
-        var schedule = this.getCurrentSchedule(date);
-        if (schedule.periods.length > 0)
-            return _.last(schedule.periods);
-        else
-            return this.getPreviousPeriod(date);
     }
 
     getCurrentSchedule(date) {
