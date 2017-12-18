@@ -19,8 +19,9 @@ Web application to synchronize a timer to indicate the end of the periods at sch
 - Adjustable correction for use when the server time is not the exact same as the school time
 - Hits are recorded to a database for analysis
 
-![screenshot](http://i.imgur.com/tgIC22s.png "Screenshot")
-![customizable](http://i.imgur.com/5wQH81b.png "Customizable")
-
 ## Documentation
 Usage instructions are provided on [our wiki](https://github.com/nicolaschan/bell/wiki).
+
+## Screenshots
+![screenshot](http://i.imgur.com/tgIC22s.png "Screenshot")
+![customizable](http://i.imgur.com/5wQH81b.png "Customizable")
