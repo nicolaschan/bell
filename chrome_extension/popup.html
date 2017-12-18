@@ -4,12 +4,9 @@
  "browser_action" field in manifest.json contains the "default_popup" key with
  value "popup.html".
  -->
- <!--
-Most stuff taken from the Google example page
- -->
 <html>
   <head>
-    <title>Bell Popup</title>
+    <title>Bell Chrome Extension</title>
     <link rel="shortcut icon" type="image/pug" href="../favicons/empty.png" id="favicon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -22,27 +19,9 @@ Most stuff taken from the Google example page
      -->
   </head>
   <body>
-    <div id="page1" class="container">
-      <div id="countdown" class="centered">
-        <span id="time">
-        </span>
-        <br>
-        <span class="subtitle">
-          <span id="subtitle">
-          </span>
-          <br>
-          <span id="scheduleName" class="subtitle">
-          </span>
-        </span>
-      </div>
-    </div>
-    <canvas id="circle" class="centered">
-      Could not load canvas.
-    </canvas>
-    <div class="centered loading"><i id="loadingIcon" class="material-icons">sync</i><br><span id="loadingMessage">Loading</span></div>
+    <span id="root"></span> <!-- Necessary to ensure that Mithril doesn't overwrite the iframe -->
     <script type="text/javascript" src="https://countdown.zone/timesync/timesync.js"></script>
     <script src="bin/popup.js?v=undefined"></script>
-
     <style type="text/css">
       #iframe {
         display: none;

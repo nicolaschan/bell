@@ -99,13 +99,6 @@ var startWebServer = function (callback) {
       server: config['server name']
     })
   })
-  app.get('/legacy', (req, res) => {
-    res.render('index', {
-      version: getVersion(),
-      server_name: config['server name'],
-      message: getMessage()
-    })
-  })
   app.get('/periods', (req, res) => {
     res.render('periods')
   })

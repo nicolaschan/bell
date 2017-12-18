@@ -4,7 +4,6 @@ const path = require('path')
 
 module.exports = {
   entry: {
-    client: ['babel-polyfill', './src/client.js'],
     stats: ['babel-polyfill', './src/stats.js'],
     enter: ['babel-polyfill', './src/enter.js'],
     classes: ['babel-polyfill', './src/classes.js'],
@@ -12,7 +11,6 @@ module.exports = {
     periods: ['babel-polyfill', './src/periods.coffee'],
     online: ['babel-polyfill', './src/online.js'],
     'client-mithril': ['babel-polyfill', './src/client-mithril.js']
-  },
   resolve: {
     alias: {}
   },

@@ -56,8 +56,8 @@ $(window).on('load', async function() {
     await cookieManager.initialize();
     await cookieManager.convertLegacy(cookieManager2, 2);
     processQuery(window.location.href, cookieManager);
+    // CHANGE THIS FOR LOCAL TESTING TO THE ID FOUND IN CHROME://EXTENSIONS
     chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc');
-
     uiModel.setLoadingMessage('Synchronizing');
     await Promise.all([
         popupModel.refresh(),

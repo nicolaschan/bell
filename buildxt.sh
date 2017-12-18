@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Builds the extension to distribute a testing build
 if [ -d "xt_distr" ]; then
     rm -rf "xt_distr"
 fi

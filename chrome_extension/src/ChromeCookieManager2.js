@@ -46,7 +46,6 @@ var CookieManagerFactory = async function() {
         var cookies = await new Promise((resolve, reject) => {
             port.onMessage.addListener(msg => resolve(msg.value));
         });
-
         cookies = cookieSerializer.serializeAll(cookies);
         cookieManager.cookies = cookies;
         chrome.storage.local.clear(() =>
