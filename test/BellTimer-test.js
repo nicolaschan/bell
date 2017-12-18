@@ -153,6 +153,16 @@ describe('BellTimer', function () {
       this.bellTimer.enableDevMode('2017-10-20 8:30:00', 0)
       this.bellTimer.getTimeRemainingString().should.equal('29:40')
     })
+    it('time remaining string minutes should be padded correctly', function () {
+      this.bellTimer.enableDevMode('2017-10-20 8:59:38', 0)
+      this.bellTimer.getTimeRemainingString().should.equal('0:02')
+    })
+    it('time remaining string hours should be padded correctly', function () {
+      this.bellTimer.enableDevMode('2017-10-20 5:59:40', 0)
+      this.bellTimer.getTimeRemainingString().should.equal('2:00:00')
+      this.bellTimer.enableDevMode('2017-10-20 5:58:40', 0)
+      this.bellTimer.getTimeRemainingString().should.equal('2:01:00')
+    })
     it('should get proportion correct', function () {
       this.bellTimer.enableDevMode('2017-10-20 8:29:40', 0)
       this.bellTimer.getProportionElapsed().should.equal(0.5)
