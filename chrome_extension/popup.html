@@ -9,7 +9,7 @@ Most stuff taken from the Google example page
  -->
 <html>
   <head>
-    <title>Bell Popup</title>
+    <title>Bell Chrome Extension</title>
     <link rel="shortcut icon" type="image/pug" href="../favicons/empty.png" id="favicon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -23,22 +23,15 @@ Most stuff taken from the Google example page
   </head>
   <body>
     <div id="page1" class="container">
-      <div id="countdown" class="centered">
-        <span id="time">
-        </span>
-        <br>
-        <span class="subtitle">
-          <span id="subtitle">
-          </span>
-          <br>
-          <span id="scheduleName" class="subtitle">
-          </span>
-        </span>
+      <div class="centered time-text">
+        <div class="time"></div>
+        <div class="period"></div>
+        <div class="schedule"></div>
       </div>
-    </div>
-    <canvas id="circle" class="centered">
+    <canvas id="circle" class="centered" width="400" height="400">
       Could not load canvas.
     </canvas>
+    </div>
     <div class="centered loading"><i id="loadingIcon" class="material-icons">sync</i><br><span id="loadingMessage">Loading</span></div>
     <script type="text/javascript" src="https://countdown.zone/timesync/timesync.js"></script>
     <script src="bin/popup.js?v=undefined"></script>

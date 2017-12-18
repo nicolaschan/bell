@@ -3,16 +3,45 @@
  */
 
 body {
-	font-family: 'Roboto', sans-serif;
-	transition: background-color 0.25s ease;
-	margin: 0;
-	min-width: 400px; /* Used only for the Chrome extension */
-	min-height: 400px;
-	cursor: default;
-	user-select: none;
+    font-family: Roboto, sans-serif;
+    transition: background-color 3s ease;
+    margin: 0;
+    min-width: 400px;
+    min-height: 400px;
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    overflow-x: hidden;
 }
 
-#circle {
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+canvas {
 	opacity: 0.1;
 }
 
@@ -31,15 +60,42 @@ body {
 .alert-text {
 	margin: 10px;
 }
-
 .container {
-	padding: 0;
-	margin: 0;
-	height: 100vh;
-	position: relative;
-	-webkit-backface-visibility: hidden;
-	transition: background-color 3s ease;
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    position: relative;
+    -webkit-backface-visibility: hidden;
+    transition: background-color 3s ease;
+    overflow-x: hidden;
+    background-position: center;
+    animation: fade-in 0.5s;
+    overflow-y: hidden;
 }
+
+.no-classes {
+    color: #999999;
+    font-style: italic;
+    font-size: 1.5em;
+}
+
+.school-indicator {
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+.school-indicator:hover {
+    opacity: 0.5;
+}
+
+table {
+    font-size: 1.2em;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+td {
+    padding: 0.5em;
+}
+
 .centered {
 	position: absolute;
 	top: 50%;
@@ -55,47 +111,53 @@ body {
 	top: 20px;
 	right: 20px;
 }
-#countdown {
-	opacity: 0;
-	z-index: 1;
-	transition: opacity 0.25s ease;
+
+.top {
+    position: absolute;
+    top: 0px;
 }
-#time {
-	text-align: center;
-	transition: color 3s ease;
+.no-decoration {
+    text-decoration: none;
 }
-.subtitle {
-	text-align: center;
-	transition: color 0.25s ease;
+.popup {
+    margin: 1em;
+    font-size: 0.8em;
+    padding: 0.2em;
 }
-#scheduleName {
-	transition: color 0.25s ease;
-	opacity: 0.3;
+.link:link, .link:visited {
+    text-decoration: none;
 }
-table {
-	border-collapse: collapse;
-	border-spacing: 0;
+.link:hover {
+    text-decoration: underline;
 }
-td {
-	padding: 10px;
+
+.fade-in {
+    animation: fade-in 0.5s;
+}
+@keyframes fade-in {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+.fade-out {
+    animation: fade-out 0.5s;
+}
+@keyframes fade-out {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
+div.time {
+    font-size: 10em;
+    transition: color 3s ease;
 }
 .period {
-	list-style: none;
-	transition: background-color 0.25s ease;
+    font-size: 3em;
+    transition: color 3s ease;
 }
-.time {
-	color: #999999;
-}
-.completed {
-	color: #999999;
-	text-decoration: line-through;
-}
-.current {
-	background-color: #eeeeee;
-}
-#noClasses {
-	color: #999999;
-	font-style: italic;
+.schedule {
+    font-size: 3em;
+    transition: color 3s ease;
+    opacity: 0.3;
 }
 
 .footer-right {
@@ -117,15 +179,17 @@ td {
 	background-color: white;
 }
 
-#settingsIcon {
-	font-size: 50px;
-	color: #aaaaaa;
-	cursor: pointer;
-	transition: opacity 2s ease, transform 1s ease, color 1s ease;
+.settings-icon {
+    color: #aaa;
+    cursor: pointer;
+    transition: opacity 1s ease, color 1s ease, transform 1s ease;
+    opacity: 0.2;
+    font-size: 4em;
 }
-#settingsIcon:hover {
-	color: #000000;
-	transform: rotate(2rad);
+.settings-icon:hover {
+    color: black;
+    opacity: 1;
+    transform: rotate(2rad);
 }
 
 .loading {
@@ -133,11 +197,11 @@ td {
 	font-size: 18px;
 	position: fixed;
 	opacity: 0.3;
+	transition: opacity 0.3s ease;
 }
 #loadingIcon {
 	font-size: 120px;
 	animation: spin 1s linear infinite;
 }
-
 @keyframes spin { 100% { transform:rotate(-360deg); } }
 
