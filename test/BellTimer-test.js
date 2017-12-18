@@ -82,6 +82,9 @@ describe('BellTimer', function () {
       this.bellTimer.enableDevMode('2017-10-20 9:30:00', 0)
       this.bellTimer.getCurrentPeriod().name.should.equal('Period 1')
     })
+    it('set correction correctly', function () {
+      this.bellTimer.getCorrection().should.equal(20000)
+    })
     it('calendar should be set correctly', function () {
       this.bellTimer.enableDevMode('2017-10-20 8:30:00', 0)
       this.bellTimer.calendar.week.should.deep.equal({
@@ -151,6 +154,10 @@ describe('BellTimer', function () {
     it('should get custom course correctly', function () {
       this.bellTimer.enableDevMode('2017-12-18 8:00', 0)
       this.bellTimer.getCurrentPeriod().name.should.equal('Slavic R5A')
+    })
+    it('should set free periods for custom courses', function () {
+      this.bellTimer.enableDevMode('2017-12-18 10:00', 0)
+      this.bellTimer.getCurrentPeriod().name.should.equal('Free')
     })
   })
   describe('time calculations', function () {

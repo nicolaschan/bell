@@ -22,44 +22,6 @@ class BellTimer {
         }
     }
 
-    setDebugLogFunction(logger) {
-        this.debug = logger;
-    }
-
-    setSchedulesAndCalendar(schedules, calendar) {
-        var empty = true;
-        for (var day of calendar.defaultWeek) {
-            for (var period in schedules[day].periods) {
-                if (period.toLowerCase() != 'free') {
-                    empty = false;
-                    break;
-                }
-            }
-            if (!empty)
-                break;
-        }
-
-        if (empty) {
-            this.schedules = {
-                None: {
-                    displayName: 'No schedules',
-                    periods: [{
-                        name: 'None',
-                        time: [6, 0]
-                    }]
-                }
-            };
-            this.calendar = {
-                defaultWeek: ['None', 'None', 'None', 'None', 'None', 'None', 'None'],
-                specialDays: {}
-            };
-            this.empty = true;
-        } else {
-            this.schedules = schedules;
-            this.calendar = calendar;
-        }
-    }
-
     loadCustomCourses() {
         var courses = this.cookieManager.get('courses');
 
@@ -242,9 +204,7 @@ class BellTimer {
     getDate() {
         if (this.devMode)
             return new Date((this.startTime + ((Date.now() - this.devModeStartTime) * this.timeScale) + this.correction));
-        if (this.ts)
-            return new Date(this.ts.now() + this.correction);
-        return new Date(Date.now() + this.correction);
+        return new Date(this.ts.now() + this.correction);
     }
 
     getTimeRemainingNumber() {

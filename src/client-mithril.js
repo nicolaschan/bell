@@ -1,7 +1,6 @@
 const async = require('async');
 const _ = require('lodash');
 const $ = require('jquery');
-const Visibility = require('visibilityjs');
 const CookieManager3 = require('./CookieManager3.js');
 const BellTimer = require('./BellTimer.js');
 const SimpleLogger = require('./SimpleLogger.js');
