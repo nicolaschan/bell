@@ -1,9 +1,11 @@
+#!/bin/bash
+
 if [ -d "xt_distr" ]; then
     rm -rf "xt_distr"
 fi
 
 log() {
-    echo -e "\033[0;36m$1\033[0m"
+    echo -e "🕑 \033[0;36m$1\033[0m"
 }
 
 DEST="xt_distr"
