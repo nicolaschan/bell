@@ -51,13 +51,13 @@ $ ->
     themeSelector = $('select#theme').selectize
       valueField: 'name'
       searchField: ['name']
-      options: (Object.keys themeManager.getAvailableThemes()).map((x) -> { name: x })
+      options: (Object.keys themeManager.availableThemes).map((x) -> { name: x })
       render:
         item: (item, escape) -> "<div><b>#{item.name}</b></div>"
         option: (item, escape) -> "<div><b>#{item.name}</b></div>"
-      onChange: (value) -> themeManager.setCurrentTheme value
+      onChange: (value) -> themeManager.currentThemeName = value
 
-    themeSelector[0].selectize.setValue themeManager.getCurrentThemeName()
+    themeSelector[0].selectize.setValue themeManager.currentThemeName
 
     # Done button
     $('#doneIcon').click -> window.location.href = '/'

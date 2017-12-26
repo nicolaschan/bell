@@ -207,7 +207,7 @@ class BellTimer {
         return new Date(this.ts.now() + this.correction);
     }
 
-    getTimeRemainingNumber() {
+    getTimeRemainingMs() {
         var date = this.getDate();
         return this.getNextPeriod().timestamp.getTime() - (date.getTime() / 1000) * 1000;
     }
@@ -224,7 +224,7 @@ class BellTimer {
                 minutes = '0' + minutes;
             return (hours < 1) ? minutes + ':' + seconds : hours + ':' + minutes + ':' + seconds;
         };
-        return displayTimeNumber(this.getTimeRemainingNumber());
+        return displayTimeNumber(this.getTimeRemainingMs());
     }
 
     getProportionElapsed() {
