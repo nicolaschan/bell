@@ -2,6 +2,7 @@
 <p align="center">
   <a href="https://travis-ci.org/nicolaschan/bell"><img src="https://img.shields.io/travis/nicolaschan/bell.svg" alt="Build Status"></a>
   <a href="http://codecov.io/github/nicolaschan/bell?branch=master"><img src="https://img.shields.io/codecov/c/github/nicolaschan/bell/master.svg" alt="codecov.io"></a>
+  <a href="https://codebeat.co/projects/github-com-nicolaschan-bell-master"><img alt="codebeat badge" src="https://codebeat.co/badges/aaca5932-6582-4334-a487-91680d43a994" /></a>
   <a href="https://david-dm.org/nicolaschan/bell"><img src="https://david-dm.org/nicolaschan/bell/status.svg" alt="dependencies Status"></a>
   <a href="https://david-dm.org/nicolaschan/bell?type=dev"><img src="https://david-dm.org/nicolaschan/bell/dev-status.svg" alt="devDependencies Status"></a>
   <a href="https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc"><img src="https://img.shields.io/chrome-web-store/users/pkeeekfbjjpdkbijkjfljamglegfaikc.svg" alt="Chrome Web Store"></a>
