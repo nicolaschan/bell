@@ -8,19 +8,17 @@ class ChromeExtensionMessenger {
   }
 
   connect (extensionId) {
-    logger.log('Attempting to connect to host...', 'ChromeExtensionMessenger')
     if (window.chrome && window.chrome.runtime) {
+      logger.log('Attempting to connect to host...', 'ChromeExtensionMessenger')
       var port = chrome.runtime.connect(extensionId)
       port.postMessage({
         type: 'all_cookies',
         value: this.cookieManager.getAll()
       })
-            // TODO add client success/failure messages
-      logger.success('Connection success.')
+      // TODO add client success/failure messages
+      logger.log('Chrome extension connection attempted', 'ChromeExtensionMessenger')
       port.onMessage.addListener(
                 msg => port.postMessage(this.respond(msg)))
-    } else {
-      logger.warn('Connection failed.')
     }
   }
 

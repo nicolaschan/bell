@@ -103,10 +103,17 @@ class MithrilUI {
     m.mount(root, {
       view: function () {
         if (!uiModel.state.ready) {
+          if (!uiModel.state.errorMessage.visible) {
+            return m('.centered.loading', [
+              m('i.material-icons.loading-icon.spin', 'sync'),
+              m('br'),
+              m('.loading-message', uiModel.state.loadingMessage.value)
+            ])
+          }
           return m('.centered.loading', [
-            m('i.material-icons.loading-icon.spin', 'sync'),
+            m('i.material-icons.loading-icon', 'error_outline'),
             m('br'),
-            m('.loading-message', uiModel.state.loadingMessage.value)
+            m('.loading-message', uiModel.state.errorMessage.value)
           ])
         }
         return [m('span', {

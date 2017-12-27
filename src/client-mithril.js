@@ -62,28 +62,34 @@ $(window).on('load', async function () {
   await analyticsManager.reportAnalytics()
 })
 
+var hasSentReport = false
 window.onunhandledrejection = async function (e) {
   console.error(e)
   try {
-    await requestManager.post('/api/errors', {
-      id: cookieManager.get('id'),
-      theme: themeManager.currentThemeName,
-      userAgent: window.navigator.userAgent,
-      source: cookieManager.get('source'),
-      error: {
-        columnNumber: e.reason.columnNumber,
-        fileName: e.reason.fileName,
-        lineNumber: e.reason.lineNumber,
-        message: e.reason.message,
-        stack: e.reason.stack
-      }
-    })
+    if (!hasSentReport) {
+      hasSentReport = true
+      logger.debug('Sending error report')
+      await requestManager.post('/api/errors', {
+        id: cookieManager.get('id'),
+        theme: themeManager.currentThemeName,
+        userAgent: window.navigator.userAgent,
+        source: cookieManager.get('source'),
+        error: {
+          columnNumber: e.reason.columnNumber,
+          fileName: e.reason.fileName,
+          lineNumber: e.reason.lineNumber,
+          name: e.reason.name,
+          message: e.reason.message,
+          stack: e.reason.stack
+        }
+      })
+    }
   } catch (requestError) {
     console.error(requestError)
   }
   await cookieManager.clear()
   if (!uiModel.state.ready) {
-    uiModel.setLoadingMessage('Something went wrong')
+    uiModel.setErrorMessage('An error occurred')
   }
 }
 

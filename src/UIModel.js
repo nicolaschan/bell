@@ -9,6 +9,10 @@ class UIModel {
     this.state = {
       loadingMessage: {
         visible: true,
+        value: 'Loading'
+      },
+      errorMessage: {
+        visible: false,
         value: ''
       }
     }
@@ -22,6 +26,12 @@ class UIModel {
   }
   hideLoading () {
     this.state.loadingMessage.visible = false
+  }
+  setErrorMessage (message) {
+    this.state.errorMessage = {
+      visible: true,
+      value: message
+    }
   }
 
   async initialize () {

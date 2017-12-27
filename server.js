@@ -206,13 +206,21 @@ app.post('/api/analytics', async(req, res) => {
     userAgent: req.body.userAgent,
     theme: req.body.theme,
     source: req.body.source,
-      // https://stackoverflow.com/a/10849772/
+    // https://stackoverflow.com/a/10849772/
     ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
   })
   return res.json({ success: true })
 })
-app.post('/api/errors', (req, res) => {
-  console.log('Reported error:', JSON.stringify(req.body))
+app.post('/api/errors', async(req, res) => {
+  await analyticsHandler.recordError({
+    id: req.body.id,
+    userAgent: req.body.userAgent,
+    theme: req.body.theme,
+    source: req.body.source,
+    error: JSON.stringify(req.body.error),
+    // https://stackoverflow.com/a/10849772/
+    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+  })
   return res.json({ success: true })
 })
 app.get('/api/themes', (req, res) => {

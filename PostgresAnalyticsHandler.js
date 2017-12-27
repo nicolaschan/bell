@@ -9,7 +9,7 @@ const db = new Client(config.postgres)
 const PostgresAnalyticsHandler = {
   initialize: async() => {
     db.connect()
-    return db.query(`CREATE TABLE IF NOT EXISTS hits (
+    await db.query(`CREATE TABLE IF NOT EXISTS hits (
         id SERIAL,
         userId TEXT, 
         userAgent TEXT, 
@@ -21,6 +21,19 @@ const PostgresAnalyticsHandler = {
         ip TEXT, 
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
+    return db.query(`CREATE TABLE IF NOT EXISTS errors (
+        id SERIAL,
+        userId TEXT, 
+        userAgent TEXT, 
+        browser TEXT, 
+        device TEXT, 
+        os TEXT, 
+        theme TEXT, 
+        source TEXT, 
+        ip TEXT,
+        error TEXT,
+        timestamp TIMESTAMP WITH TIME ZONE
+    )`)
   },
   recordHit: async(user) => {
     var result = UAParser(user.userAgent)
@@ -30,6 +43,16 @@ const PostgresAnalyticsHandler = {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TIMESTAMP 'now')`,
       values: [
         user.id, user.userAgent, result.browser.name, device, result.os.name, user.theme, user.source, user.ip
+      ]})
+  },
+  recordError: async(user) => {
+    var result = UAParser(user.userAgent)
+    var device = (result.device.vendor && result.device.model) ? `${result.device.vendor} ${result.device.model}` : 'Unknown device'
+    return db.query({
+      text: `INSERT INTO errors (userId, userAgent, browser, device, os, theme, source, ip, error, timestamp) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TIMESTAMP 'now')`,
+      values: [
+        user.id, user.userAgent, result.browser.name, device, result.os.name, user.theme, user.source, user.ip, user.error
       ]})
   },
   getBrowserStats: async() => db.query(`WITH users_timestamp AS (
