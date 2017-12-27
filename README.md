@@ -5,9 +5,12 @@
 [![dependencies Status](https://david-dm.org/nicolaschan/bell/status.svg)](https://david-dm.org/nicolaschan/bell)
 [![devDependencies Status](https://david-dm.org/nicolaschan/bell/dev-status.svg)](https://david-dm.org/nicolaschan/bell?type=dev)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/users/pkeeekfbjjpdkbijkjfljamglegfaikc.svg)](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc)
-[![GitHub last commit](https://img.shields.io/github/last-commit/nicolaschan/bell.svg)](https://github.com/nicolaschan/bell/commits/master)
 
-Web application to synchronize a timer to indicate the end of the periods at school. A live instance of this program is currently running at [countdown.zone](https://countdown.zone) (formerly [bell.lahs.club](https://bell.lahs.club)). It also features [a Chrome extension](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc) originally developed by [noloerino](https://github.com/noloerino/bell). Periodic announcements about the status of the website are posted to [blog.countdown.zone](https://blog.countdown.zone).
+> Waiting for class to end since 2016
+
+Bell is a **synchronized timer that counts down to the next time the bell rings at school**. A live instance of this program is currently running at [countdown.zone](https://countdown.zone) (formerly [bell.lahs.club](https://bell.lahs.club)). It also features [a Chrome extension](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc) originally developed by [noloerino](https://github.com/noloerino/bell). Periodic announcements about the status of the website are posted to [blog.countdown.zone](https://blog.countdown.zone).
+
+**_As seen in [The Talon](https://lahstalon.org/38066/news/senior-creates-website-for-bell-schedule/), the Los Altos High School newspaper_**
 
 ## Features
 - Support for weekly schedules
