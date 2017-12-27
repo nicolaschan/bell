@@ -21,6 +21,8 @@ cp "manifest.json" $DEST
 log "Copying icons"
 cp -r "icons" $DEST
 cp -r "favicons" $DEST
+log "Copying img"
+cp -r "img" $DEST
 
 DEST="$DEST/chrome_extension"
 mkdir $DEST

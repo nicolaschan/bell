@@ -28,39 +28,34 @@ var getIconImage = function(min) {
 };
 var Timer = {
     view: function(vnode) {
-        var time = vnode.attrs.model.bellTimer.getTimeRemainingString();        
+        var bellTimer = vnode.attrs.model.bellTimer;
+        var time = bellTimer.getTimeRemainingString();        
         var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60);
         if (time.split(':').length > 2)
             min = 60;
         favicon.href = getIconImage(min)
 
-        var theme = vnode.attrs.model.themeManager.getCurrentTheme()(time);
+        var theme = vnode.attrs.model.themeManager.currentTheme.theme(bellTimer);
         return m('.time', {
-            style: {
-                color: theme[0]
-            }
+            style: theme.text
         }, time);
     }
 };
 var Period = {
     view: function(vnode) {
-        var time = vnode.attrs.model.bellTimer.getTimeRemainingString();
-        var theme = vnode.attrs.model.themeManager.getCurrentTheme()(time);
+        var bellTimer = vnode.attrs.model.bellTimer;
+        var theme = vnode.attrs.model.themeManager.currentTheme.theme(bellTimer);
         return m('.period', {
-            style: {
-                color: theme[1]
-            }
+            style: theme.subtext
         }, vnode.attrs.model.bellTimer.getCurrentPeriod().name);
     }
 };
 var ScheduleName = {
     view: function(vnode) {
-        var time = vnode.attrs.model.bellTimer.getTimeRemainingString();
-        var theme = vnode.attrs.model.themeManager.getCurrentTheme()(time);
+        var bellTimer = vnode.attrs.model.bellTimer;
+        var theme = vnode.attrs.model.themeManager.currentTheme.theme(bellTimer);
         return m('.schedule', {
-            style: {
-                color: theme[1]
-            }
+            style: theme.subtext
         }, vnode.attrs.model.bellTimer.getCurrentSchedule().display);
     }
 };
@@ -75,7 +70,7 @@ var updateGraphics = function(vnode) {
     c.height = 400;
 
     var time = bellTimer.getTimeRemainingString();
-    var color = thememan.getCurrentTheme()(time)[1];
+    var color = thememan.currentTheme.theme(bellTimer).subtext.color;
     var proportion = bellTimer.getProportionElapsed();
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
@@ -96,7 +91,7 @@ var SchoolIndicator = {
         var model = vnode.attrs.model;
         var source = model.bellTimer.source;
         var time = model.bellTimer.getTimeRemainingString();
-        var theme = model.themeManager.getCurrentTheme()(time);
+        var theme = model.themeManager.currentTheme.theme(model.bellTimer);
         var meta = model.requestManager.getSync(`/api/data/${source}/meta`);
         if (!meta)
             return;
@@ -104,9 +99,7 @@ var SchoolIndicator = {
         return m('.top.left.popup.school-indicator', m('table', m('tr', [
             m('td', m('a.no-decoration.center-vertical', {
                 href: `${hostname}/settings`,
-                style: {
-                    color: theme[1]
-                },
+                style: theme.subtext,
                 onclick: openSettingsTab
             }, meta.name))
         ])));
@@ -114,20 +107,11 @@ var SchoolIndicator = {
 };
 var Page1 = {
     view: function(vnode) {
-        var time = vnode.attrs.model.bellTimer.getTimeRemainingString();
-        var theme = vnode.attrs.model.themeManager.getCurrentTheme()(time);
-
-        var style;
-        if (typeof theme[2] == 'string') {
-            style = {
-                'background-color': theme[2]
-            };
-        } else {
-            style = theme[2];
-        }
+        var bellTimer = vnode.attrs.model.bellTimer;
+        var theme = vnode.attrs.model.themeManager.currentTheme.theme(bellTimer);
 
         return m('.container#page1', {
-            style: style
+            style: theme.background
         }, [
             m('.centered.time-text', [
                 m(Timer, vnode.attrs),

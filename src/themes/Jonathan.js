@@ -40,6 +40,25 @@ module.exports = {
       text: 'lime',
       subtext: 'white',
       contrast: '#444'
-    }]
+    }], {
+      holiday: {
+        background: {
+          'background-image': 'url(\'../img/jonathan-1.png\')',
+          'background-size': '100%'
+        },
+        text: 'magenta',
+        subtext: 'white',
+        contrast: '#444'
+      },
+      weekend: {
+        background: {
+          'background-image': 'url(\'../img/jonathan-1.png\')',
+          'background-size': '100%'
+        },
+        text: 'cyan',
+        subtext: 'white',
+        contrast: '#444'
+      }
+    }
   )
 }
