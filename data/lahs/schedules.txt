@@ -265,3 +265,16 @@
 14:40 Passing to {Period 7}
 14:45 {Period 7}
 15:30 Free
+
+* intersession # Intersession
+8:20 Passing to Homeroom
+8:25 Homeroom
+8:45 Passing to Session 1
+8:50 Session 1
+10:25 Brunch
+10:40 Passing to Session 2
+10:45 Session 2
+12:15 Lunch
+13:00 Passing to Session 3
+13:05 Session 3
+14:35 Free

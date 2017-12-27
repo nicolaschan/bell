@@ -52,3 +52,20 @@ Sat weekend
 12/15/2017 finals-fri
 12/18/2017-01/01/2018 holiday # Holiday Recess
 01/02/2018 holiday # Teacher Service Day
+01/03/2018 intersession # Intersession Day 1
+01/04/2018 intersession # Intersession Day 2
+01/05/2018 intersession # Intersession Day 3
+01/15/2018 holiday # MLK Day
+02/07/2018 modified-even
+02/08/2018 modified-odd
+02/19/2018-02/23/2018 holiday # Winter Recess
+03/19/2018 holiday # Teacher Service Day
+04/06/2018 assembly # Diversity Assembly
+04/09/2018-04/13/2018 holiday # Spring Recess
+05/25/2018 even
+05/28/2018 holiday # Memorial Day
+05/29/2018 odd
+05/30/2018 finals-wed
+05/31/2018 finals-thu
+06/01/2018 finals-fri
+06/02/2018-08/20/2018 holiday # Summer Recess
