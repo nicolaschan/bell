@@ -120,6 +120,9 @@ var startWebServer = function (callback) {
   app.get('/extension', (req, res) => {
     res.redirect('https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc')
   })
+  app.get('/gh', (req, res) => {
+    res.redirect('https://github.com/nicolaschan/bell')
+  })
 
     // if (config['enable redis'])
   app.get('/stats', (req, res) => {
@@ -207,9 +210,11 @@ var startWebServer = function (callback) {
       // https://stackoverflow.com/a/10849772/
       ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
     })
-    return res.json({
-      success: true
-    })
+    return res.json({ success: true })
+  })
+  app.post('/api/errors', (req, res) => {
+    console.log('Reported error:', JSON.stringify(req.body))
+    return res.json({ success: true })
   })
   app.get('/api/themes', (req, res) => {
     res.set('Content-Type', 'text/json')

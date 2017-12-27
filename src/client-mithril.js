@@ -2,7 +2,6 @@ const $ = require('jquery')
 const CookieManager3 = require('./CookieManager3.js')
 const BellTimer = require('./BellTimer.js')
 const SimpleLogger = require('./SimpleLogger.js')
-const CookieManager2 = require('./CookieManager2.js')
 const RequestManager = require('./RequestManager')
 const ThemeManager = require('./ThemeManager.js')
 const AnalyticsManager = require('./AnalyticsManager2.js')
@@ -16,7 +15,6 @@ var logger = new SimpleLogger()
 logger.setLevel('info')
 
 var cookieManager = new CookieManager3()
-var cookieManager2 = new CookieManager2()
 
 var requestManager = new RequestManager(cookieManager)
 var themeManager = new ThemeManager(cookieManager)
@@ -54,10 +52,8 @@ $(window).on('load', async function () {
   // CHANGE THIS FOR LOCAL TESTING TO THE ID FOUND IN CHROME://EXTENSIONS
   chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc')
   uiModel.setLoadingMessage('Synchronizing')
-  await Promise.all([
-    popupModel.refresh(),
-    bellTimer.initialize()
-  ])
+  popupModel.refresh()
+  await bellTimer.initialize()
 
   uiModel.initialize()
   logger.success('Ready!')
@@ -65,6 +61,31 @@ $(window).on('load', async function () {
   logger.debug('Reporting analytics')
   await analyticsManager.reportAnalytics()
 })
+
+window.onunhandledrejection = async function (e) {
+  console.error(e)
+  try {
+    await requestManager.post('/api/errors', {
+      id: cookieManager.get('id'),
+      theme: themeManager.currentThemeName,
+      userAgent: window.navigator.userAgent,
+      source: cookieManager.get('source'),
+      error: {
+        columnNumber: e.reason.columnNumber,
+        fileName: e.reason.fileName,
+        lineNumber: e.reason.lineNumber,
+        message: e.reason.message,
+        stack: e.reason.stack
+      }
+    })
+  } catch (requestError) {
+    console.error(requestError)
+  }
+  await cookieManager.clear()
+  if (!uiModel.state.ready) {
+    uiModel.setLoadingMessage('Something went wrong')
+  }
+}
 
 var greetings = ['Hello', 'Hi there', 'Greetings', 'Howdy']
 var greeting = greetings[Math.floor(Math.random() * greetings.length)]

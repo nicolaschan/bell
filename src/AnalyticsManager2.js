@@ -27,7 +27,7 @@ class AnalyticsManager {
             send = await requestManager.post('/api/analytics', {
                 id: this.cookieManager.get('id'),
                 newPageLoad: this.newPageLoad,
-                theme: this.themeManager.getCurrentThemeName(),
+                theme: this.themeManager.currentThemeName,
                 userAgent: $(window)[0].navigator.userAgent,
                 source: this.cookieManager.get('source')
             });
