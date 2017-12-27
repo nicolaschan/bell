@@ -34,7 +34,6 @@
         "selectize": "^0.12.4",
         "shortid": "^2.2.6",
         "sqlite3": "^3.1.13",
-        "standard": "^10.0.3",
         "timesync": "^0.4.1",
         "ua-parser-js": "^0.7.17"
     },
@@ -60,6 +59,7 @@
         "karma-tap": "^3.1.1",
         "karma-webpack": "^2.0.5",
         "mocha": "^4.0.1",
+        "standard": "^10.0.3",
         "uglifyjs-webpack-plugin": "^1.0.1",
         "webpack": "^3.8.1"
     }

@@ -49,6 +49,17 @@ var removeNonNumbers = function (string) {
   return out
 }
 
+var checkTime = function (time) { // time is an int array :)
+  var hour = time[0]
+  var min = time[1]
+  return hour <= 24 && hour >= 0 && min >= 0 && min <= 60
+}
+var getTime = function (time) { // time is a string array
+  if (time.length !== 1 && time.length !== 2) { throw new Error('Failed to parse time ' + time) }
+  var x
+  if (time.length === 1) { x = [parseInt(time[0]), 0] } else { x = [parseInt(time[0]), parseInt(time[1])] }
+  if (checkTime(x)) { return x } else { throw new Error('Time ' + x + ' is out of range.') }
+}
 // like the old parsing function, but with more validation
 var parseTime = function (timestring) {
     /**
@@ -58,17 +69,7 @@ var parseTime = function (timestring) {
   timestring = timestring.trim()
     // check if AM/PM is specified
   var tokens = timestring.split(/\s/)
-  var checkTime = function (time) { // time is an int array :)
-    var hour = time[0]
-    var min = time[1]
-    return hour <= 24 && hour >= 0 && min >= 0 && min <= 60
-  }
-  var getTime = function (time) { // time is a string array
-    if (time.length !== 1 && time.length !== 2) { throw new Error('Failed to parse time ' + tokens[0]) }
-    var x
-    if (time.length === 1) { x = [parseInt(time[0]), 0] } else { x = [parseInt(time[0]), parseInt(time[1])] }
-    if (checkTime(x)) { return x } else { throw new Error('Time ' + x + ' is out of range.') }
-  }
+
   var word = (arr, x) => arr.toUpperCase().indexOf(x) > -1
   switch (tokens.length) {
     case 1: // TODO interpret either as 24hr or as most likely 12hr input

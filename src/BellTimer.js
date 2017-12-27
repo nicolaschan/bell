@@ -243,33 +243,29 @@ class BellTimer {
     return elapsedTime / totalTime
   }
 
-  getNextPeriod () {
-    var date = this.getDate()
-    var period = this.calendar.getSchedule(date).getNextPeriod(date)
-    while (!period) {
-      date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0, 0, 0, 0)
-      period = this.calendar.getSchedule(date).getFirstPeriod(date)
-    }
-    return period
-  }
-  getPreviousPeriod () {
-    var date = this.getDate()
-    var period = this.calendar.getSchedule(date).getPreviousPeriod(date)
-    while (!period) {
-      date = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1, 0, 0, 0, 0)
-      period = this.calendar.getSchedule(date).getLastPeriod(date)
+  searchForPeriod (date, increment, skip = 0) {
+    if (increment === 0) { throw new Error('Increment cannot be 0 (search will never terminate)') }
+    var period
+    while (!period || skip > 0) {
+      date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + increment, 0, 0, 0, 0)
+      var schedule = this.calendar.getSchedule(date)
+      period = (increment < 0) ? schedule.getLastPeriod(date) : schedule.getFirstPeriod(date)
+      if (period) { skip-- }
     }
     return period
   }
 
+  getNextPeriod () {
+    var date = this.getDate()
+    return this.calendar.getSchedule(date).getNextPeriod(date) || this.searchForPeriod(date, 1)
+  }
+  getPreviousPeriod () {
+    var date = this.getDate()
+    return this.calendar.getSchedule(date).getPreviousPeriod(date) || this.searchForPeriod(date, -1, 1)
+  }
   getCurrentPeriod () {
     var date = this.getDate()
-    var period = this.calendar.getSchedule(date).getCurrentPeriod(date)
-    while (!period) {
-      date = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1, 23, 59, 59, 999)
-      period = this.calendar.getSchedule(date).getCurrentPeriod(date)
-    }
-    return period
+    return this.calendar.getSchedule(date).getCurrentPeriod(date) || this.searchForPeriod(date, -1)
   }
 
   getCurrentPeriodNumber () {

@@ -294,7 +294,7 @@ describe('BellTimer', function () {
     })
     describe('#getCurrentPeriod', function () {
       it('should get current period over multiple days', function () {
-        this.bellTimer.enableDevMode('2017-10-20 7:00', 0)
+        this.bellTimer.enableDevMode('2017-10-19 7:00', 0)
         this.bellTimer.getCurrentPeriod().name.should.equal('Special Event')
       })
       it('should give something without dev mode', function () {

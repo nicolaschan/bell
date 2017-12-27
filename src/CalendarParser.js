@@ -30,37 +30,26 @@ var parse = function (str, schedules) {
       continue
     }
 
+    tail = trim(' ', tail)
+    let name = tail[0]
+    tail = tail.slice(1)
+    tail = trim(' ', tail)
+    tail = tail.slice(1)
+    tail = trim(' ', tail)
+    let display = concat(tail)
     if (section === 'Default Week') {
-      var day = head
-      tail = trim(' ', tail)
-      var name = tail[0]
-      tail = tail.slice(1)
-      tail = trim(' ', tail)
-      tail = tail.slice(1)
-      tail = trim(' ', tail)
-      var display = concat(tail)
-
-      week[day] = {
+      week[head] = {
         name: name,
         display: display
       }
-      if (!week[day].display) { delete week[day].display }
+      if (!week[head].display) { delete week[head].display }
     }
     if (section === 'Special Days') {
-      var date = head
-      tail = trim(' ', tail)
-      let name = tail[0]
-      tail = tail.slice(1)
-      tail = trim(' ', tail)
-      tail = tail.slice(1)
-      tail = trim(' ', tail)
-      let display = concat(tail)
-
-      special[date] = {
+      special[head] = {
         name: name,
         display: display
       }
-      if (!special[date].display) { delete special[date].display }
+      if (!special[head].display) { delete special[head].display }
     }
   }
 
