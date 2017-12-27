@@ -59,7 +59,7 @@ var ScheduleDisplay = {
     var displayTimeArray = function (timeArray) {
       timeArray = [timeArray.hour, timeArray.min]
 
-      var hours = ((timeArray[0] == 0) ? 12 : (timeArray[0] > 12) ? timeArray[0] % 12 : timeArray[0]).toString()
+      var hours = ((timeArray[0] === 0) ? 12 : (timeArray[0] > 12) ? timeArray[0] % 12 : timeArray[0]).toString()
       var minutes = timeArray[1].toString()
       if (minutes.length < 2) { minutes = '0' + minutes }
       return hours + ':' + minutes
@@ -81,7 +81,9 @@ var ScheduleDisplay = {
     completed = completed.slice(completed.length - numberOfCompletedPeriods)
     future = future.slice(0, numberOfFuturePeriods)
 
-    if (!completed.length && !future.length && current.name == 'Free') { return m('.no-classes', 'No classes today') }
+    if (!completed.length && !future.length && current.name === 'Free') {
+      return m('.no-classes', 'No classes today')
+    }
 
     var rows = []
     for (let period of completed) { rows.push(m('tr.completed', [m('td.time', displayTimeArray(period.time)), m('td', period.name)])) }
@@ -128,14 +130,53 @@ var updateGraphics = function (vnode) {
   ctx.closePath()
   ctx.fill()
 }
+
+var Background = {
+  onbeforeupdate: function (vnode) {
+    var bellTimer = vnode.attrs.model.bellTimer
+    var theme = vnode.attrs.model.themeManager.currentTheme.theme(bellTimer).background
+    if (vnode.state.currentStyle !== theme && theme) {
+      if (vnode.state.topVisible) {
+        vnode.state.topStyle = vnode.state.currentStyle
+        vnode.state.bottomStyle = theme
+      } else {
+        vnode.state.topStyle = theme
+        vnode.state.bottomStyle = vnode.state.currentStyle
+      }
+      vnode.state.currentStyle = theme
+      vnode.state.topVisible = !vnode.state.topVisible
+    }
+    return true
+  },
+  view: function (vnode) {
+    /* Need to smoothly transition non-color changes such as gradient or background-image.
+
+    To do this, we have two layers and fade in/out the top one.
+    If the top is not visible, then change it to the new style and fade in top.
+    If the top is visible, then change the bottom to the new stale and fade out top. */
+    if (!vnode.state.topStyle) {
+      return
+    }
+    var top = JSON.parse(JSON.stringify(vnode.state.topStyle))
+    top.opacity = (vnode.state.topVisible) ? '1' : '0'
+
+    return m('.fill-parent', [
+      m('.background.fill-parent#hi', {
+        style: vnode.state.bottomStyle
+      }),
+      m('.background.fill-parent#there', {
+        style: top
+      })
+    ])
+  }
+}
+
 var Page1 = {
   view: function (vnode) {
-    var bellTimer = vnode.attrs.model.bellTimer
-    var theme = vnode.attrs.model.themeManager.currentTheme.theme(bellTimer)
-
     return m('.container#page1', {
-      style: theme.background
+      style: vnode.state.bottomStyle
     }, [
+      m(Background, vnode.attrs),
       m('.centered.time-text', [
         m(Timer, vnode.attrs),
         m(Period, vnode.attrs),
