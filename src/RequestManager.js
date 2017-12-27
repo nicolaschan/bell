@@ -1,115 +1,116 @@
-const $ = require('jquery');
+const $ = require('jquery')
 
-const cache = 'requestCache';
+const cache = 'requestCache'
 
 class RequestManager {
-    constructor(cookieManager, host, request, online, timeout = 1000) {
-        if (host) {
-            var lastChar = host.substring(host.length - 1);
-            this.host = (lastChar == '/') ? host.substring(0, host.length - 1) : host;
-        } else {
-            this.host = '';
+  constructor (cookieManager, host, request, online, timeout = 1000) {
+    if (host) {
+      var lastChar = host.substring(host.length - 1)
+      this.host = (lastChar === '/') ? host.substring(0, host.length - 1) : host
+    } else {
+      this.host = ''
+    }
+    this.cookieManager = cookieManager
+
+    $.ajaxSetup({
+      timeout: timeout
+    })
+    this.request = request || {
+      post: (url, data) => {
+        if ((online || navigator).onLine) { // Saves time waiting if offline
+          return $.post(url, data)
         }
-        this.cookieManager = cookieManager;
-
-        $.ajaxSetup({
-            timeout: timeout
-        });
-        this.request = request || {
-            post: (url, data) => {
-                if ((online || navigator).onLine) // Saves time waiting if offline
-                    return $.post(url, data);
-                throw new Error('Request failed because not online');
-            },
-            get: url => {
-                if ((online || navigator).onLine) // Saves time waiting if offline
-                    return $.get(url);
-                throw new Error('Request failed because not online');
-            }
-        };
-    }
-
-    async post(url, data) {
-        var result;
-        try {
-            result = await this.request.post(this.generateUrl(url), data);
-        } catch (e) {
-            throw new Error('Post failed');
+        throw new Error('Request failed because not online')
+      },
+      get: url => {
+        if ((online || navigator).onLine) { // Saves time waiting if offline
+          return $.get(url)
         }
-        return result;
+        throw new Error('Request failed because not online')
+      }
     }
+  }
 
-    async get(url, defaultValue) {
-        this.logRequest(url, Date.now());
-        var result;
-        try {
-            result = await this.getNoCache(url);
-            this.cache(url, result);
-        } catch (e) {
-            result = this.getCached(url);
-        }
-        return result || defaultValue;
+  async post (url, data) {
+    var result
+    try {
+      result = await this.request.post(this.generateUrl(url), data)
+    } catch (e) {
+      throw new Error('Post failed')
     }
+    return result
+  }
 
-    generateUrl(url) {
-        return `${this.host}${url}?_v=${Date.now()}`;
+  async get (url, defaultValue) {
+    this.logRequest(url, Date.now())
+    var result
+    try {
+      result = await this.getNoCache(url)
+      this.cache(url, result)
+    } catch (e) {
+      result = this.getCached(url)
     }
+    return result || defaultValue
+  }
 
-    async getNoCache(url) {
-        var result;
-        try {
-            result = await this.request.get(this.generateUrl(url));
-        } catch (e) {
-            throw new Error('Request failed');
-        }
-        return result;
-    }
+  generateUrl (url) {
+    return `${this.host}${url}?_v=${Date.now()}`
+  }
 
-    logRequest(url, time) {
-        var logged = this.cookieManager.get('requestTimes', {});
-        logged[url] = time;
-        return this.cookieManager.set('requestTimes', logged);
+  async getNoCache (url) {
+    var result
+    try {
+      result = await this.request.get(this.generateUrl(url))
+    } catch (e) {
+      throw new Error('Request failed')
     }
+    return result
+  }
 
-    getAllLogs() {
-        return this.cookieManager.get('requestTimes', {});
-    }
+  logRequest (url, time) {
+    var logged = this.cookieManager.get('requestTimes', {})
+    logged[url] = time
+    return this.cookieManager.set('requestTimes', logged)
+  }
 
-    async getThrottled(url, defaultValue, timeout = 4 * 60 * 1000) {
-        var requests = this.getAllLogs();
-        var lastTime = requests[url];
-        if (!lastTime || Date.now() > lastTime + timeout)
-            return this.get(url, defaultValue);
-        return this.getCached(url, defaultValue);
-    }
+  getAllLogs () {
+    return this.cookieManager.get('requestTimes', {})
+  }
 
-    getSync(url, defaultValue) {
-        this.getThrottled(url, defaultValue);
-        return this.getCached(url, defaultValue);
-    }
+  async getThrottled (url, defaultValue, timeout = 4 * 60 * 1000) {
+    var requests = this.getAllLogs()
+    var lastTime = requests[url]
+    if (!lastTime || Date.now() > lastTime + timeout) { return this.get(url, defaultValue) }
+    return this.getCached(url, defaultValue)
+  }
 
-    getCached(url, defaultValue) {
-        var cached = this.getAllCached();
-        return cached[url] || defaultValue;
-    }
+  getSync (url, defaultValue) {
+    this.getThrottled(url, defaultValue)
+    return this.getCached(url, defaultValue)
+  }
 
-    getAllCached() {
-        return this.cookieManager.get(cache, {});
-    }
+  getCached (url, defaultValue) {
+    var cached = this.getAllCached()
+    return cached[url] || defaultValue
+  }
 
-    setAllCached(all) {
-        return this.cookieManager.set(cache, all);
-    }
+  getAllCached () {
+    return this.cookieManager.get(cache, {})
+  }
 
-    cache(url, data) {
-        var cached = this.getAllCached();
-        cached[url] = data;
-        return this.setAllCached(cached);
-    }
+  setAllCached (all) {
+    return this.cookieManager.set(cache, all)
+  }
 
-    clearCache() {
-        return this.cookieManager.remove(cache);
-    }
+  cache (url, data) {
+    var cached = this.getAllCached()
+    cached[url] = data
+    return this.setAllCached(cached)
+  }
+
+  clearCache () {
+    return this.cookieManager.remove(cache)
+  }
 }
 
-module.exports = RequestManager;
+module.exports = RequestManager

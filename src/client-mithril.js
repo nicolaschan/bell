@@ -18,7 +18,7 @@ var cookieManager = new CookieManager3()
 
 var requestManager = new RequestManager(cookieManager)
 var themeManager = new ThemeManager(cookieManager)
-var analyticsManager = new AnalyticsManager(cookieManager, themeManager, logger)
+var analyticsManager = new AnalyticsManager(cookieManager, themeManager, requestManager, logger)
 var bellTimer = new BellTimer(cookieManager, requestManager)
 var popupModel = new PopupModel(cookieManager, requestManager)
 var uiModel = new UIModel(bellTimer, cookieManager, themeManager, analyticsManager, requestManager, popupModel)

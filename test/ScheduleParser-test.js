@@ -1,101 +1,101 @@
-const chai = require('chai');
-const should = chai.should();
-const expect = chai.expect;
-var chaiAsPromised = require('chai-as-promised');
-chai.use(chaiAsPromised);
+/* global describe, it */
 
-describe('ScheduleParser', function() {
-    const parse = require('../src/ScheduleParser');
+const chai = require('chai')
+var chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised)
 
-    describe('#parse', function() {
-        it('should parse a single entry schedule names properly', function() {
-            var result = parse('* dev # Developer\n8:05 First Period');
+describe('ScheduleParser', function () {
+  const parse = require('../src/ScheduleParser')
 
-            result['dev'].name.should.equal('dev');
-            result['dev'].display.should.equal('Developer');
-        });
-        it('should parse a single entry schedule names with multiword display name', function() {
-            var result = parse('* dev # Multi Word\n8:05 First Period');
+  describe('#parse', function () {
+    it('should parse a single entry schedule names properly', function () {
+      var result = parse('* dev # Developer\n8:05 First Period')
 
-            result['dev'].name.should.equal('dev');
-            result['dev'].display.should.equal('Multi Word');
-        });
-        it('should parse a single entry schedule names with no display name', function() {
-            var result = parse('* dev\n8:05 First Period');
+      result['dev'].name.should.equal('dev')
+      result['dev'].display.should.equal('Developer')
+    })
+    it('should parse a single entry schedule names with multiword display name', function () {
+      var result = parse('* dev # Multi Word\n8:05 First Period')
 
-            result['dev'].name.should.equal('dev');
-            result['dev'].display.should.equal('dev');
-        });
-        it('should parse no periods', function() {
-            var result = parse('* holiday # Holiday\n');
+      result['dev'].name.should.equal('dev')
+      result['dev'].display.should.equal('Multi Word')
+    })
+    it('should parse a single entry schedule names with no display name', function () {
+      var result = parse('* dev\n8:05 First Period')
 
-            result['holiday'].name.should.equal('holiday');
-            result['holiday'].display.should.equal('Holiday');
-            result['holiday'].periods.length.should.equal(0);
-        });
-        it('should parse one period', function() {
-            var result = parse('* normal # Normal Schedule\n8:05 First Period');
+      result['dev'].name.should.equal('dev')
+      result['dev'].display.should.equal('dev')
+    })
+    it('should parse no periods', function () {
+      var result = parse('* holiday # Holiday\n')
 
-            result['normal'].name.should.equal('normal');
-            result['normal'].display.should.equal('Normal Schedule');
-            result['normal'].periods[0].time.should.deep.equal({
-                hour: 8,
-                min: 5
-            });
-            result['normal'].periods[0].display({}).should.equal('First Period');
-        });
-        it('should parse one period with format', function() {
-            var result = parse('* normal # Normal Schedule\n8:05 {Period 1}');
+      result['holiday'].name.should.equal('holiday')
+      result['holiday'].display.should.equal('Holiday')
+      result['holiday'].periods.length.should.equal(0)
+    })
+    it('should parse one period', function () {
+      var result = parse('* normal # Normal Schedule\n8:05 First Period')
 
-            result['normal'].name.should.equal('normal');
-            result['normal'].display.should.equal('Normal Schedule');
-            result['normal'].periods[0].time.should.deep.equal({
-                hour: 8,
-                min: 5
-            });
-            result['normal'].periods[0].display({
-                'Period 1': 'Wind Ensemble'
-            }).should.equal('Wind Ensemble');
-        });
-        it('should parse one period with format with literals', function() {
-            var result = parse('* normal # Normal Schedule\n8:05 Passing to {Period 1}');
+      result['normal'].name.should.equal('normal')
+      result['normal'].display.should.equal('Normal Schedule')
+      result['normal'].periods[0].time.should.deep.equal({
+        hour: 8,
+        min: 5
+      })
+      result['normal'].periods[0].display({}).should.equal('First Period')
+    })
+    it('should parse one period with format', function () {
+      var result = parse('* normal # Normal Schedule\n8:05 {Period 1}')
 
-            result['normal'].name.should.equal('normal');
-            result['normal'].display.should.equal('Normal Schedule');
-            result['normal'].periods[0].time.should.deep.equal({
-                hour: 8,
-                min: 5
-            });
-            result['normal'].periods[0].display({
-                'Period 1': 'Wind Ensemble'
-            }).should.equal('Passing to Wind Ensemble');
-        });
-        it('should parse one period with extra spaces', function() {
-            var result = parse('*    normal   #   Normal Schedule      \n8:05    First Period  ');
+      result['normal'].name.should.equal('normal')
+      result['normal'].display.should.equal('Normal Schedule')
+      result['normal'].periods[0].time.should.deep.equal({
+        hour: 8,
+        min: 5
+      })
+      result['normal'].periods[0].display({
+        'Period 1': 'Wind Ensemble'
+      }).should.equal('Wind Ensemble')
+    })
+    it('should parse one period with format with literals', function () {
+      var result = parse('* normal # Normal Schedule\n8:05 Passing to {Period 1}')
 
-            result['normal'].name.should.equal('normal');
-            result['normal'].display.should.equal('Normal Schedule');
-            result['normal'].periods[0].time.should.deep.equal({
-                hour: 8,
-                min: 5
-            });
-            result['normal'].periods[0].display({}).should.equal('First Period');
-        });
-        it('should parse one period with no bindings', function() {
-            var result = parse('* normal # Normal Schedule\n8:05 {Period 0}');
+      result['normal'].name.should.equal('normal')
+      result['normal'].display.should.equal('Normal Schedule')
+      result['normal'].periods[0].time.should.deep.equal({
+        hour: 8,
+        min: 5
+      })
+      result['normal'].periods[0].display({
+        'Period 1': 'Wind Ensemble'
+      }).should.equal('Passing to Wind Ensemble')
+    })
+    it('should parse one period with extra spaces', function () {
+      var result = parse('*    normal   #   Normal Schedule      \n8:05    First Period  ')
 
-            result['normal'].name.should.equal('normal');
-            result['normal'].display.should.equal('Normal Schedule');
-            result['normal'].periods[0].time.should.deep.equal({
-                hour: 8,
-                min: 5
-            });
-            result['normal'].periods[0].display().should.equal('Period 0');
-        });
+      result['normal'].name.should.equal('normal')
+      result['normal'].display.should.equal('Normal Schedule')
+      result['normal'].periods[0].time.should.deep.equal({
+        hour: 8,
+        min: 5
+      })
+      result['normal'].periods[0].display({}).should.equal('First Period')
+    })
+    it('should parse one period with no bindings', function () {
+      var result = parse('* normal # Normal Schedule\n8:05 {Period 0}')
 
-        it('should parse a real schedule file correctly', function() {
-            var result = parse(
-                '* normal # Normal Schedule\n\
+      result['normal'].name.should.equal('normal')
+      result['normal'].display.should.equal('Normal Schedule')
+      result['normal'].periods[0].time.should.deep.equal({
+        hour: 8,
+        min: 5
+      })
+      result['normal'].periods[0].display().should.equal('Period 0')
+    })
+
+    it('should parse a real schedule file correctly', function () {
+      var result = parse(
+                `* normal # Normal Schedule\n\
                 7:10 Passing to {Period 0}\n\
                 7:15 {Period 0}\n\
                 8:05 Passing to {Period 1}\n\
@@ -136,11 +136,11 @@ describe('ScheduleParser', function() {
                 13:55 {Period 6}\n\
                 14:40 Passing to {Period 7}\n\
                 14:45 {Period 7}\n\
-                15:30 After School\n');
-            result['normal'].name.should.equal('normal');
-            result['normal'].display.should.equal('Normal Schedule');
-            result['tutorial'].name.should.equal('tutorial');
-            result['tutorial'].display.should.equal('Tutorial Schedule');
+                15:30 After School\n`)
+      result['normal'].name.should.equal('normal')
+      result['normal'].display.should.equal('Normal Schedule')
+      result['tutorial'].name.should.equal('tutorial')
+      result['tutorial'].display.should.equal('Tutorial Schedule')
 
             // result['normal'].getCurrentPeriod(new Date('2017-11-20 8:10')).display().should.equal('Period 1');
             // result['tutorial'].getCurrentPeriod(new Date('2017-11-20 11:00')).display().should.equal('Tutorial');
@@ -156,6 +156,6 @@ describe('ScheduleParser', function() {
             // result['tutorial'].getCurrentPeriod(new Date('2017-11-20 22:25')).display({
             //     'Period 4': 'Film Analysis'
             // }).should.equal('After School');
-        });
-    });
-});
+    })
+  })
+})

@@ -1,1 +1,1 @@
-global.countdownOnline = true;
+global.countdownOnline = true

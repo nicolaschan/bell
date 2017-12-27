@@ -31,7 +31,7 @@ describe('BellTimer', function () {
       })
       var requestManager = new RequestManager(cookieManager)
       var bellTimer = new BellTimer(cookieManager, requestManager)
-      bellTimer.devMode.should.be.true
+      bellTimer.devMode.should.equal(true)
       bellTimer.timeScale.should.equal(2)
     })
   })

@@ -1,6 +1,7 @@
+/* global timesync */
+
 const _ = require('lodash')
 const $ = require('jquery')
-const async = require('async')
 
 const Period = require('./Period')
 const Schedule = require('./Schedule')
@@ -76,7 +77,7 @@ class BellTimer {
     var periods = {}
 
     for (let id in courses) {
-      var course = courses[id]
+      let course = courses[id]
       var name = course.name
       var sections = course.sections
 
@@ -95,7 +96,7 @@ class BellTimer {
       }
     }
 
-    for (var day in week) {
+    for (let day in week) {
       day = week[day].name
       schedules[day] = new Schedule(day, day, periods[day] || [])
     }
@@ -114,7 +115,7 @@ class BellTimer {
 
     this.source = dataSource
 
-    if (this.version && this.version != version) {
+    if (this.version && this.version !== version) {
       // Give IndexedDB time to write (TODO: make more robust)
       setTimeout(() => $(window)[0].location.reload(), 1000)
     } else { this.version = version }
@@ -218,7 +219,6 @@ class BellTimer {
   }
 
   getTimeRemainingString () {
-    var date = this.getDate()
     var displayTimeNumber = function (time) {
       time = Math.ceil(time / 1000) * 1000
       var hours = Math.floor(time / 1000 / 60 / 60)

@@ -1,24 +1,24 @@
-const format = require('./FormatString');
+const format = require('./FormatString')
 
 class Period {
-    constructor(time, formatString) {
-        this.time = time;
-        this.formatString = formatString;
-    }
+  constructor (time, formatString) {
+    this.time = time
+    this.formatString = formatString
+  }
 
-    display(bindings = {}) {
-        return format(this.formatString, bindings);
-    }
+  display (bindings = {}) {
+    return format(this.formatString, bindings)
+  }
 
-    getTimestamp(date) {
-        return new Date(
+  getTimestamp (date) {
+    return new Date(
             date.getFullYear(),
             date.getMonth(),
             date.getDate(),
             this.time.hour,
             this.time.min,
-            0, 0);
-    }
+            0, 0)
+  }
 }
 
-module.exports = Period;
+module.exports = Period
