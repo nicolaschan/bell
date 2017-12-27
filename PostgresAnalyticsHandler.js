@@ -40,7 +40,7 @@ const PostgresAnalyticsHandler = {
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
-      LIMIT 1)
+    )
     SELECT browser, COUNT(DISTINCT userId) AS count FROM users GROUP BY browser`),
   getOSStats: async() => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
@@ -50,7 +50,7 @@ const PostgresAnalyticsHandler = {
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
-      LIMIT 1)
+      )
     SELECT os, count(DISTINCT userId) AS count FROM users GROUP BY os`),
   getDeviceStats: async() => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
@@ -60,7 +60,7 @@ const PostgresAnalyticsHandler = {
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
-      LIMIT 1)
+      )
     SELECT device, count(DISTINCT userId) AS count FROM users GROUP BY device`),
   getThemeStats: async() => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
@@ -70,7 +70,7 @@ const PostgresAnalyticsHandler = {
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
-      LIMIT 1)
+      )
     SELECT theme, count(DISTINCT userId) AS count FROM users GROUP BY theme`),
   getSourceStats: async() => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
@@ -80,7 +80,7 @@ const PostgresAnalyticsHandler = {
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
-      LIMIT 1)
+      )
     SELECT source, count(DISTINCT user) AS count FROM users GROUP BY source`),
   getUsers: async() => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
@@ -90,7 +90,7 @@ const PostgresAnalyticsHandler = {
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
-      LIMIT 1)
+      )
     SELECT * FROM users`),
   getTotalDailyHits: async() => db.query(`SELECT timestamp::date AS date, count(*) AS count 
     FROM hits GROUP BY date`),
