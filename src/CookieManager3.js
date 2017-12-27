@@ -10,9 +10,9 @@ class CookieManager {
 
   async initialize () {
     var keys = await this.storage.keys()
-    for (let key of keys) {
+    return Promise.all(keys.map(async key => {
       this.cache[key] = await this.storage.getItem(key)
-    }
+    }))
   }
 
   get (key, defaultValue) {
