@@ -209,12 +209,13 @@ class BellTimer {
 
     getTimeRemainingMs() {
         var date = this.getDate();
-        return this.getNextPeriod().timestamp.getTime() - (date.getTime() / 1000) * 1000;
+        return this.getNextPeriod().timestamp.getTime() - date.getTime();
     }
 
     getTimeRemainingString() {
         var date = this.getDate();
         var displayTimeNumber = function(time) {
+            time = Math.ceil(time / 1000) * 1000
             var hours = Math.floor(time / 1000 / 60 / 60);
             var seconds = Math.floor(time / 1000 % 60).toString();
             if (seconds.length < 2)
