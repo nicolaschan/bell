@@ -86,16 +86,16 @@ describe('ThemeManager', function () {
         this.bellTimer.enableDevMode('2017-12-25 6:00', 0)
         this.themeManager.currentTheme.theme(this.bellTimer).background['background-color'].should.equal('lime')
       })
-      it('Verify colors on normal day when time = 14:59 min', function () {
-        this.bellTimer.enableDevMode('2017-12-25 7:45:01', 0)
+      it('Verify colors on normal day when time = 15 min', function () {
+        this.bellTimer.enableDevMode('2017-12-25 7:45', 0)
         this.themeManager.currentTheme.theme(this.bellTimer).background['background-color'].should.equal('yellow')
       })
-      it('Verify colors on normal day when time = 4:59 min', function () {
-        this.bellTimer.enableDevMode('2017-12-25 7:55:01', 0)
+      it('Verify colors on normal day when time = 5 min', function () {
+        this.bellTimer.enableDevMode('2017-12-25 7:55', 0)
         this.themeManager.currentTheme.theme(this.bellTimer).background['background-color'].should.equal('orange')
       })
-      it('Verify colors on normal day when time = 1:59 min', function () {
-        this.bellTimer.enableDevMode('2017-12-25 7:58:01', 0)
+      it('Verify colors on normal day when time = 2 min', function () {
+        this.bellTimer.enableDevMode('2017-12-25 7:58', 0)
         this.themeManager.currentTheme.theme(this.bellTimer).background['background-color'].should.equal('red')
       })
       it('Verify colors on holiday', function () {
