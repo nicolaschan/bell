@@ -69,10 +69,10 @@ var getCorrection = cache(60, async function (source) {
   return fetch(source, 'correction.txt')
 })
 var getSchedules = cache(60, async function (source) {
-  return fetch(source, 'schedules.txt')
+  return fetch(source, 'schedules.bell')
 })
 var getCalendar = cache(60, async function (source) {
-  return fetch(source, 'calendar.txt')
+  return fetch(source, 'calendar.bell')
 })
 var getMeta = cache(60, async function (source) {
   var meta = await fetch(source, 'meta.json')
