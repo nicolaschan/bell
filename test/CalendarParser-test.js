@@ -199,5 +199,21 @@ describe('CalendarParser', function () {
       result.getSchedule(new Date('11/20/2017')).display.should.equal('Monday!')
       result.getSchedule(new Date('11/24/2017')).display.should.equal('Normal Schedule')
     })
+    it('should retrieve special schedules properly', function () {
+      var schedules = scheduleParse('* normal # Normal Schedule\n8:05 {Period 0}\n* holiday')
+      var result = parse(
+        `* Default Week
+        Mon normal
+        Tue normal
+        Wed normal
+        Thu normal
+        Fri normal
+        Sat normal
+        Sun normal
+
+        * Special Days
+        12/27/2017 holiday`, schedules)
+      result.getSchedule(new Date('12/27/2017')).name.should.equal('holiday')
+    })
   })
 })

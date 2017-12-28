@@ -42,7 +42,7 @@ Sat weekend
 09/04/2017 holiday # Labor Day
 09/20/2017 modified-even
 09/21/2017 modified-odd
-11/7/2017 normal
+11/07/2017 normal
 11/10/2017 holiday # Veteran's Day
 11/22/2017 holiday # Teacher Service Day
 11/23/2017 holiday # Thanksgiving Day
