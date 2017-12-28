@@ -3,7 +3,7 @@ const $ = require('jquery')
 const cache = 'requestCache'
 
 class RequestManager {
-  constructor (cookieManager, host, request, online, timeout = 1000) {
+  constructor (cookieManager, host, request, online, timeout = 4000) {
     if (host) {
       var lastChar = host.substring(host.length - 1)
       this.host = (lastChar === '/') ? host.substring(0, host.length - 1) : host
