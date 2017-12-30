@@ -34,3 +34,5 @@ cp -r "chrome_extension/bin" $DEST
 log "Copying css"
 cp -r "chrome_extension/css" $DEST
 cp -r "chrome_extension/sizedicons" $DEST
+
+zip -r bellxt.zip xt_distr
