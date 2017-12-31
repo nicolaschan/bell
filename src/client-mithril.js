@@ -87,8 +87,8 @@ window.onunhandledrejection = async function (e) {
   } catch (requestError) {
     console.error(requestError)
   }
-  await cookieManager.clear()
   if (!uiModel.state.ready) {
+    await cookieManager.clear()
     uiModel.setErrorMessage('An error occurred')
   }
 }
