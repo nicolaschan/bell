@@ -3,16 +3,23 @@ const localForage = require('localforage')
 class CookieManager {
   constructor (storage) {
     this.cache = {}
-    this.storage = localForage.createInstance({
-      name: 'countdown_1'
-    })
+    try {
+      this.storage = localForage.createInstance({
+        name: 'countdown_1'
+      })
+    } catch (e) {
+      console.log(e)
+      console.warn('Failed to create localForage instance. Settings will not be saved after page closes.')
+    }
   }
 
   async initialize () {
-    var keys = await this.storage.keys()
-    return Promise.all(keys.map(async key => {
-      this.cache[key] = await this.storage.getItem(key)
-    }))
+    if (this.storage) {
+      var keys = await this.storage.keys()
+      return Promise.all(keys.map(async key => {
+        this.cache[key] = await this.storage.getItem(key)
+      }))
+    }
   }
 
   get (key, defaultValue) {
@@ -20,23 +27,33 @@ class CookieManager {
     return this.cache[key] || defaultValue
   }
 
-  set (key, value) {
+  async set (key, value) {
     this.cache[key] = value
-    return this.storage.setItem(key, value)
+    if (this.storage) {
+      return this.storage.setItem(key, value)
+    }
   }
 
-  remove (key) {
+  async remove (key) {
     delete this.cache[key]
-    return this.storage.removeItem(key)
+    if (this.storage) {
+      return this.storage.removeItem(key)
+    }
   }
 
-  clear () {
+  async clear () {
     this.cache = {}
-    return this.storage.clear()
+    if (this.storage) {
+      return this.storage.clear()
+    }
   }
 
   get keys () {
-    return this.storage.keys()
+    if (this.storage) {
+      return this.storage.keys()
+    } else {
+      return Object.keys(this.cache)
+    }
   }
 
   getAll () {
