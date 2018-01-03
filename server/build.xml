@@ -1,0 +1,95 @@
+
+<project name="Bell" default="build" basedir=".">
+    <property environment="env"/>
+    <property name="src" location="src"/>
+    <property name="build" location="bin"/>
+    <property name="dist" location="dist"/>
+    <!-- External dependencies -->
+    <!--<property name="kotlin.lib" location="third-party/kotlinc/lib"/>
+    <property name="servlet-jar" location="${env.CATALINA_HOME}/lib/servlet-api.jar"/>
+    <property name="json-jar" location="third-party/kotlinx-serialization-runtime-0.4.jar"/>
+    <condition property="has-dependencies">
+        <and>
+            <available file="${kotlin.lib}"/>
+            <available file="${servlet-jar}"/>
+            <available file="${json-jar}"/>
+        </and>
+    </condition>-->
+
+    <typedef resource="org/jetbrains/kotlin/ant/antlib.xml"
+        classpath="${kotlin.lib}/kotlin-ant.jar"/>
+    <description>
+        A build file for the server-side code of countdown.zone.
+    </description>
+
+    <target name="init">
+        <tstamp/>
+        <!--<echo message="CATALINA_HOME is set to ${env.CATALINA_HOME}"/>
+        <echo message="Servlet jar is found at ${servlet-jar}"/>
+        <echo message="Serialization library is found at ${json-jar}"/>-->
+        <mkdir dir="bin"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <!--<delete dir="lib"/>
+        <mkdir dir="lib"/>
+        <delete dir="${build}"/>
+        <mkdir dir="${build}"/>
+        <javac srcdir="${src}" destdir="${build}">
+            <classpath path="${servlet-jar}:${json-jar}"/>
+            <withKotlin/>
+        </javac>
+        <jar destfile="lib/countdownServer.jar">
+            <fileset dir="${build}"/>
+        </jar>-->
+        <delete dir="lib"/>
+        <exec dir="." executable="gradle" failonerror="true">
+            <arg value="shadowJar"/>
+        </exec>
+        <copy todir="lib/">
+            <fileset dir="build/libs"/>
+        </copy>
+        <!--<kotlinc output="lib/countdownServer.jar">
+            <classpath path="${json-jar}:${servlet-jar}"/>
+            <src path="${src}/kotlin"/>
+        </kotlinc>-->
+        <!-- Shows classes to make hierarchy more clear -->
+        <delete dir="${build}"/>
+        <unzip src="lib/countdownServer.jar" dest="${build}"/>
+    </target>
+
+    <target name="build" depends="compile"
+        description="Builds the project">
+        <delete dir="web/static"/>
+        <mkdir dir="web/static"/>
+        <echo message="Copying/building static content"/>
+        <exec dir="." executable="./build_web_xml.py" failonerror="true"/>
+        <exec dir="." executable="./migratePug.js" failonerror="true">
+            <env key="NODE_PATH" value="client/node_modules"/>
+        </exec>
+        <exec dir="." executable="./copyStaticAndDep.sh" failonerror="true"/>
+    </target>
+
+    <target name="dist" depends="build"
+        description="Generates the distribution">
+        <!--<delete dir="dist"/>
+        <mkdir dir="${dist}/lib"/>
+        <copy todir="${dist}/lib/">
+            <fileset dir="lib"/>
+        </copy>-->
+        <delete dir="web/WEB-INF/lib/"/>
+        <copy todir="web/WEB-INF/lib/">
+            <fileset dir="lib"/>
+        </copy>
+        <!-- figure out how to package war-->
+        <war destfile="countdownServer.war" basedir="web"/>
+        <move file="countdownServer.war" tofile="${env.CATALINA_HOME}/webapps/ROOT.war"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build}"/>
+        <exec dir="." executable="gradle">
+            <arg value="clean"/>
+        </exec>
+    </target>
+</project>

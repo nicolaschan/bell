@@ -1,0 +1,55 @@
+buildscript {
+    ext.kotlin_version = '1.2.10'
+    ext.serialization_version = '0.4'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven {
+            url "https://kotlin.bintray.com/kotlinx"
+        }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.2"
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'kotlinx-serialization'
+apply plugin: "com.github.johnrengelman.shadow"
+
+def servlet_jar = "$System.env.CATALINA_HOME"
+
+sourceSets {
+    main.kotlin.srcDirs += 'src/kotlin'
+    main.java.srcDirs += 'src/java'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://kotlin.bintray.com/kotlinx" }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile "org.jetbrains.kotlin:kotlin-reflect"
+    compile 'javax.servlet:javax.servlet-api:4.0.0'
+}
+
+shadowJar {
+    if (servlet_jar == null) {
+        ant.fail("Could not find servlet jar")
+    }
+    baseName = "countdownServer"
+    classifier = null
+    version = null
+}
+

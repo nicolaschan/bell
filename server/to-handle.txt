@@ -1,0 +1,25 @@
+/data/version.txt
+/data/message.json
+/data/${source}/${file}
+--
+correction.txt, schedules.bell, calendar.bell, meta.json
+
+/api/
+stats
+sources
+sources/names
+version
+message
+uuid
+time
+analytics
+errors
+themes
+data/:source/meta
+data/:source/correction
+data/:source/calendar
+data/:source/schedules
+
+DONE /timesync
+
+re-restructure files (also copy data folder)
