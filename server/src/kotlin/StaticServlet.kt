@@ -6,7 +6,7 @@ import javax.servlet.http.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.JSON
 
-class StaticServlet() : HttpServlet() {
+class StaticServlet() : CountdownZoneApiServlet() {
 
 	val pages = setOf<String>("/blog", "/classes", "/client-mithril", "/enter", "/index", "/periods", "/settings", "/stats")
 	val pagesWithXt = pages.map { it + ".html" }
@@ -16,7 +16,7 @@ class StaticServlet() : HttpServlet() {
 
 	override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
 		val uri = req.getRequestURI()
-		var fileToServe: String = getServletContext().getRealPath("./static") + "/" + when(uri) {
+		var fileToServe: String = "./static" + "/" + when(uri) {
 			"/" -> "/index.html"
 			in pages -> uri + ".html"
 			in pagesWithXt -> uri

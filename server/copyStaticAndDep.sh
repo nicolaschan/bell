@@ -25,6 +25,9 @@ cp -Rf ../node_modules/material-design-icons/iconfont web/static/icons/iconfont
 log "Copying ../node_modules/roboto-fontface/fonts"
 cp -Rf ../node_modules/roboto-fontface/fonts web/static/
 
+log "Copying timesync files"
+cp ../node_modules/timesync/dist/* web/static
+
 copyj() {
 	log "Copying $1"
 	cp $1 lib

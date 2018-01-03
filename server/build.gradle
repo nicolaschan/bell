@@ -35,14 +35,18 @@ repositories {
     mavenCentral()
     jcenter()
     maven { url "https://kotlin.bintray.com/kotlinx" }
+    maven { url "http://dl.bintray.com/snimavat/maven" }
 }
 
 dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlin:kotlin-reflect"
-    compile 'javax.servlet:javax.servlet-api:4.0.0'
+    compile "javax.servlet:javax.servlet-api:4.0.0"
+    compile "com.google.code.gson:gson:2.8.2"
+    compile "me.nimavat:shortid:1.0.1.RC1"
 }
+
 
 shadowJar {
     if (servlet_jar == null) {

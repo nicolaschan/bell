@@ -21,7 +21,7 @@ data class URLSourceData(val location: String, val url: String)
 @Serializable
 data class GHSourceData(val location: String, val repo: String)
 
-class DataServlet() : HttpServlet() {
+open class DataServlet() : CountdownZoneApiServlet() {
 
 	val userAgentStr = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2"
 
@@ -36,8 +36,7 @@ class DataServlet() : HttpServlet() {
 		val file: ByteArray
 		when (location) {
 			"local" -> {
-				val path = Paths.get("data/$source/$target")
-				file = Files.readAllBytes(path)
+				file = retrieveFile("/data/$source/$target")
 			}
 			"web" -> {
 				val urlData = JSON.parse<URLSourceData>(sourceJsonStr)
@@ -52,8 +51,8 @@ class DataServlet() : HttpServlet() {
 			"github" -> {
 				val ghData = JSON.parse<GHSourceData>(sourceJsonStr)
 				val pieces: List<String> = ghData.repo.split('/')
-			    val usernameRepo = pieces.slice(0..2).joinToString("/")
-			    var path = pieces.slice(2..pieces.size).joinToString("/")
+			    val usernameRepo = pieces.slice(0 until 2).joinToString("/")
+			    var path = pieces.slice(2 until pieces.size).joinToString("/")
 				val url = "https://raw.githubusercontent.com/${usernameRepo}/master/${path}/${target}"
 			    val connection: URLConnection = URL(url).openConnection()
 				val inputStream: InputStream = connection.getInputStream()
@@ -64,14 +63,12 @@ class DataServlet() : HttpServlet() {
 		return file
 	}
 
-	private val getSourceJson: (String) -> ByteArray = cache({
-		source -> File(getServletContext().getRealPath(".") + "/data/${source}/source.json").readBytes()
-		})
-	private val getCorrection: (String) -> ByteArray = cache({ source -> fetch(source, "correction.txt") })
-	private val getSchedules: (String) -> ByteArray = cache({ source -> fetch(source, "schedules.bell") })
-	private val getCalendar: (String) -> ByteArray = cache({ source -> fetch(source, "calendar.bell") })
+	protected val getSourceJson: (String) -> ByteArray = cache({ source -> retrieveFile("/data/${source}/source.json") })
+	protected val getCorrection: (String) -> ByteArray = cache({ source -> fetch(source, "correction.txt") })
+	protected val getSchedules: (String) -> ByteArray = cache({ source -> fetch(source, "schedules.bell") })
+	protected val getCalendar: (String) -> ByteArray = cache({ source -> fetch(source, "calendar.bell") })
 	// Unlike the javascript analog, this does not parse this as a JSON object
-	private val getMeta: (String) -> ByteArray = cache({ source -> fetch(source, "meta.json") })
+	protected val getMeta: (String) -> ByteArray = cache({ source -> fetch(source, "meta.json") })
 
 	override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
 		val pathInfo = req.getPathInfo().trim('/')

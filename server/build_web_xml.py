@@ -40,42 +40,51 @@ def build_web_xml():
             line("<!-- Static resources -->", lvl)
             make_servlet("resources", "com.countdownzone.api.ResourceServlet", lvl)
             line("<!-- API servlets -->", lvl)
-            for name in api_names:
-                make_servlet("api-" + name, "com.countdownzone.api.API" + name[0].upper() +  name[1:], lvl)
+            make_servlet("api-general", "com.countdownzone.api.APIGeneralServlet", lvl)
+            make_servlet("api-sources", "com.countdownzone.api.APISourcesServlet", lvl)
             line("<!-- Data servlet -->", lvl)
             make_servlet("data", "com.countdownzone.api.DataServlet", lvl)
             line("<!-- Timesync servlet -->", lvl)
             make_servlet("timesync", "com.countdownzone.timesync.TimesyncServlet", lvl)
 
 
-        static_links = {"", "/", "/m", "/periods", "/classes", "/enter", "/settings", "/blog",
-                        "/xt", "/extension", "/gh", "/stats"}
-        resources = {"/favicons", "/bin", "/css", "/img", "/icons", "/fonts"}
+        static_links = ["", "/", "/m", "/periods", "/classes", "/enter", "/settings", "/blog",
+                        "/xt", "/extension", "/gh", "/stats"]
+        resources = ["/favicons", "/bin", "/css", "/img", "/icons", "/fonts"]
         def generate_servlet_mappings(f):
             lvl = 1
             line("<!-- Mappings for static views -->", lvl)
             make_mapping("static", static_links, lvl)
             line("<!-- Mappings for static resources -->", lvl)
             make_mapping("resources", [x + "/*" for x in resources], lvl)
-            line("<!-- Mappnings for /api requests -->", lvl)
-            for name in api_names:
-                make_mapping("api-" + name, "/api/" + name, lvl)
+            line("<!-- Mappings for /api requests -->", lvl)
+            make_mapping("api-general", "/api/*", lvl)
+            make_mapping("api-sources", "/api/sources/*", lvl)
             line("<!-- Mapping for /api/data requests -->", lvl)
             make_mapping("data", "/api/data/*", lvl)
             line("<!-- Mapping for timesync servlet -->", lvl)
             make_mapping("timesync", "/timesync/*", lvl)
 
-        def make_error_tag(code, file, lvl):
+        def make_http_error_tag(code, file, lvl):
             line("<error-page>", lvl)
             line("<error-code>{0}</error-code>".format(str(code)), lvl + 1)
+            line("<location>{0}</location>".format("/errors/" + str(file)), lvl + 1)
+            line("</error-page>\n", lvl)
+
+        def make_java_error_tag(exception_type, file, lvl):
+            line("<error-page>", lvl)
+            line("<exception-type>{0}</exception-type>".format(exception_type), lvl + 1)
             line("<location>{0}</location>".format("/errors/" + str(file)), lvl + 1)
             line("</error-page>\n", lvl)
 
         def generate_error_tags(f):
             lvl = 1
             line("<!-- Responses to error codes -->", lvl)
-            make_error_tag(404, "error404.html", lvl)
-            make_error_tag(418, "teapot.html", lvl)
+            make_http_error_tag(404, "error404.jsp", lvl)
+            make_java_error_tag("java.io.FileNotFoundException", "error404.jsp", lvl)
+            make_http_error_tag(418, "teapot.jsp", lvl)
+            #make_http_error_tag(500, "serverError.jsp", lvl)
+            # also add: other java.io errors, SerializationException
 
         f.write(
 """

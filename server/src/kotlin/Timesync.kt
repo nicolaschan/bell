@@ -18,7 +18,7 @@ data class SyncData(val jsonrpc: String, val id: Int, val method: String)
  * A timesync servlet, similar to the timesync library for nodejs.
  * That code can be found at https://github.com/enmasseio/timesync/blob/master/server/index.js
  */
-class TimesyncServlet() : HttpServlet() {
+class TimesyncServlet() : CountdownZoneApiServlet() {
 
 	/**
 	 * Responds to a get request, in accordance with the Servlet API.
@@ -29,10 +29,10 @@ class TimesyncServlet() : HttpServlet() {
 	override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
 		val uri = req.getRequestURL()
 		// ugly syntax :(
-		var fileToServe: String = getServletContext().getRealPath(".")
+		val fileToServe: String
 		when {
-			uri.endsWith("timesync.js") -> fileToServe += ("/timesync.js")
-			uri.endsWith("timesync.min.js") -> fileToServe += ("/timesync.min.js")
+			uri.endsWith("timesync.js") -> fileToServe = "static/timesync.js"
+			uri.endsWith("timesync.min.js") -> fileToServe = "static/timesync.min.js"
 			else -> {
 				send404(resp)
 				return

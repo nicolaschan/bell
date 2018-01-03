@@ -23,7 +23,28 @@ class Cache(val func: (String) -> ByteArray, val time: Int = 60) {
 	}
 }
 
+class ProducerCache(val func: () -> ByteArray, val time: Int = 60) {
+
+	// only a single result is ever cached
+	var cached = ByteArray(0)
+	var previousCheck: Long = 0L
+
+	fun value(): ByteArray {
+		val now = System.currentTimeMillis()
+		if (now - previousCheck > 1000 * time) {
+			cached = func()
+		}
+		return cached
+	}
+
+}
+
 fun cache(func: (String) -> ByteArray, time: Int = 60): (String) -> ByteArray {
 	val thisCache = Cache(func, time)
 	return { arg -> thisCache.value(arg) }
+}
+
+fun cache(func: () -> ByteArray, time: Int = 60): () -> ByteArray {
+	val thisCache = ProducerCache(func, time)
+	return thisCache::value
 }
