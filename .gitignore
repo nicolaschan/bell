@@ -67,6 +67,4 @@ server/bin
 server/build
 server/lib
 server/third-party
-server/web/data
-server/web/static
-server/web/WEB-INF
+server/web/

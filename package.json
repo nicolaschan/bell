@@ -9,7 +9,8 @@
         "build:chrome": "cd chrome_extension; webpack",
         "build:chrome:watch": "npm run build:chrome -- -w",
         "test": "karma start --single-run --browsers Firefox && standard",
-        "test:manual": "karma start"
+        "test:manual": "karma start",
+        "start": "./startup.sh"
     },
     "author": "",
     "license": "MIT",

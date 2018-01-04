@@ -2,7 +2,7 @@
     "port": 8080,
     "server name": "bell-0",
     "postgres": {
-        "enabled": false,
+        "enabled": true,
         "user": "postgres",
         "host": "localhost",
         "database": "bell",

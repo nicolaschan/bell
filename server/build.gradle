@@ -16,7 +16,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"
-        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.2"
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.2" // fat jars
     }
 }
 
@@ -35,18 +35,20 @@ repositories {
     mavenCentral()
     jcenter()
     maven { url "https://kotlin.bintray.com/kotlinx" }
-    maven { url "http://dl.bintray.com/snimavat/maven" }
+    maven { url "http://dl.bintray.com/snimavat/maven" } // shortid generation
 }
 
 dependencies {
-    compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile "org.jetbrains.kotlin:kotlin-reflect"
-    compile "javax.servlet:javax.servlet-api:4.0.0"
-    compile "com.google.code.gson:gson:2.8.2"
-    compile "me.nimavat:shortid:1.0.1.RC1"
+    compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version" // json
+    compile "org.jetbrains.kotlin:kotlin-reflect" // dependency of kotlinx
+    compile "javax.servlet:javax.servlet-api:4.0.0" // servlet api
+    compile "com.google.code.gson:gson:2.8.2" // more json
+    compile "me.nimavat:shortid:1.0.1.RC1" // shortid generation
+    compile "org.postgresql:postgresql:42.1.4" // postgres support
+    compile "org.xerial:sqlite-jdbc:3.21.0.1" // sqlite support
+    compile "nl.basjes.parse.useragent:yauaa:3.3" // useragent parsing
 }
-
 
 shadowJar {
     if (servlet_jar == null) {
