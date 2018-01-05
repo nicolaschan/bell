@@ -23,7 +23,7 @@ module.exports = {
     rules: [{
       test: /\.coffee$/,
       use: ['coffee-loader']
-    }, /*{
+    }, {
       test: /\.js$|\.jsx$/,
       use: {
         loader: 'istanbul-instrumenter-loader',
@@ -33,13 +33,13 @@ module.exports = {
       },
       enforce: 'post',
       exclude: /node_modules|\.spec\.js$/
-    },*/ {
+    }, {
       test: /\.js$/,
       exclude: /node_modules/,
       loader: 'babel-loader'
     }]
   },
-  /*plugins: [new UglifyJsPlugin({
+  plugins: [new UglifyJsPlugin({
     cache: true
-  })]*/
+  })]
 }
