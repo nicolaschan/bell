@@ -47,6 +47,6 @@ class TimesyncServlet() : CountdownZoneApiServlet() {
 		val toSend = TimeData(bodyContent.id, time)
 		val cout: PrintWriter = resp.getWriter()
 		resp.setContentType("application/json")
-		cout.println(JSON.stringify(toSend))
+		cout.print(JSON.stringify(toSend))
 	}
 }

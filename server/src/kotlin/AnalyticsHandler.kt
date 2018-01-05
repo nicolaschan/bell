@@ -501,7 +501,7 @@ class AnalyticsHandler() : CountdownZoneApiServlet() {
                               getTotalDailyHits(conn),
                               getUniqueDailyHits(conn))
             val cout: PrintWriter = resp.getWriter()
-            cout.println(JSON.stringify(stats))
+            cout.print(JSON.stringify(stats))
         }
     }
 

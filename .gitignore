@@ -4,6 +4,9 @@ analytics.sqlite
 # Because Jonathan uses a mac
 .DS_Store
 
+# Just in case someone was using vim
+*.swp
+
 # Chrome app zip
 bellxt.zip
 

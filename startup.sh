@@ -30,7 +30,7 @@ check_dep wget
 
 check_sql_driver() {
     echo -e "\033[1;31mChecking SQL driver for $1\033[0m"
-    if [ $(grep -i $1) != 0 ]; then
+    if [ $(grep -ir $1 "$CATALINA_HOME/lib/") -ne 0 ]; then
         echo -e "\033[0;31m$1 driver not found."
         echo -e "Attempting download."
         if [ $1 == "postgres" ]; then

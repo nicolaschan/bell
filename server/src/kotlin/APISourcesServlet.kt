@@ -98,7 +98,7 @@ class APISourcesServlet() : DataServlet() {
 		when (target) {
 			"" -> sendSources(resp)
 			"names" -> sendSourcesNames(resp)
-			else -> resp.getWriter().println("Cannot get ${target}")
+			else -> resp.getWriter().print("Cannot get ${target}")
 		}		
 	}
 }

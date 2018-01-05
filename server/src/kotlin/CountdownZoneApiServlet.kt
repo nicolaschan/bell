@@ -41,11 +41,12 @@ abstract class CountdownZoneApiServlet() : HttpServlet() {
 
     private fun setRespContentType(fileName: String, resp: HttpServletResponse) {
         val path = Paths.get(getServletContext().getRealPath(fileName))
+        val pathStr = path.toString()
         // For some reason doesn't work otherwise
-        if (path.toString().endsWith(".css")) {
-            resp.setContentType("text/css")
-        } else {
-            resp.setContentType(Files.probeContentType(path))
+        when {
+            pathStr.endsWith(".css") -> resp.setContentType("text/css")
+            pathStr.endsWith(".json") -> resp.setContentType("application/json")
+            else -> resp.setContentType(Files.probeContentType(path))
         }
     }
 

@@ -42,7 +42,8 @@ class APIGeneralServlet() : DataServlet() {
 
     protected fun sendVersion(resp: HttpServletResponse) {
         val cout: PrintWriter = resp.getWriter()
-        cout.println(bytesToHex(getVersion()).toLowerCase())
+        resp.setContentType("text/plain")
+        cout.print(bytesToHex(getVersion()).toLowerCase())
     }
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
@@ -51,14 +52,8 @@ class APIGeneralServlet() : DataServlet() {
             "stats" -> TODO()
             "version" -> sendVersion(resp)
             "message" -> serveFileCached("data/message.json", resp)
-            "uuid" -> {
-                resp.setContentType("application/json")
-                resp.getWriter().println(JSON.stringify(IdObj(ShortId.generate())))
-            }
-            "time" -> {
-                resp.setContentType("application/json")
-                resp.getWriter().println(JSON.stringify(TimeObj(System.currentTimeMillis())))
-            }
+            "uuid" -> serveJSON(IdObj(ShortId.generate()), resp)
+            "time" -> serveJSON(TimeObj(System.currentTimeMillis()), resp)
             else -> send404(resp)
         }
     }

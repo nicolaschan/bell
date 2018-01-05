@@ -143,7 +143,7 @@ def build_web_xml():
 """
                 ctx_xml.write(ctx.format(DB_NAME, DB_URL))
             ctx_xml.write("""<Resource name="bean/ErrorBean" auth="Container"
-    type="com.countdownone.ErrorBean"
+    type="com.countdownzone.server.ErrorBean"
     factory="org.apache.naming.factory.BeanFactory"
     dbURL="{0}"
     usePostgres="{1}"/>)""".format(DB_URL, str(USE_POSTGRES).lower()))
@@ -160,7 +160,7 @@ def build_web_xml():
             bean/ErrorBean
         </resource-env-ref-name>
         <resource-env-ref-type>
-            com.countdownzone.ErrorBean
+            com.countdownzone.server.ErrorBean
         </resource-env-ref-type>
     </resource-env-ref>
 """
@@ -183,7 +183,7 @@ def build_web_xml():
             line("<!-- Responses to error codes -->", lvl)
             make_http_error_tag(404, "error404.jsp", lvl)
             make_http_error_tag(418, "teapot.jsp", lvl)
-            #make_java_error_tag("java.lang.Exception", "serverError.jsp", lvl)
+            make_java_error_tag("java.lang.Exception", "serverError.jsp", lvl)
 
         web_xml.write(
 """

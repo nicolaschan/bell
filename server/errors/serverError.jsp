@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="default.css">
   </head>
   <body>
-    <jsp:useBean id="errorBean" class="ErrorBean" scope="request">
+    <jsp:useBean id="errorBean" class="com.countdownzone.server.ErrorBean" scope="request">
       <jsp:setProperty name="errorBean" property="sentException">
         <jsp:attribute name="errorBean">
           exception
