@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "build": "webpack",
+        "build:server": "cd server; ant dist",
         "build:watch": "npm run build -- -w",
         "build:chrome": "cd chrome_extension; webpack",
         "build:chrome:watch": "npm run build:chrome -- -w",

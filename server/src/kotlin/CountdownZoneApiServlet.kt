@@ -5,6 +5,9 @@ import java.nio.file.Paths
 import java.io.*
 import javax.servlet.*
 import javax.servlet.http.*
+import com.google.gson.*
+
+private val JSON = Gson()
 
 data class CachedFile(val timestamp: Long, val content: ByteArray)
 
@@ -53,7 +56,6 @@ abstract class CountdownZoneApiServlet() : HttpServlet() {
      * Serves a file as a byte array to an HTTP response. Also sets the content-type header.
      */
     fun serveFile(fileName: String, resp: HttpServletResponse) {
-        resp.setHeader("Cache-Control", "max-age=0")
         setRespContentType(fileName, resp)
         val cout: ServletOutputStream = resp.getOutputStream()
         val file: ByteArray = retrieveFile(fileName)
@@ -69,13 +71,18 @@ abstract class CountdownZoneApiServlet() : HttpServlet() {
                     query = CachedFile(now, retrieveFile(fileName))
                     fileCache[fileName] = query
                 }
-                resp.setHeader("Cache-Control", "max-age=0")
                 setRespContentType(fileName, resp)
                 val cout: ServletOutputStream = resp.getOutputStream()
                 cout.use { it.write(query.content) }
             }
             else -> serveFile(fileName, resp)
         }
+    }
+
+    fun serveJSON(obj: Any, resp: HttpServletResponse) {
+        val cout = resp.getWriter()
+        resp.setContentType("application/json")
+        cout.println(JSON.toJson(obj))
     }
 
     /**

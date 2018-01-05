@@ -13,15 +13,22 @@ config = {}
 with open("../config.json", 'r') as config_file:
     config = json.load(config_file)
 
-DB_NAME="jdbc/bell"
-use_postgres = config["postgres"] and config["postgres"]["enabled"]
+pg = config["postgres"]
+if all([pg, pg["enabled"], pg["host"]]):
+    DB_URL = ("jdbc:postgresql://" + pg["host"] + ":" + str(pg.get("port", 5432))
+            + "/" + config.get("database", "bell"))
+else:
+    DB_URL = "jdbc:sqlite:/{0}/analytics.sqlite".format(os.environ["CATALINA_HOME"])
+
+DB_NAME="jdbc/" + config.get("database", "bell")
+USE_POSTGRES = bool(config["postgres"] and config["postgres"]["enabled"])
 
 def build_web_xml():
     with open("web/WEB-INF/web.xml", 'w') as web_xml, open("web/META-INF/context.xml", 'w') as ctx_xml:
         def line(txt, ind_level):
             web_xml.write(" " * (4 * ind_level) + txt + "\n")
         def cline(txt, ind_level):
-            web_xml.write(" " * (4 * ind_level) + txt + "\n")
+            ctx_xml.write(" " * (4 * ind_level) + txt + "\n")
 
         def make_servlet(name, clazz, level):
             line("<servlet>", level)
@@ -60,16 +67,8 @@ def build_web_xml():
         <servlet-name>analytics</servlet-name>
         <servlet-class>com.countdownzone.analytics.AnalyticsHandler</servlet-class>
         <load-on-startup>1</load-on-startup>
-        <init-param>
-            <param-name>db-name</param-name>
-            <param-value>{0}</param-value>
-        </init-param>
-        <init-param>
-            <param-name>pg-enabled</param-name>
-            <param-value>{1}</param-value>
-        </init-param>
     </servlet>
-""".format(DB_NAME, str(use_postgres).lower()))
+""")
             line("<!-- Data servlet -->", lvl)
             make_servlet("data", "com.countdownzone.api.DataServlet", lvl)
             line("<!-- Timesync servlet -->", lvl)
@@ -109,7 +108,7 @@ def build_web_xml():
 
         # has side effect of writing to context.xml
         def build_jdbc():
-            if use_postgres:
+            if USE_POSTGRES:
                 ctx = """
 <Context>
     <Resource name="{0}"
@@ -124,14 +123,12 @@ def build_web_xml():
                 pg = config["postgres"]
                 if pg:
                     if pg["host"]:
-                        prop("url", "jdbc:postgresql://" + pg["host"] + ":" + (str(pg["port"]) if pg["port"] else "5432") + "/" + "bell")
-                                                                                                            # BE WARNED: IF DB_NAME CHANGES
-                                                                                                            # IT MUST CHANGE HERE AS WELL
+                        prop("url", DB_URL)
                     if pg["user"]:
                         prop("username", pg["user"])
                     if pg["password"]:
                         prop("password", pg["password"])
-                ctx += "/>\n</Context>"
+                ctx += "/>\n"
                 ctx_xml.write(ctx.format(DB_NAME))
             else:
                 ctx = """
@@ -140,13 +137,16 @@ def build_web_xml():
               auth="Container" 
               type="javax.sql.DataSource" 
               driverClassName="org.sqlite.JDBC"
-              url="jdbc:sqlite:/{1}/analytics.sqlite"
+              url="{1}"
               factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory">
     </Resource>
-</Context>
 """
-                ctx_xml.write(ctx.format(DB_NAME, os.environ['CATALINA_HOME']))
-
+                ctx_xml.write(ctx.format(DB_NAME, DB_URL))
+            ctx_xml.write("""<Resource name="bean/ErrorBean" auth="Container"
+    type="com.countdownone.ErrorBean"
+    factory="org.apache.naming.factory.BeanFactory"
+    dbURL="{0}"
+    usePostgres="{1}"/>)""".format(DB_URL, str(USE_POSTGRES).lower()))
             web = """
     <resource-ref>
         <description>Analytics database</description>
@@ -154,6 +154,15 @@ def build_web_xml():
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
+    <resource-env-ref>
+        <description>Object factory for ErrorBean instances</description>
+        <resource-env-ref-name>
+            bean/ErrorBean
+        </resource-env-ref-name>
+        <resource-env-ref-type>
+            com.countdownzone.ErrorBean
+        </resource-env-ref-type>
+    </resource-env-ref>
 """
             web_xml.write(web.format(DB_NAME))
 
@@ -173,10 +182,8 @@ def build_web_xml():
             lvl = 1
             line("<!-- Responses to error codes -->", lvl)
             make_http_error_tag(404, "error404.jsp", lvl)
-            make_java_error_tag("java.io.FileNotFoundException", "error404.jsp", lvl)
             make_http_error_tag(418, "teapot.jsp", lvl)
-            #make_http_error_tag(500, "serverError.jsp", lvl)
-            # also add: other java.io errors, SerializationException
+            #make_java_error_tag("java.lang.Exception", "serverError.jsp", lvl)
 
         web_xml.write(
 """
@@ -186,12 +193,21 @@ def build_web_xml():
     <description>
         A bell timer.
     </description>
-""")
+    <context-param>
+        <param-name>db-name</param-name>
+        <param-value>{0}</param-value>
+    </context-param>
+    <context-param>
+        <param-name>pg-enabled</param-name>
+        <param-value>{1}</param-value>
+    </context-param>
+""".format(DB_NAME, str(USE_POSTGRES).lower()))
         generate_error_tags()
         generate_servlet_names()
         generate_servlet_mappings()
         make_filters_with_mapping()
         build_jdbc()
         line("</web-app>", 0)
+        cline("</Context>", 0)
 
 build_web_xml()

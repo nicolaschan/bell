@@ -9,6 +9,7 @@ import java.sql.JDBCType as JDBCType
 import javax.sql.*
 import javax.naming.*
 import java.net.URLDecoder
+import java.text.SimpleDateFormat
 /*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.JSON
@@ -113,6 +114,7 @@ class AnalyticsHandler() : CountdownZoneApiServlet() {
             error TEXT,
             timestamp TIMESTAMP WITH TIME ZONE
         )""",
+
         // needed to work around kotlin string templating
         "rec-hit" to """INSERT INTO hits (userId, userAgent, browser, device, os, theme, source, ip, timestamp) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, TIMESTAMP 'now')""",
@@ -228,11 +230,11 @@ class AnalyticsHandler() : CountdownZoneApiServlet() {
     }
 
     override fun init() {
-        val initDbName = getInitParameter("db-name")
+        val initDbName = getServletContext().getInitParameter("db-name")
         if (initDbName != null) {
             dbName += initDbName
         }
-        val initUsePg = getInitParameter("pg-enabled")
+        val initUsePg = getServletContext().getInitParameter("pg-enabled")
         usePg = initUsePg != null && initUsePg == "true"
         if (usePg) {
             queries = pgQueries
@@ -369,7 +371,6 @@ class AnalyticsHandler() : CountdownZoneApiServlet() {
         } catch(e: SQLException) {
             succeeded = false
             errMsg = e.message ?: "Error in SQL query"
-            throw e
         }
         resp.setContentType("application/json")
         val cout: PrintWriter = resp.getWriter()
@@ -458,11 +459,24 @@ class AnalyticsHandler() : CountdownZoneApiServlet() {
 
     //fun getUsers() { dbQuery(queries["users"]) }
 
+    /**
+     * Because of a possible sqlite driver bug that I'm unwilling to test and file an issue for, this
+     * function is kind of a hacky way to get the date out of a database.
+     */
+    private fun getDateFrom(rs: ResultSet): java.sql.Date {
+        try {
+            return rs.getDate("date")
+        } catch(e: SQLException) {
+            val formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+            return java.sql.Date(formatter.parse(rs.getString("date")).getTime())
+        }
+    }
+
     fun getTotalDailyHits(conn: Connection): List<TotalHits> {
         val rs = dbQuery(conn, queries["total-daily-hits"]!!)
         val lst = mutableListOf<TotalHits>()
         while (rs.next()) {
-            lst.add(TotalHits(rs.getDate("date"), rs.getInt("count")))
+            lst.add(TotalHits(getDateFrom(rs), rs.getInt("count")))
         }
         return lst
     }
@@ -471,7 +485,7 @@ class AnalyticsHandler() : CountdownZoneApiServlet() {
         val rs = dbQuery(conn, queries["unique-daily-hits"]!!)
         val lst = mutableListOf<UniqueHits>()
         while (rs.next()) {
-            lst.add(UniqueHits(rs.getDate("date"), rs.getInt("count")))
+            lst.add(UniqueHits(getDateFrom(rs), rs.getInt("count")))
         }
         return lst
     }

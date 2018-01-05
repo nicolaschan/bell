@@ -81,8 +81,7 @@ class APISourcesServlet() : DataServlet() {
 				JSON.fromJson(file, CustomMeta::class.java)
 			}, it)
 		}
-		val cout: PrintWriter = resp.getWriter()
-		cout.println(JSON.toJson(sources))
+		serveJSON(sources, resp)
 	}	
 
 	protected fun sendSourcesNames(resp: HttpServletResponse) {
@@ -90,8 +89,7 @@ class APISourcesServlet() : DataServlet() {
 		val dirs: Array<String> = dataDir.list(object : FilenameFilter {
 			override fun accept(dir: File, name: String): Boolean = File(dir, name).isDirectory()
 		})
-		val cout: PrintWriter = resp.getWriter()
-		cout.println(JSON.toJson(dirs))
+		serveJSON(dirs, resp)
 	}
 
 
