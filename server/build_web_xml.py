@@ -1,9 +1,7 @@
-#!/usr/local/bin/python3
-
 """This script generates the web.xml file, to be placed in web/WEB-INF.
 This script also makes the language strip on the github repository more colorful.
 
-Usage: ./build_webxml.py
+Usage: python3 build_webxml.py
 """
 
 import json
@@ -142,11 +140,13 @@ def build_web_xml():
     </Resource>
 """
                 ctx_xml.write(ctx.format(DB_NAME, DB_URL))
-            ctx_xml.write("""<Resource name="bean/ErrorBean" auth="Container"
-    type="com.countdownzone.server.ErrorBean"
-    factory="org.apache.naming.factory.BeanFactory"
-    dbURL="{0}"
-    usePostgres="{1}"/>)""".format(DB_URL, str(USE_POSTGRES).lower()))
+            ctx_xml.write("""
+    <Resource name="bean/ErrorBean" auth="Container"
+              type="com.countdownzone.server.ErrorBean"
+              factory="org.apache.naming.factory.BeanFactory"
+              dbURL="{0}"
+              postgres="{1}">
+    </Resource>\n""".format(DB_URL, str(USE_POSTGRES).lower()))
             web = """
     <resource-ref>
         <description>Analytics database</description>

@@ -1,6 +1,7 @@
 package com.countdownzone.analytics
 
 import com.countdownzone.api.CountdownZoneApiServlet
+import com.countdownzone.utils.*
 import java.io.*
 import javax.servlet.*
 import javax.servlet.http.*
@@ -10,16 +11,9 @@ import javax.sql.*
 import javax.naming.*
 import java.net.URLDecoder
 import java.text.SimpleDateFormat
-/*
-import kotlinx.serialization.*
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.Serializable
-*/
-import com.google.gson.*
 import nl.basjes.parse.useragent.*
 
-private val JSON = Gson()
-private fun Gson.stringify(obj: Any?) = JSON.toJson(obj)
+private val JSON = JsonWrapper()
 
 data class ReceivedAnalytics(val id: String?, val userAgent: String?, val theme: String?, val source: String?)
 data class User(val id: String?, val userAgent: String?, val theme: String?, val source: String?, val ip: String?)
@@ -348,7 +342,7 @@ class AnalyticsHandler() : CountdownZoneApiServlet() {
         var succeeded: Boolean
         var errMsg = ""
         try {
-            val user: User = convert(JSON.fromJson(reqJson, ReceivedAnalytics::class.java), req)
+            val user: User = convert(JSON.parse<ReceivedAnalytics>(reqJson), req)
             val userAgent: UserAgent = uaa.parse(user.userAgent)
             val device = userAgent.get("DeviceName").getValue()
             val browser = userAgent.get("AgentName").getValue()
@@ -382,7 +376,7 @@ class AnalyticsHandler() : CountdownZoneApiServlet() {
         var succeeded: Boolean
         var errMsg = ""
         try {
-            val user: Error = convert(JSON.fromJson(reqJson, ReceivedError::class.java), req)
+            val user: Error = convert(JSON.parse<ReceivedError>(reqJson), req)
             val userAgent: UserAgent = uaa.parse(user.userAgent)
             val device = userAgent.get("DeviceName").getValue()
             val browser = userAgent.get("AgentName").getValue()

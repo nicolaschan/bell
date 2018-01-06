@@ -1,13 +1,10 @@
 package com.countdownzone.api
 
-import com.countdownzone.cache.*
+import com.countdownzone.utils.*
 import java.io.*
 import javax.servlet.*
 import javax.servlet.http.*
 import java.security.MessageDigest
-import kotlinx.serialization.*
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.Serializable
 import me.nimavat.shortid.ShortId
 
 // https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
@@ -22,23 +19,30 @@ private fun bytesToHex(bytes: ByteArray): String {
     return String(hexChars)
 }
 
-@Serializable data class IdObj(val id: String)
-@Serializable data class TimeObj(val time: Long)
+data class IdObj(val id: String)
+data class TimeObj(val time: Long)
 
 // This class extends DataServlet for access to the fetch and getMeta methods, if something goes wrong it's because of that
 class APIGeneralServlet() : DataServlet() {
 
     val availableGet = setOf<String>("stats", "version", "message", "uuid", "time")
 
-    private fun _getVersionHash(): ByteArray {
-        var md = MessageDigest.getInstance("MD5")
-        val md5Sum: ByteArray = md.digest(retrieveFile("data/version.txt"))
-        return md5Sum
-    }
+    private val previousCheck: Long = 0L
+    private val lastVersion = ByteArray(0)
+
     /**
-     * Gets a hashed version of the current version string.
+     * Gets and caches hashed version of the current version string.
      */
-    protected val getVersion: () -> ByteArray = cache ( ::_getVersionHash )
+    protected fun getVersion(): ByteArray {
+        val now = System.currentTimeMillis()
+        if (now - previousCheck > 1000 * 60) {
+            var md = MessageDigest.getInstance("MD5")
+            val md5Sum: ByteArray = md.digest(retrieveFile("data/version.txt"))
+            return md5Sum
+        } else {
+            return lastVersion
+        }
+    }
 
     protected fun sendVersion(resp: HttpServletResponse) {
         val cout: PrintWriter = resp.getWriter()

@@ -3,8 +3,6 @@ package com.countdownzone.api
 import java.io.*
 import javax.servlet.*
 import javax.servlet.http.*
-import kotlinx.serialization.*
-import kotlinx.serialization.json.JSON
 
 class StaticServlet() : CountdownZoneApiServlet() {
 

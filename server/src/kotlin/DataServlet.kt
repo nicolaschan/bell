@@ -1,6 +1,6 @@
 package com.countdownzone.api
 
-import com.countdownzone.cache.*
+import com.countdownzone.utils.*
 import java.io.*
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -8,17 +8,13 @@ import java.net.URLConnection
 import java.net.URL
 import javax.servlet.*
 import javax.servlet.http.*
-import kotlinx.serialization.*
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.Serializable
 
-@Serializable
+private val JSON = JsonWrapper()
+
 data class SourceData(val location: String)
 
-@Serializable
 data class URLSourceData(val location: String, val url: String)
 
-@Serializable
 data class GHSourceData(val location: String, val repo: String)
 
 open class DataServlet() : CountdownZoneApiServlet() {
@@ -31,7 +27,7 @@ open class DataServlet() : CountdownZoneApiServlet() {
     private fun fetch(source: String, target: String): ByteArray {
         // Location should always be stored in the JSON
         var sourceJsonStr = String(getSourceJson(source))
-        val sourceData = JSON.nonstrict.parse<SourceData>(sourceJsonStr)
+        val sourceData = JSON.parse<SourceData>(sourceJsonStr)
         val location = sourceData.location
         val file: ByteArray
         when (location) {

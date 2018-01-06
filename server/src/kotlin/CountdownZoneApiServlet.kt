@@ -1,13 +1,13 @@
 package com.countdownzone.api
 
+import com.countdownzone.utils.*
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.io.*
 import javax.servlet.*
 import javax.servlet.http.*
-import com.google.gson.*
 
-private val JSON = Gson()
+private val JSON = JsonWrapper()
 
 data class CachedFile(val timestamp: Long, val content: ByteArray)
 
@@ -69,6 +69,7 @@ abstract class CountdownZoneApiServlet() : HttpServlet() {
                 var query = fileCache[fileName]!!
                 val now = System.currentTimeMillis()
                 if (now - query.timestamp > 1000 * time) {
+                    fileCache.clear()
                     query = CachedFile(now, retrieveFile(fileName))
                     fileCache[fileName] = query
                 }

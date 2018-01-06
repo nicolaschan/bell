@@ -1,16 +1,12 @@
 package com.countdownzone.api
 
+import com.countdownzone.utils.*
 import java.io.*
 import javax.servlet.*
 import javax.servlet.http.*
 import java.nio.file.Paths
-/*import kotlinx.serialization.*
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.Serializable*/
-// Because kotlinx seems to have issues with abstract classes, I turn to a different library
-import com.google.gson.*
 
-private val JSON = Gson()
+private val JSON = JsonWrapper()
 
 /**
  * Static typing makes JSON manipulation a little harder. As such, the ReceivedMeta class

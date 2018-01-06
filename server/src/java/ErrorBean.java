@@ -42,7 +42,7 @@ public class ErrorBean implements Serializable {
     }
 
     // Must be called on server startup, after setDbURL
-    public void setUsePostgres(boolean usePg) {
+    public void setPostgres(boolean usePg) {
         pgEnabled = usePg;
         try (Connection conn = getDbConnection()) {
             PreparedStatement stmt = conn.prepareStatement(pgEnabled ? PG_INIT_DB : SQLITE_INIT_DB);

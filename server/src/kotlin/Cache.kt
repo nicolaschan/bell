@@ -1,4 +1,4 @@
-package com.countdownzone.cache
+package com.countdownzone.utils
 
 /**
  * Caches the results of calling a function for a given amount of time.
@@ -33,6 +33,7 @@ class ProducerCache(val func: () -> ByteArray, val time: Int = 60) {
 		val now = System.currentTimeMillis()
 		if (now - previousCheck > 1000 * time) {
 			cached = func()
+			previousCheck = now
 		}
 		return cached
 	}

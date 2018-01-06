@@ -41,7 +41,9 @@
         <echo message="Copying/building static content"/>
         <mkdir dir="web/WEB-INF"/>
         <mkdir dir="web/META-INF"/>
-        <exec dir="." executable="./build_web_xml.py" failonerror="true"/>
+        <exec dir="." executable="python3" failonerror="true">
+            <arg value="build_web_xml.py"/>
+        </exec>
         <exec dir="." executable="./migratePug.js" failonerror="true">
             <env key="NODE_PATH" value="client/node_modules"/>
         </exec>

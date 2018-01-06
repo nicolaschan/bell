@@ -1,17 +1,15 @@
 package com.countdownzone.timesync
 
 import com.countdownzone.api.*
+import com.countdownzone.utils.*
 import java.io.*
 import javax.servlet.*
 import javax.servlet.http.*
-import kotlinx.serialization.*
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.Serializable
 
-@Serializable
+private val JSON = JsonWrapper()
+
 data class TimeData(val id: Int, val result: Long)
 
-@Serializable
 data class SyncData(val jsonrpc: String, val id: Int, val method: String)
 
 /**
