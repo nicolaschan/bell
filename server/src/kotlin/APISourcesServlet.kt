@@ -33,28 +33,6 @@ abstract class SentMeta() {
 }
 data class SentSchoolMeta(override val name: String, override val id: String, val periods: Array<String>) : SentMeta()
 data class SentCustomMeta(override val name: String, override val id: String, val type: String) : SentMeta()
-// For some reason, the serialization library does not seem to handle serialization for abstract classes very well.
-// It's also not that well documented. Thus, I turn to this SUPER DUPER UNSAFE manual JSON generation method.
-/*private fun toJson(obj: SentMeta): String {
-	val firstHalf = "{\"name\"=\"${obj.name}\",\"id\"=\"${obj.id}\","
-	val secondHalf = when (obj) {
-		is SentSchoolMeta -> "\"periods\"=${JSON.toJson(obj.periods)}}"
-		is SentCustomMeta -> "\"type\"=\"${obj.type}\"}"
-		else -> throw IllegalArgumentException("No implementation for requisite SentMeta type")
-	}
-	return firstHalf + secondHalf
-}
-private fun toJsonArray(objs: List<SentMeta>): String {
-	var s = StringBuilder("[")
-	for (i in 0..objs.size) {
-		if (i != 0) {
-			s.append(",")
-		}
-		s.append(toJson(objs[i]))
-	}
-	s.append("]")
-	return s.toString()
-}*/
 
 // This class extends DataServlet for access to the fetch and getMeta methods, if something goes wrong it's because of that
 class APISourcesServlet() : DataServlet() {
