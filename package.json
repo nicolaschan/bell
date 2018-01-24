@@ -1,11 +1,13 @@
 {
     "name": "bell",
-    "version": "3.1.1",
-    "description": "",
+    "version": "3.1.2",
+    "description": "Countdown to the next time the bell rings at school.",
     "main": "index.js",
     "scripts": {
         "build": "webpack",
-        "build:watch": "npm run build -- -w",
+        "build:prod": "webpack --config production-webpack.config.js",
+        "build:dev": "webpack --config dev-webpack.config.js",
+        "build:watch": "npm run build:dev -- -w",
         "build:chrome": "cd chrome_extension; webpack",
         "build:chrome:watch": "npm run build:chrome -- -w",
         "test": "karma start --single-run --browsers Firefox && standard",
