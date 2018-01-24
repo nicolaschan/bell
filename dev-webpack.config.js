@@ -1,5 +1,4 @@
 require('webpack')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const path = require('path')
 
 module.exports = {
