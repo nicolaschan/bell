@@ -25,22 +25,9 @@ module.exports = {
       test: /\.coffee$/,
       use: ['coffee-loader']
     }, {
-      test: /\.js$|\.jsx$/,
-      use: {
-        loader: 'istanbul-instrumenter-loader',
-        options: {
-          esModules: true
-        }
-      },
-      enforce: 'post',
-      exclude: /node_modules|\.spec\.js$/
-    }, {
       test: /\.js$/,
       exclude: /node_modules/,
       loader: 'babel-loader'
     }]
-  },
-  plugins: [new UglifyJsPlugin({
-    cache: true
-  })]
+  }
 }
