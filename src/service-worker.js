@@ -30,7 +30,6 @@ async function fromCache (request) {
   var cache = await caches.open(CACHE)
   var matching = await cache.match(request)
   if (!matching) {
-    console.log(request.url, urlMatch(request.url, 'api'))
     if (urlMatch(request.url, 'api')) {
       throw new Error('No cached data')
     } else {
