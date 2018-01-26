@@ -90,7 +90,10 @@ var getSource = cache(60, async function (source) {
 })
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'))
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
+})
+app.get('/offline', (req, res) => {
+  res.sendFile(path.join(__dirname, 'html', 'offline.html'))
 })
 app.get('/m', (req, res) => {
   res.render('client-mithril', {
@@ -112,6 +115,11 @@ app.get('/settings', (req, res) => {
 })
 app.get('/blog', (req, res) => {
   res.render('blog')
+})
+app.get('/bin/service-worker.js', (req, res) => {
+  res.set('Service-Worker-Allowed', '/')
+  res.set('Cache-Control', 'no-cache, public')
+  res.sendFile(path.join(__dirname, 'bin', 'service-worker.js'))
 })
 app.get('/xt', (req, res) => {
   res.redirect('https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc')
@@ -235,8 +243,12 @@ app.use('/favicons', express.static('favicons'))
 app.use('/bin', express.static('bin'))
 app.use('/css', express.static('css'))
 app.use('/img', express.static('img'))
-app.use('/icons', express.static('node_modules/material-design-icons'))
-app.use('/fonts', express.static('node_modules/roboto-fontface/fonts'))
+app.use('/icons', express.static('node_modules/material-design-icons', {
+  maxage: '24h'
+}))
+app.use('/fonts', express.static('node_modules/roboto-fontface/fonts', {
+  maxage: '24h'
+}))
 
 var startWebServer = function () {
   return new Promise((resolve, reject) => {
