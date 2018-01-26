@@ -1,7 +1,7 @@
 /* global self, caches, fetch */
 // Based on https://serviceworke.rs/strategy-network-or-cache_service-worker_doc.html
 
-const VERSION = 'v3.1.2'
+const VERSION = 'v3.1.3'
 var CACHE = `cache-${VERSION}`
 const SimpleLogger = require('./SimpleLogger')
 const logger = new SimpleLogger()
@@ -70,7 +70,7 @@ self.addEventListener('activate', evt => {
   )
 })
 self.addEventListener('fetch', function (evt) {
-  evt.respondWith(fromNetwork(evt.request, 2000).catch(function () {
+  evt.respondWith(fromNetwork(evt.request, 4000).catch(function () {
     logger.log(`${evt.request.url} serving from cached`, 'ServiceWorker')
     return fromCache(evt.request)
   }))
