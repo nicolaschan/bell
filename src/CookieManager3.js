@@ -30,7 +30,12 @@ class CookieManager {
   async set (key, value) {
     this.cache[key] = value
     if (this.storage) {
-      return this.storage.setItem(key, value)
+      try {
+        await this.storage.setItem(key, value)
+      } catch (e) {
+        console.warn(e)
+        console.warn('Could not save to database')
+      }
     }
   }
 

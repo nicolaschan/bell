@@ -1,12 +1,14 @@
 {
-    "name": "bell",
-    "version": "3.1.1",
-    "description": "",
+    "name": "bell-countdown",
+    "version": "3.1.3",
+    "description": "Countdown to the next time the bell rings at school.",
     "main": "index.js",
     "scripts": {
         "build": "webpack",
         "build:server": "cd server; ant dist",
-        "build:watch": "npm run build -- -w",
+        "build:prod": "webpack --config production-webpack.config.js",
+        "build:dev": "webpack --config dev-webpack.config.js",
+        "build:watch": "npm run build:dev -- -w",
         "build:chrome": "cd chrome_extension; webpack",
         "build:chrome:watch": "npm run build:chrome -- -w",
         "test": "karma start --single-run --browsers Firefox && standard",
@@ -17,6 +19,7 @@
     "license": "MIT",
     "dependencies": {
         "async": "^2.5.0",
+        "better-sqlite3": "^4.1.0",
         "bluebird": "^3.5.1",
         "body-parser": "^1.18.2",
         "chart.js": "^2.7.0",
@@ -35,7 +38,6 @@
         "roboto-fontface": "^0.8.0",
         "selectize": "^0.12.4",
         "shortid": "^2.2.6",
-        "sqlite3": "^3.1.13",
         "timesync": "^0.4.1",
         "ua-parser-js": "^0.7.17"
     },

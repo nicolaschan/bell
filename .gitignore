@@ -64,6 +64,9 @@ jspm_packages
 bin
 chrome_extension/bin
 
+# Server dependencies
+dependencies
+
 # Server side compiled code and copied static content
 server/.gradle*
 server/bin

@@ -93,6 +93,12 @@ window.onunhandledrejection = async function (e) {
   }
 }
 
+if (navigator.serviceWorker) {
+  navigator.serviceWorker.register('/bin/service-worker.js', {
+    scope: './'
+  })
+}
+
 var greetings = ['Hello', 'Hi there', 'Greetings', 'Howdy']
 var greeting = greetings[Math.floor(Math.random() * greetings.length)]
 var colors = ['red', 'orange', 'lime', 'darkblue', 'magenta']

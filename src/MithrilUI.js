@@ -128,8 +128,8 @@ class MithrilUI {
               model: uiModel
             })
           ]),
-          m('.footer-right', m('a[href=/settings]',
-                        m('i.settings-icon.material-icons', 'settings')))
+          m('.footer-right', (navigator.onLine) ? m('a[href=/settings]',
+                        m('i.settings-icon.material-icons', 'settings')) : m('span', 'Settings not available offline'))
         ]), m(Popup, {
           model: uiModel
         }), m(SchoolIndicator, {
