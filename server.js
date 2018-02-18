@@ -315,14 +315,14 @@ var getNewestVersion = async function () {
     throw new Error('Failed to get newest version')
   }
 }
-var alertAboutVersionChange = function () {
-  if (newestVersion !== getVersion()) {
+var alertAboutVersionChange = function (currentVersion, newVersion) {
+  if (currentVersion !== newVersion) {
     logger.warn('There is a new version of bell-countdown available')
-    logger.warn(`You are using ${getVersion()} while the newest version available is ${newestVersion}`)
+    logger.warn(`You are using ${currentVersion} while the newest version available is ${newVersion}`)
     logger.warn('Please update by visiting https://countdown.zone/gh')
     return false
   } else {
-    logger.log(`bell-countdown is up to date (version ${newestVersion})`)
+    logger.log(`bell-countdown is up to date (version ${currentVersion})`)
     return true
   }
 }
@@ -332,7 +332,7 @@ var checkForNewVersion = async function () {
     var version = await getNewestVersion()
     if (version !== newestVersion) {
       newestVersion = version
-      alertAboutVersionChange()
+      alertAboutVersionChange(getVersion(), newestVersion)
     }
   } catch (e) {
     logger.warn('You may not be online — check your internet connection')
