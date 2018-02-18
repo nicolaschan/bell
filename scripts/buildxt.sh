@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Builds the extension to distribute a testing build
-if [ -d "xt_distr" ]; then
-    rm -rf "xt_distr"
+if [ -d "../xt_distr" ]; then
+    rm -rf "../xt_distr"
 fi
 
 log() {
@@ -10,6 +10,7 @@ log() {
 }
 
 DEST="xt_distr"
+cd ..
 mkdir $DEST
 log "Building extension"
 cd "chrome_extension"
