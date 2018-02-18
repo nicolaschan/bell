@@ -1,10 +1,16 @@
-const UAParser = require('ua-parser-js')
+const UAParser = require('ua-parser')
 const config = require('./config.json')
 
 const {
     Client
 } = require('pg')
 const db = new Client(config.postgres)
+
+var getDevice = function(result) {
+  return (result.device.family || (result.device.vendor && result.device.model))
+    ? (result.device.family || `${result.device.vendor} ${result.device.model}`)
+    : 'Unknown device'
+}
 
 const PostgresAnalyticsHandler = {
   initialize: async() => {
@@ -35,24 +41,27 @@ const PostgresAnalyticsHandler = {
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
   },
+  disconnect: async() => {
+    return db.end()
+  },
   recordHit: async(user) => {
-    var result = UAParser(user.userAgent)
-    var device = (result.device.vendor && result.device.model) ? `${result.device.vendor} ${result.device.model}` : 'Unknown device'
+    var result = UAParser.parse(user.userAgent)
+    var device = getDevice(result)
     return db.query({
       text: `INSERT INTO hits (userId, userAgent, browser, device, os, theme, source, ip, timestamp) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TIMESTAMP 'now')`,
       values: [
-        user.id, user.userAgent, result.browser.name, device, result.os.name, user.theme, user.source, user.ip
+        user.id, user.userAgent, result.ua.family, device, result.os.family, user.theme, user.source, user.ip
       ]})
   },
   recordError: async(user) => {
-    var result = UAParser(user.userAgent)
-    var device = (result.device.vendor && result.device.model) ? `${result.device.vendor} ${result.device.model}` : 'Unknown device'
+    var result = UAParser.parse(user.userAgent)
+    var device = getDevice(result)
     return db.query({
       text: `INSERT INTO errors (userId, userAgent, browser, device, os, theme, source, ip, error, timestamp) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TIMESTAMP 'now')`,
       values: [
-        user.id, user.userAgent, result.browser.name, device, result.os.name, user.theme, user.source, user.ip, user.error
+        user.id, user.userAgent, result.ua.family, device, result.os.family, user.theme, user.source, user.ip, user.error
       ]})
   },
   getBrowserStats: async() => db.query(`WITH users_timestamp AS (

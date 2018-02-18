@@ -1,6 +1,12 @@
-const UAParser = require('ua-parser-js')
+const UAParser = require('ua-parser')
 const Database = require('better-sqlite3')
 const db = new Database('analytics.sqlite')
+
+var getDevice = function(result) {
+  return (result.device.family || (result.device.vendor && result.device.model))
+    ? (result.device.family || `${result.device.vendor} ${result.device.model}`)
+    : 'Unknown device'
+}
 
 const ServerAnalyticsHandler = {
   initialize: async() => {
@@ -8,17 +14,17 @@ const ServerAnalyticsHandler = {
     db.prepare('CREATE TABLE IF NOT EXISTS errors (user, userAgent, browser, device, os, theme, source, ip, error, timestamp DATETIME)').run()
   },
   recordError: async(data) => {
-    var result = UAParser(data.userAgent)
-    var device = (result.device.vendor && result.device.model) ? `${result.device.vendor} ${result.device.model}` : 'unknown device'
+    var result = UAParser.parse(data.userAgent)
+    var device = getDevice(result)
     return db.prepare('INSERT INTO errors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
-      data.id, data.userAgent, result.browser.name, device, result.os.name,
+      data.id, data.userAgent, result.ua.family, device, result.os.family,
       data.theme, data.source, data.ip, data.error)
   },
   recordHit: async(user) => {
-    var result = UAParser(user.userAgent)
-    var device = (result.device.vendor && result.device.model) ? `${result.device.vendor} ${result.device.model}` : 'unknown device'
+    var result = UAParser.parse(user.userAgent)
+    var device = getDevice(result)
     return db.prepare('INSERT INTO hits VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
-            user.id, user.userAgent, result.browser.name, device, result.os.name,
+            user.id, user.userAgent, result.ua.family, device, result.os.family,
             user.theme, user.source, user.ip)
   },
   getBrowserStats: async() => {
