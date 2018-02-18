@@ -306,25 +306,27 @@ var reportUsage = async function () {
 
 var newestVersion
 var checkForNewVersion = async function () {
+  var newestPackage
   try {
-    var newestPackage = (await request.getAsync('https://raw.githubusercontent.com/nicolaschan/bell/master/package.json')).body
+    newestPackage = (await request.getAsync('https://raw.githubusercontent.com/nicolaschan/bell/master/package.json')).body
     newestPackage = JSON.parse(newestPackage)
-    if (newestPackage.version === newestVersion) {
-      return getVersion() === newestVersion
-    }
-    newestVersion = newestPackage.version
-    if (newestVersion !== getVersion()) {
-      logger.warn('There is a new version of bell-countdown available')
-      logger.warn(`You are using ${getVersion()} while the newest version available is ${newestVersion}`)
-      logger.warn('Please update by visiting https://countdown.zone/gh')
-      return false
-    } else {
-      logger.log(`bell-countdown is up to date (version ${newestVersion})`)
-      return true
-    }
   } catch (e) {
     // Failed to check for a new version
     logger.warn('You may not be online — check your internet connection')
+  }
+
+  if (!newestPackage || newestPackage.version === newestVersion) {
+    return getVersion() === newestVersion
+  }
+  newestVersion = newestPackage.version
+  if (newestVersion !== getVersion()) {
+    logger.warn('There is a new version of bell-countdown available')
+    logger.warn(`You are using ${getVersion()} while the newest version available is ${newestVersion}`)
+    logger.warn('Please update by visiting https://countdown.zone/gh')
+    return false
+  } else {
+    logger.log(`bell-countdown is up to date (version ${newestVersion})`)
+    return true
   }
 }
 setInterval(checkForNewVersion, 24 * 60 * 60 * 1000)

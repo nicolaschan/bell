@@ -17,7 +17,7 @@ var columnsIncludes = function (columns, target) {
   return false
 }
 
-var ensureColumn = function (db, table, column, columns, alter) {
+var ensureColumn = function (table, column, columns, alter) {
   if (!columnsIncludes(columns, column)) {
     db.prepare(alter).run()
   }
@@ -33,8 +33,8 @@ const ServerAnalyticsHandler = {
     ServerAnalyticsHandler.addVersionColumnIfNotExists()
   },
   addVersionColumnIfNotExists: async() => {
-    ensureColumn(db, 'hits', 'version', db.pragma('table_info(hits)'), 'ALTER TABLE hits ADD COLUMN version')
-    ensureColumn(db, 'errors', 'version', db.pragma('table_info(errors)'), 'ALTER TABLE errors ADD COLUMN version')
+    ensureColumn('hits', 'version', db.pragma('table_info(hits)'), 'ALTER TABLE hits ADD COLUMN version')
+    ensureColumn('errors', 'version', db.pragma('table_info(errors)'), 'ALTER TABLE errors ADD COLUMN version')
   },
   recordError: async(data) => {
     var result = UAParser.parse(data.userAgent)
