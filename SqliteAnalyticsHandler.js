@@ -8,10 +8,30 @@ var getDevice = function (result) {
     : 'Other'
 }
 
+var columnsIncludes = function(columns, target) {
+  for (let col of columns) {
+    if (col.name === target) {
+      return true
+    }
+  }
+  return false;
+}
+
+var ensureColumn = function(db, table, column, columns) {
+  if (!columnsIncludes(columns, column)) {
+    db.prepare('ALTER TABLE ? ADD COLUMN ?').run(table, column)
+  }
+}
+
 const ServerAnalyticsHandler = {
   initialize: async() => {
     db.prepare('CREATE TABLE IF NOT EXISTS hits (user, userAgent, browser, device, os, theme, source, ip, version, timestamp DATETIME)').run()
     db.prepare('CREATE TABLE IF NOT EXISTS errors (user, userAgent, browser, device, os, theme, source, ip, error, version, timestamp DATETIME)').run()
+    ServerAnalyticsHandler.addVersionColumnIfNotExists()
+  },
+  addVersionColumnIfNotExists: async() => {
+    ensureColumn(db, 'hits', 'version', db.pragma('table_info(hits)'))
+    ensureColumn(db, 'errors', 'version', db.pragma('table_info(errors)'))
   },
   recordError: async(data) => {
     var result = UAParser.parse(data.userAgent)
