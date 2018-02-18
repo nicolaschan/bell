@@ -10,45 +10,45 @@ var getDevice = function (result) {
 
 const ServerAnalyticsHandler = {
   initialize: async() => {
-    db.prepare('CREATE TABLE IF NOT EXISTS hits (user, userAgent, browser, device, os, theme, source, ip, timestamp DATETIME)').run()
-    db.prepare('CREATE TABLE IF NOT EXISTS errors (user, userAgent, browser, device, os, theme, source, ip, error, timestamp DATETIME)').run()
+    db.prepare('CREATE TABLE IF NOT EXISTS hits (user, userAgent, browser, device, os, theme, source, ip, version, timestamp DATETIME)').run()
+    db.prepare('CREATE TABLE IF NOT EXISTS errors (user, userAgent, browser, device, os, theme, source, ip, error, version, timestamp DATETIME)').run()
   },
   recordError: async(data) => {
     var result = UAParser.parse(data.userAgent)
     var device = getDevice(result)
-    return db.prepare('INSERT INTO errors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
+    return db.prepare('INSERT INTO errors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
       data.id, data.userAgent, result.ua.family, device, result.os.family,
-      data.theme, data.source, data.ip, data.error)
+      data.theme, data.source, data.ip, data.error, data.version)
   },
   recordHit: async(user) => {
     var result = UAParser.parse(user.userAgent)
     var device = getDevice(result)
-    return db.prepare('INSERT INTO hits VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
+    return db.prepare('INSERT INTO hits VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
             user.id, user.userAgent, result.ua.family, device, result.os.family,
-            user.theme, user.source, user.ip)
+            user.theme, user.source, user.ip, user.version)
   },
   getBrowserStats: async() => {
-    var rows = db.prepare('WITH users AS (SELECT user, userAgent, browser, device, os, theme, source, ip, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)) SELECT browser, count(DISTINCT user) AS count FROM users GROUP BY browser').all()
+    var rows = db.prepare('WITH users AS (SELECT user, userAgent, browser, device, os, theme, source, ip, version, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)) SELECT browser, count(DISTINCT user) AS count FROM users GROUP BY browser').all()
     return { rows: rows }
   },
   getOSStats: async() => {
-    var rows = db.prepare('WITH users AS (SELECT user, userAgent, browser, device, os, theme, source, ip, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)) SELECT os, count(DISTINCT user) AS count FROM users GROUP BY os').all()
+    var rows = db.prepare('WITH users AS (SELECT user, userAgent, browser, device, os, theme, source, ip, version, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)) SELECT os, count(DISTINCT user) AS count FROM users GROUP BY os').all()
     return { rows: rows }
   },
   getDeviceStats: async() => {
-    var rows = db.prepare('WITH users AS (SELECT user, userAgent, browser, device, os, theme, source, ip, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)) SELECT device, count(DISTINCT user) AS count FROM users GROUP BY device').all()
+    var rows = db.prepare('WITH users AS (SELECT user, userAgent, browser, device, os, theme, source, ip, version, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)) SELECT device, count(DISTINCT user) AS count FROM users GROUP BY device').all()
     return { rows: rows }
   },
   getThemeStats: async() => {
-    var rows = db.prepare('WITH users AS (SELECT user, userAgent, browser, device, os, theme, source, ip, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)) SELECT theme, count(DISTINCT user) AS count FROM users GROUP BY theme').all()
+    var rows = db.prepare('WITH users AS (SELECT user, userAgent, browser, device, os, theme, source, ip, version, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)) SELECT theme, count(DISTINCT user) AS count FROM users GROUP BY theme').all()
     return { rows: rows }
   },
   getSourceStats: async() => {
-    var rows = db.prepare('WITH users AS (SELECT user, userAgent, browser, device, os, theme, source, ip, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)) SELECT source, count(DISTINCT user) AS count FROM users GROUP BY source').all()
+    var rows = db.prepare('WITH users AS (SELECT user, userAgent, browser, device, os, theme, source, ip, version, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)) SELECT source, count(DISTINCT user) AS count FROM users GROUP BY source').all()
     return { rows: rows }
   },
   getUsers: async() => {
-    var rows = db.prepare('SELECT user, userAgent, browser, device, os, theme, source, ip, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)').all()
+    var rows = db.prepare('SELECT user, userAgent, browser, device, os, theme, source, ip, version, timestamp FROM hits GROUP BY user HAVING timestamp = MAX(timestamp)').all()
     return { rows: rows }
   },
   getTotalDailyHits: async() => {

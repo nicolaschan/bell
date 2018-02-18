@@ -24,7 +24,8 @@ const PostgresAnalyticsHandler = {
         os TEXT, 
         theme TEXT, 
         source TEXT, 
-        ip TEXT, 
+        ip TEXT,
+        version TEXT,
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
     return db.query(`CREATE TABLE IF NOT EXISTS errors (
@@ -38,6 +39,7 @@ const PostgresAnalyticsHandler = {
         source TEXT, 
         ip TEXT,
         error TEXT,
+        version TEXT,
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
   },
@@ -48,27 +50,27 @@ const PostgresAnalyticsHandler = {
     var result = UAParser.parse(user.userAgent)
     var device = getDevice(result)
     return db.query({
-      text: `INSERT INTO hits (userId, userAgent, browser, device, os, theme, source, ip, timestamp) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TIMESTAMP 'now')`,
+      text: `INSERT INTO hits (userId, userAgent, browser, device, os, theme, source, ip, version, timestamp) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TIMESTAMP 'now')`,
       values: [
-        user.id, user.userAgent, result.ua.family, device, result.os.family, user.theme, user.source, user.ip
+        user.id, user.userAgent, result.ua.family, device, result.os.family, user.theme, user.source, user.ip, user.version
       ]})
   },
   recordError: async(user) => {
     var result = UAParser.parse(user.userAgent)
     var device = getDevice(result)
     return db.query({
-      text: `INSERT INTO errors (userId, userAgent, browser, device, os, theme, source, ip, error, timestamp) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TIMESTAMP 'now')`,
+      text: `INSERT INTO errors (userId, userAgent, browser, device, os, theme, source, ip, error, version, timestamp) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TIMESTAMP 'now')`,
       values: [
-        user.id, user.userAgent, result.ua.family, device, result.os.family, user.theme, user.source, user.ip, user.error
+        user.id, user.userAgent, result.ua.family, device, result.os.family, user.theme, user.source, user.ip, user.error, user.version
       ]})
   },
   getBrowserStats: async() => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
-      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.timestamp
+      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.version, hits.timestamp
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
@@ -78,7 +80,7 @@ const PostgresAnalyticsHandler = {
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
-      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.timestamp
+      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.version, hits.timestamp
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
@@ -88,7 +90,7 @@ const PostgresAnalyticsHandler = {
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
-      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.timestamp
+      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.version, hits.timestamp
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
@@ -98,7 +100,7 @@ const PostgresAnalyticsHandler = {
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
-      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.timestamp
+      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.version, hits.timestamp
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
@@ -108,7 +110,7 @@ const PostgresAnalyticsHandler = {
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
-      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.timestamp
+      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.version, hits.timestamp
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
@@ -118,7 +120,7 @@ const PostgresAnalyticsHandler = {
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
-      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.timestamp
+      SELECT hits.userId, hits.userAgent, hits.browser, hits.device, hits.os, hits.theme, hits.source, hits.ip, hits.version, hits.timestamp
       FROM hits, users_timestamp 
       WHERE hits.userId = users_timestamp.userId AND hits.timestamp = users_timestamp.timestamp
       ORDER BY hits.timestamp
