@@ -305,20 +305,17 @@ var reportUsage = async function () {
 }
 
 var newestVersion
-var checkForNewVersion = async function () {
-  var newestPackage
+var getNewestVersion = async function () {
   try {
-    newestPackage = (await request.getAsync('https://raw.githubusercontent.com/nicolaschan/bell/master/package.json')).body
+    var newestPackage = (await request.getAsync('https://raw.githubusercontent.com/nicolaschan/bell/master/package.json')).body
     newestPackage = JSON.parse(newestPackage)
+    return newestPackage.version
   } catch (e) {
     // Failed to check for a new version
-    logger.warn('You may not be online — check your internet connection')
+    throw new Error('Failed to get newest version')
   }
-
-  if (!newestPackage || newestPackage.version === newestVersion) {
-    return getVersion() === newestVersion
-  }
-  newestVersion = newestPackage.version
+}
+var alertAboutVersionChange = function () {
   if (newestVersion !== getVersion()) {
     logger.warn('There is a new version of bell-countdown available')
     logger.warn(`You are using ${getVersion()} while the newest version available is ${newestVersion}`)
@@ -327,6 +324,18 @@ var checkForNewVersion = async function () {
   } else {
     logger.log(`bell-countdown is up to date (version ${newestVersion})`)
     return true
+  }
+}
+
+var checkForNewVersion = async function () {
+  try {
+    var version = await getNewestVersion()
+    if (version !== newestVersion) {
+      newestVersion = version
+      alertAboutVersionChange()
+    }
+  } catch (e) {
+    logger.warn('You may not be online — check your internet connection')
   }
 }
 setInterval(checkForNewVersion, 24 * 60 * 60 * 1000)
