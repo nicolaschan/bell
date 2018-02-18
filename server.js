@@ -37,11 +37,8 @@ var cache = function (time, f) {
   }
 }
 
-var currentVersion
 var getVersion = cache(60, function () {
-  var hash = crypto.createHash('md5')
-  currentVersion = hash.update(fs.readFileSync('data/version.txt').toString()).digest('hex')
-  return currentVersion
+  return JSON.parse(fs.readFileSync('./data/version.json').toString())
 })
 var getMessage = cache(60, function () {
   return JSON.parse(fs.readFileSync(`./data/message.json`).toString())
@@ -214,6 +211,7 @@ app.post('/api/analytics', async(req, res) => {
     userAgent: req.body.userAgent,
     theme: req.body.theme,
     source: req.body.source,
+    version: req.body.version,
     // https://stackoverflow.com/a/10849772/
     ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
   })
@@ -226,6 +224,7 @@ app.post('/api/errors', async(req, res) => {
     theme: req.body.theme,
     source: req.body.source,
     error: JSON.stringify(req.body.error),
+    version: req.body.version,
     // https://stackoverflow.com/a/10849772/
     ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
   })
