@@ -1,4 +1,4 @@
-const UAParser = require('ua-parser')
+const UAParser = require('useragent')
 const Database = require('better-sqlite3')
 const db = new Database('analytics.sqlite')
 
@@ -16,15 +16,15 @@ const ServerAnalyticsHandler = {
   recordError: async(data) => {
     var result = UAParser.parse(data.userAgent)
     var device = getDevice(result)
-    return db.prepare('INSERT INTO errors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
-      data.id, data.userAgent, result.ua.family, device, result.os.family,
+    return db.prepare('INSERT INTO errors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
+      data.id, data.userAgent, result.family, device, result.os.family,
       data.theme, data.source, data.ip, data.error, data.version)
   },
   recordHit: async(user) => {
     var result = UAParser.parse(user.userAgent)
     var device = getDevice(result)
-    return db.prepare('INSERT INTO hits VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
-            user.id, user.userAgent, result.ua.family, device, result.os.family,
+    return db.prepare('INSERT INTO hits VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
+            user.id, user.userAgent, result.family, device, result.os.family,
             user.theme, user.source, user.ip, user.version)
   },
   getBrowserStats: async() => {

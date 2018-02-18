@@ -1,4 +1,4 @@
-const UAParser = require('ua-parser')
+const UAParser = require('useragent')
 const config = require('../config.json')
 const { Client } = require('pg')
 const pgDb = new Client(config.postgres)
@@ -24,12 +24,12 @@ var recordHit = async function (row) {
   var timestamp = row.timestamp
   var result = UAParser.parse(uaStr)
   var device = getDevice(result)
-  console.log(user, result.ua.family, device, result.os.family, theme, source, ip, timestamp)
+  console.log(user, result.family, device, result.os.family, theme, source, ip, timestamp)
   return pgDb.query({
     text: `INSERT INTO hits (userId, userAgent, browser, device, os, theme, source, ip, timestamp) 
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
     values: [
-      user, uaStr, result.ua.family, device, result.os.family, theme, source, ip, timestamp
+      user, uaStr, result.family, device, result.os.family, theme, source, ip, timestamp
     ]})
 }
 
