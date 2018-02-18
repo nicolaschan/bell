@@ -1,4 +1,4 @@
-const UAParser = require('ua-parser')
+const UAParser = require('useragent')
 const config = require('./config.json')
 
 const {
@@ -51,7 +51,7 @@ const PostgresAnalyticsHandler = {
       text: `INSERT INTO hits (userId, userAgent, browser, device, os, theme, source, ip, timestamp) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TIMESTAMP 'now')`,
       values: [
-        user.id, user.userAgent, result.ua.family, device, result.os.family, user.theme, user.source, user.ip
+        user.id, user.userAgent, result.family, device, result.os.family, user.theme, user.source, user.ip
       ]})
   },
   recordError: async(user) => {
@@ -61,7 +61,7 @@ const PostgresAnalyticsHandler = {
       text: `INSERT INTO errors (userId, userAgent, browser, device, os, theme, source, ip, error, timestamp) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TIMESTAMP 'now')`,
       values: [
-        user.id, user.userAgent, result.ua.family, device, result.os.family, user.theme, user.source, user.ip, user.error
+        user.id, user.userAgent, result.family, device, result.os.family, user.theme, user.source, user.ip, user.error
       ]})
   },
   getBrowserStats: async() => db.query(`WITH users_timestamp AS (

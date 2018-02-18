@@ -37,8 +37,8 @@
         "selectize": "^0.12.4",
         "shortid": "^2.2.6",
         "timesync": "^1.0.1",
-        "ua-parser": "^0.3.5",
-        "ua-parser-js": "^0.7.17"
+        "ua-parser-js": "^0.7.17",
+        "useragent": "^2.3.0"
     },
     "devDependencies": {
         "babel-core": "^6.26.0",
