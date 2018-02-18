@@ -40,7 +40,7 @@ We do NOT collect:
 - Your custom course schedule
 
 ## Sharing the Data
-Since we do not collect personal information, we may share data we collect publicly. For example, we may report aggregate statistics on [stats.countdown.zone](https://stats.countdown.zone).
+Since we do not collect personal information, we may share data we collect publicly. For example, we may report aggregate statistics on [countdown.zone/stats](https://countdown.zone/stats).
 
 ## Responding to Do Not Track
 Since we do not collect personal information, we do not respond to Do Not Track requests. The data we collect is not used to track users across multiple sites.
@@ -57,4 +57,4 @@ Since we do not collect personal information, it is impossible for us to know fo
 If you believe you have sent us personal information and we have recorded it and you would like it removed, please email support@nc99.co.
 
 ## Changes to this Policy
-We may change this privacy policy without notice, so please check back regularly. This privacy policy was last updated on 9 December 2017.
+We may change this privacy policy without notice, so please check back regularly. This privacy policy was last updated on 18 February 2018.
