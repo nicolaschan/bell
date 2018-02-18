@@ -131,6 +131,14 @@ class BellTimer {
     this.calendar = calendar
   }
 
+  set source (value) {
+    this.cookieManager.set('source', value)
+  }
+
+  get source () {
+    return this.cookieManager.get('source')
+  }
+
   async reloadData () {
     var dataSource = this.cookieManager.get('source', 'lahs')
     if (dataSource === 'custom') {

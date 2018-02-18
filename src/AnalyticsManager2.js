@@ -14,7 +14,7 @@ class AnalyticsManager {
 
     var uuid = this.cookieManager.get('id')
     if (!uuid) {
-      uuid = (await this.requestManager.getNoCache('/api/uuid')).id
+      uuid = (await this.requestManager.get('/api/uuid')).id
       this.cookieManager.set('id', uuid)
     }
   }
@@ -38,7 +38,11 @@ class AnalyticsManager {
 
     this.newPageLoad = false
 
-    if (send.success) { this.logger.success('Analytics data sent successfully') } else { this.logger.warn('Analytics are disabled') }
+    if (send.success) {
+      this.logger.success('Analytics data sent successfully')
+    } else {
+      this.logger.warn('Analytics are disabled')
+    }
 
     return send
   }

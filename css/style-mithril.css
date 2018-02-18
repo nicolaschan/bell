@@ -80,6 +80,20 @@ body {
     overflow-y: hidden;
 }
 
+.header {
+    padding: 20px;
+    background-color: #ddd;
+    transition: background-color 3s ease;
+    text-align: center;
+}
+
+.desc {
+    color: #555;
+    text-align: justify;
+    margin: 1em 0;
+    font-size: 12px;
+}
+
 .background {
     transition: opacity 3s ease;
 }
@@ -200,15 +214,53 @@ body {
     bottom: 1em;
     color: #aaa;
 }
-.settings-icon {
+.icon {
     color: #aaa;
     cursor: pointer;
     transition: color 1s ease, transform 1s ease;
     font-size: 4em;
 }
+.done-icon:hover {
+    color: limegreen;
+}
 .settings-icon:hover {
     color: black;
     transform: rotate(2rad);
+}
+
+.inputBox {
+    font-family: 'Roboto', sans-serif;
+    border: 1px solid #dddddd;
+    font-size: 20px;
+    padding: 10px;
+    outline: none;
+    width: 12em;
+    transition: border-color 1s ease;
+}
+.inputBox:focus {
+    border-color: darkturquoise;
+    outline: none;
+}
+.inputBox:disabled {
+    text-decoration: line-through;
+    background-color: #eeeeee;
+}
+
+.add-link {
+    text-align: center;
+    margin: 1em;
+}
+a.add:link, a.add:visited {
+    text-decoration: none;
+    color: #aaa;
+    margin: 0 0.5em;
+    padding: 0.5em;
+    border: 1px solid #aaa;
+    transition: color 0.5s ease, border-color 0.5s ease;
+}
+a.add:hover {
+    color: darkturquoise;
+    border-color: darkturquoise;
 }
 
 #page1 {
@@ -276,3 +328,75 @@ canvas {
     opacity: 0.1;
 }
 
+
+/*
+checkbox css is modified from https://kyusuf.com/post/completely-css-custom-checkbox-radio-buttons-and-select-boxes
+*/
+.control-group {
+    display: inline-block;
+    width: 200px;
+    height: 210px;
+    margin: 10px;
+    padding: 30px;
+    text-align: left;
+    vertical-align: top;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.1);
+}
+.control {
+    font-size: 18px;
+    position: relative;
+    display: block;
+    margin-bottom: 15px;
+    padding-left: 30px;
+    cursor: pointer;
+}
+
+.control input {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+}
+.control__indicator {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background: #e6e6e6;
+    transform: rotate(135deg);
+    transition: background-color 0.5s ease, transform 0.5s ease;
+}
+
+/* Checked state */
+.control input:checked ~ .control__indicator {
+    background: darkturquoise;
+    transform: rotate(0deg);
+}
+
+/* Check mark */
+.control__indicator:after {
+    position: absolute;
+    display: none;
+    content: '';
+}
+
+/* Show check mark */
+.control input:checked ~ .control__indicator:after {
+    display: block;
+}
+
+/* Checkbox tick */
+.control--checkbox .control__indicator:after {
+    top: 4px;
+    left: 8px;
+    width: 3px;
+    height: 8px;
+    transform: rotate(45deg);
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+}
+
+.checkbox {
+    width: 0px;
+}
