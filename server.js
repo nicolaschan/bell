@@ -10,7 +10,6 @@ const fs = Promise.promisifyAll(require('fs'))
 const path = require('path')
 const shortid = require('shortid')
 const request = Promise.promisifyAll(require('request'))
-const crypto = require('crypto')
 const timesyncServer = require('timesync/server')
 
 const analyticsHandler = config.postgres.enabled ? require('./PostgresAnalyticsHandler') : require('./SqliteAnalyticsHandler')
