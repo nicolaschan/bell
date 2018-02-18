@@ -271,7 +271,7 @@ var startWebServer = function () {
   })
 }
 
-var getServerID = async function() {
+var getServerID = async function () {
   var idFile = path.join(__dirname, 'data', 'id.txt')
   try {
     var id = await fs.readFileAsync(idFile)

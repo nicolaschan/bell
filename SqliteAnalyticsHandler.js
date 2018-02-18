@@ -8,16 +8,16 @@ var getDevice = function (result) {
     : 'Other'
 }
 
-var columnsIncludes = function(columns, target) {
+var columnsIncludes = function (columns, target) {
   for (let col of columns) {
     if (col.name === target) {
       return true
     }
   }
-  return false;
+  return false
 }
 
-var ensureColumn = function(db, table, column, columns, alter) {
+var ensureColumn = function (db, table, column, columns, alter) {
   if (!columnsIncludes(columns, column)) {
     db.prepare(alter).run()
   }
@@ -37,13 +37,15 @@ const ServerAnalyticsHandler = {
     ensureColumn(db, 'errors', 'version', db.pragma('table_info(errors)'), 'ALTER TABLE errors ADD COLUMN version')
   },
   recordError: async(data) => {
+    var result = UAParser.parse(data.userAgent)
+    var device = getDevice(result)
     return db.prepare('INSERT INTO errors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
       data.id, data.userAgent, result.family, device, result.os.family,
       data.theme, data.source, data.ip, data.error, data.version)
   },
   recordServer: async(data) => {
     return db.prepare('INSERT INTO servers VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
-      data.id, data.ip, data.version, data.os.platform, data.os.release, data.os.type, data.os.arch, data.node);
+      data.id, data.ip, data.version, data.os.platform, data.os.release, data.os.type, data.os.arch, data.node)
   },
   recordHit: async(user) => {
     var result = UAParser.parse(user.userAgent)
