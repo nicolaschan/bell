@@ -5,7 +5,7 @@ const db = new Database('analytics.sqlite')
 var getDevice = function (result) {
   return (result.device.family || (result.device.vendor && result.device.model))
     ? (result.device.family || `${result.device.vendor} ${result.device.model}`)
-    : 'Unknown device'
+    : 'Other'
 }
 
 const ServerAnalyticsHandler = {
