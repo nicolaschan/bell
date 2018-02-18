@@ -16,14 +16,14 @@ const ServerAnalyticsHandler = {
   recordError: async(data) => {
     var result = UAParser.parse(data.userAgent)
     var device = getDevice(result)
-    return db.prepare('INSERT INTO errors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
+    return db.prepare('INSERT INTO errors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
       data.id, data.userAgent, result.family, device, result.os.family,
       data.theme, data.source, data.ip, data.error, data.version)
   },
   recordHit: async(user) => {
     var result = UAParser.parse(user.userAgent)
     var device = getDevice(result)
-    return db.prepare('INSERT INTO hits VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
+    return db.prepare('INSERT INTO hits VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
             user.id, user.userAgent, result.family, device, result.os.family,
             user.theme, user.source, user.ip, user.version)
   },

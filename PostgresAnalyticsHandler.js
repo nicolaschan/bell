@@ -51,7 +51,7 @@ const PostgresAnalyticsHandler = {
     var device = getDevice(result)
     return db.query({
       text: `INSERT INTO hits (userId, userAgent, browser, device, os, theme, source, ip, version, timestamp) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TIMESTAMP 'now')`,
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TIMESTAMP 'now')`,
       values: [
         user.id, user.userAgent, result.family, device, result.os.family, user.theme, user.source, user.ip, user.version
       ]})

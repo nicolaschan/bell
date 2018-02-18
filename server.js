@@ -37,7 +37,7 @@ var cache = function (time, f) {
 }
 
 var getVersion = cache(60, function () {
-  return JSON.parse(fs.readFileSync('./data/version.json').toString())
+  return JSON.parse(fs.readFileSync('./package.json').toString()).version
 })
 var getMessage = cache(60, function () {
   return JSON.parse(fs.readFileSync(`./data/message.json`).toString())
