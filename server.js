@@ -11,6 +11,7 @@ const path = require('path')
 const shortid = require('shortid')
 const uuid = require('uuid/v4')
 const request = Promise.promisifyAll(require('request'))
+const os = require('os')
 const timesyncServer = require('timesync/server')
 
 const analyticsHandler = config.postgres.enabled ? require('./PostgresAnalyticsHandler') : require('./SqliteAnalyticsHandler')
@@ -221,9 +222,12 @@ app.post('/api/analytics/server', async(req, res) => {
   await analyticsHandler.recordServer({
     id: req.body.id,
     version: req.body.version,
+    os: req.body.os,
+    node: req.body.node,
     // https://stackoverflow.com/a/10849772/
     ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
   })
+  return res.json({ success: true })
 })
 app.post('/api/errors', async(req, res) => {
   await analyticsHandler.recordError({
@@ -285,6 +289,13 @@ var reportUsage = async function () {
     await request.postAsync('http://localhost:8080/api/analytics/server', {
       form: {
         id: serverId,
+        os: {
+          platform: os.platform(),
+          release: os.release(),
+          type: os.type(),
+          arch: os.arch()
+        },
+        node: process.version,
         version: getVersion()
       }
     })
@@ -293,7 +304,33 @@ var reportUsage = async function () {
   }
 }
 
+var newestVersion
+var checkForNewVersion = async function () {
+  try {
+    var newestPackage = (await request.getAsync('https://raw.githubusercontent.com/nicolaschan/bell/master/package.json')).body
+    newestPackage = JSON.parse(newestPackage)
+    if (newestPackage.version === newestVersion) {
+      return getVersion() === newestVersion
+    }
+    newestVersion = newestPackage.version
+    if (newestVersion !== getVersion()) {
+      logger.warn('There is a new version of bell-countdown available')
+      logger.warn(`You are using ${getVersion()} while the newest version available is ${newestVersion}`)
+      logger.warn('Please update by visiting https://countdown.zone/gh')
+      return false
+    } else {
+      logger.log(`bell-countdown is up to date (version ${newestVersion})`)
+      return true
+    }
+  } catch (e) {
+    // Failed to check for a new version
+    logger.warn('You may not be online — check your internet connection')
+  }
+}
+setInterval(checkForNewVersion, 24 * 60 * 60 * 1000)
+
 analyticsHandler.initialize()
   .then(startWebServer)
   .then(reportUsage)
+  .then(checkForNewVersion)
   .then(() => logger.success('Ready'))

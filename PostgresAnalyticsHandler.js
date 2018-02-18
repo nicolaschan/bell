@@ -47,6 +47,11 @@ const PostgresAnalyticsHandler = {
         userId TEXT,
         ip TEXT,
         version TEXT,
+        platform TEXT,
+        release TEXT,
+        type TEXT,
+        arch TEXT,
+        node TEXT,
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
   },
@@ -66,9 +71,9 @@ const PostgresAnalyticsHandler = {
   recordServer: async(user) => {
     return db.query({
       text: `INSERT INTO hits (userId, ip, version, timestamp) 
-        VALUES ($1, $2, $3, TIMESTAMP 'now')`,
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TIMESTAMP 'now')`,
       values: [
-        user.id, user.ip, user.version
+        user.id, user.ip, user.version, user.os.platform, user.os.release, user.os.type, user.os.arch, user.node
       ]})
   },
   recordError: async(user) => {
