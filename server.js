@@ -9,6 +9,7 @@ const server = http.createServer(app)
 const fs = Promise.promisifyAll(require('fs'))
 const path = require('path')
 const shortid = require('shortid')
+const uuid = require('uuid/v4')
 const request = Promise.promisifyAll(require('request'))
 const timesyncServer = require('timesync/server')
 
@@ -216,6 +217,14 @@ app.post('/api/analytics', async(req, res) => {
   })
   return res.json({ success: true })
 })
+app.post('/api/analytics/server', async(req, res) => {
+  await analyticsHandler.recordServer({
+    id: req.body.id,
+    version: req.body.version,
+    // https://stackoverflow.com/a/10849772/
+    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+  })
+})
 app.post('/api/errors', async(req, res) => {
   await analyticsHandler.recordError({
     id: req.body.id,
@@ -258,6 +267,33 @@ var startWebServer = function () {
   })
 }
 
+var getServerID = async function() {
+  var idFile = path.join(__dirname, 'data', 'id.txt')
+  try {
+    var id = await fs.readFileAsync(idFile)
+    return id
+  } catch (e) {
+    var newId = uuid()
+    await fs.writeFileAsync(idFile, newId)
+    return newId
+  }
+}
+
+var reportUsage = async function () {
+  var serverId = await getServerID()
+  try {
+    await request.postAsync('http://localhost:8080/api/analytics/server', {
+      form: {
+        id: serverId,
+        version: getVersion()
+      }
+    })
+  } catch (e) {
+    // Failed to report this server instance
+  }
+}
+
 analyticsHandler.initialize()
   .then(startWebServer)
+  .then(reportUsage)
   .then(() => logger.success('Ready'))

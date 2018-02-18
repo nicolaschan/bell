@@ -27,6 +27,9 @@ const ServerAnalyticsHandler = {
   initialize: async() => {
     db.prepare('CREATE TABLE IF NOT EXISTS hits (user, userAgent, browser, device, os, theme, source, ip, version, timestamp DATETIME)').run()
     db.prepare('CREATE TABLE IF NOT EXISTS errors (user, userAgent, browser, device, os, theme, source, ip, error, version, timestamp DATETIME)').run()
+    db.prepare('CREATE TABLE IF NOT EXISTS servers (user, ip, version, timestamp DATETIME)').run()
+
+    // Add version column if there isn't one (for legacy support)
     ServerAnalyticsHandler.addVersionColumnIfNotExists()
   },
   addVersionColumnIfNotExists: async() => {
@@ -34,11 +37,13 @@ const ServerAnalyticsHandler = {
     ensureColumn(db, 'errors', 'version', db.pragma('table_info(errors)'), 'ALTER TABLE errors ADD COLUMN version')
   },
   recordError: async(data) => {
-    var result = UAParser.parse(data.userAgent)
-    var device = getDevice(result)
     return db.prepare('INSERT INTO errors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
       data.id, data.userAgent, result.family, device, result.os.family,
       data.theme, data.source, data.ip, data.error, data.version)
+  },
+  recordServer: async(data) => {
+    return db.prepare('INSERT INTO servers VALUES (?, ?, ?, datetime("now"))').run(
+      data.id, data.ip, data.version);
   },
   recordHit: async(user) => {
     var result = UAParser.parse(user.userAgent)

@@ -28,7 +28,7 @@ const PostgresAnalyticsHandler = {
         version TEXT,
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
-    return db.query(`CREATE TABLE IF NOT EXISTS errors (
+    await db.query(`CREATE TABLE IF NOT EXISTS errors (
         id SERIAL,
         userId TEXT, 
         userAgent TEXT, 
@@ -39,6 +39,13 @@ const PostgresAnalyticsHandler = {
         source TEXT, 
         ip TEXT,
         error TEXT,
+        version TEXT,
+        timestamp TIMESTAMP WITH TIME ZONE
+    )`)
+    return db.query(`CREATE TABLE IF NOT EXISTS servers (
+        id SERIAL,
+        userId TEXT,
+        ip TEXT,
         version TEXT,
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
@@ -54,6 +61,14 @@ const PostgresAnalyticsHandler = {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TIMESTAMP 'now')`,
       values: [
         user.id, user.userAgent, result.family, device, result.os.family, user.theme, user.source, user.ip, user.version
+      ]})
+  },
+  recordServer: async(user) => {
+    return db.query({
+      text: `INSERT INTO hits (userId, ip, version, timestamp) 
+        VALUES ($1, $2, $3, TIMESTAMP 'now')`,
+      values: [
+        user.id, user.ip, user.version
       ]})
   },
   recordError: async(user) => {
