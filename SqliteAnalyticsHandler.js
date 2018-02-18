@@ -8,15 +8,6 @@ var getDevice = function (result) {
     : 'Other'
 }
 
-var columnsIncludes = function (columns, target) {
-  for (let col of columns) {
-    if (col.name === target) {
-      return true
-    }
-  }
-  return false
-}
-
 var runSafe = function (table, alter) {
   try {
     db.prepare(alter).run()
