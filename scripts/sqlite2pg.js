@@ -9,13 +9,13 @@ const pgHandler = require('../PostgresAnalyticsHandler.js')
 
 // Migrates sqlite database to postgres, in the process re-parsing the useragent string
 
-var getDevice = function(result) {
+var getDevice = function (result) {
   return (result.device.family || (result.device.vendor && result.device.model))
     ? (result.device.family || `${result.device.vendor} ${result.device.model}`)
     : 'Unknown device'
 }
 
-var recordHit = async function(row) {
+var recordHit = async function (row) {
   var user = row.user
   var uaStr = row.userAgent
   var theme = row.theme
@@ -33,7 +33,7 @@ var recordHit = async function(row) {
     ]})
 }
 
-var recordError = async function(row) {
+var recordError = async function (row) {
   var user = row.user
   var uaStr = row.userAgent
   var theme = row.theme
@@ -52,17 +52,17 @@ var recordError = async function(row) {
     ]})
 }
 
-var migrateHits = async function() {
+var migrateHits = async function () {
   var sqliteHits = sqliteDb.prepare('SELECT * FROM hits ORDER BY rowid')
-  console.log("Migrating hits...")
+  console.log('Migrating hits...')
   for (let row of sqliteHits.iterate()) {
     await recordHit(row)
   }
 }
 
-var migrateErrors = async function() {
+var migrateErrors = async function () {
   var sqliteErrors = sqliteDb.prepare('SELECT * FROM errors ORDER BY rowid')
-  console.log("Migrating errors...")
+  console.log('Migrating errors...')
   for (let row of sqliteErrors.iterate()) {
     await recordError(row)
   }

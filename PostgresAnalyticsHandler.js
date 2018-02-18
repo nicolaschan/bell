@@ -6,7 +6,7 @@ const {
 } = require('pg')
 const db = new Client(config.postgres)
 
-var getDevice = function(result) {
+var getDevice = function (result) {
   return (result.device.family || (result.device.vendor && result.device.model))
     ? (result.device.family || `${result.device.vendor} ${result.device.model}`)
     : 'Unknown device'

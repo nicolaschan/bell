@@ -2,7 +2,7 @@ const UAParser = require('ua-parser')
 const Database = require('better-sqlite3')
 const db = new Database('analytics.sqlite')
 
-var getDevice = function(result) {
+var getDevice = function (result) {
   return (result.device.family || (result.device.vendor && result.device.model))
     ? (result.device.family || `${result.device.vendor} ${result.device.model}`)
     : 'Unknown device'
