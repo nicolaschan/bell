@@ -32,18 +32,21 @@ const ServerAnalyticsHandler = {
   recordError: async (data) => {
     var result = UAParser.parse(data.userAgent)
     var device = getDevice(result)
-    return db.prepare('INSERT INTO errors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
+    return db.prepare(`INSERT INTO errors (user, userAgent, browser, device, os, theme, source, ip, error, version, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))`).run(
       data.id, data.userAgent, result.family, device, result.os.family,
       data.theme, data.source, data.ip, data.error, data.version)
   },
   recordServer: async (data) => {
-    return db.prepare('INSERT INTO servers VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
+    return db.prepare(`INSERT INTO servers (user, ip, version, platform, release, type, arch, node, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))`).run(
       data.id, data.ip, data.version, data.os.platform, data.os.release, data.os.type, data.os.arch, data.node)
   },
   recordHit: async (user) => {
     var result = UAParser.parse(user.userAgent)
     var device = getDevice(result)
-    return db.prepare('INSERT INTO hits VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))').run(
+    return db.prepare(`INSERT INTO hits (user, userAgent, browser, device, os, theme, source, ip, version, timestamp) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))`).run(
       user.id, user.userAgent, result.family, device, result.os.family,
       user.theme, user.source, user.ip, user.version)
   },
