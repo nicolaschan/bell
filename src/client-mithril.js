@@ -55,7 +55,7 @@ setInterval(function () {
   logger.debug('Refreshing data')
   bellTimer.reloadData()
   popupModel.refresh()
-}, 4 * 60 * 1000)
+}, 1000)// 4 * 60 * 1000)
 
 $(window).on('load', async function () {
   uiModel.setLoadingMessage('Loading')

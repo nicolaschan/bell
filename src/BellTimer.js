@@ -147,7 +147,7 @@ class BellTimer {
     }
 
     var [sources, version, correction, schedules, calendar] = await Promise.all([
-      this.requestManager.get('/api/sources/names'),
+      this.requestManager.get('/api/sources/names', []),
       this.requestManager.get('/api/version'),
       this.requestManager.get(`/api/data/${dataSource}/correction`, '0'),
       this.requestManager.get(`/api/data/${dataSource}/schedules`),
@@ -172,7 +172,7 @@ class BellTimer {
     }
 
     var ts = timesync.create({
-      server: this.requestManager.host + '/timesync',
+      server: '/timesync',
       interval: 4 * 60 * 1000
     })
 

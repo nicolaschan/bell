@@ -199,6 +199,11 @@ app.get('/api/time', (req, res) => {
     time: Date.now()
   })
 })
+app.get('/api/error', (req, res) => {
+  res.json({
+    error: 'Request failed'
+  })
+})
 
 var bodyParser = require('body-parser')
 app.use(bodyParser.json()) // to support JSON-encoded bodies

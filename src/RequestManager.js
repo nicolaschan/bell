@@ -16,10 +16,13 @@ class RequestManager {
       result = await this.request.get(url)
       this.cache[url] = result
     } catch (e) {
-      if (!defaultValue) {
-        throw new Error(`Request failed: GET ${url}`)
-      }
       result = defaultValue
+    }
+    if (result && result.error) {
+      result = defaultValue
+    }
+    if (result === undefined) {
+      throw new Error(`Request failed: GET ${url}`)
     }
     return result
   }
