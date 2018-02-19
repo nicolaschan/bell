@@ -45,6 +45,7 @@ global.requestManager = requestManager
 global.uiModel = uiModel
 global.mithrilUI = mithrilUI
 global.m = require('mithril')
+global.VERSION = require('../package.json').version
 
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging')
 
@@ -93,7 +94,8 @@ window.onunhandledrejection = async function (e) {
           name: e.reason.name,
           message: e.reason.message,
           stack: e.reason.stack
-        }
+        },
+        version: require('../package.json').version
       })
     }
   } catch (requestError) {
