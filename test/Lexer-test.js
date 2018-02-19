@@ -5,9 +5,9 @@ var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 describe('Lexer', function () {
   const {
-        lex,
-        splitAndPreserve
-    } = require('../src/Lexer')
+    lex,
+    splitAndPreserve
+  } = require('../src/Lexer')
   describe('#lexLine', function () {
     it('lex on schedule header with extra spaces', function () {
       var result = lex('* dev # Developer')

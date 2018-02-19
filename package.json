@@ -23,12 +23,14 @@
         "chart.js": "^2.7.0",
         "express": "^4.16.2",
         "jquery": "^3.1.1",
+        "karma-tap": "^4.1.3",
         "localforage": "^1.5.2",
         "lodash": "^4.17.2",
         "loggy": "^1.0.2",
         "lzutf8": "^0.4.7",
         "material-design-icons": "^3.0.1",
         "mithril": "^1.1.6",
+        "mocha": "^5.0.1",
         "pg": "^7.4.0",
         "pug": "^2.0.0-rc.4",
         "query-string": "^5.0.0",
@@ -36,6 +38,7 @@
         "roboto-fontface": "^0.9.0",
         "selectize": "^0.12.4",
         "shortid": "^2.2.6",
+        "standard": "^11.0.0",
         "timesync": "^1.0.1",
         "ua-parser-js": "^0.7.17",
         "useragent": "^2.3.0"
@@ -59,10 +62,7 @@
         "karma-firefox-launcher": "^1.0.1",
         "karma-mocha": "^1.3.0",
         "karma-spec-reporter": "0.0.32",
-        "karma-tap": "^3.1.1",
         "karma-webpack": "^2.0.5",
-        "mocha": "^4.0.1",
-        "standard": "^10.0.3",
         "uglifyjs-webpack-plugin": "^1.0.1",
         "webpack": "^3.8.1"
     }

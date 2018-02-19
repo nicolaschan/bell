@@ -1,10 +1,10 @@
 const {
-    lex,
-    drop,
-    dropEnd,
-    trim,
-    concat,
-    remove
+  lex,
+  drop,
+  dropEnd,
+  trim,
+  concat,
+  remove
 } = require('./Lexer')
 const Calendar = require('./Calendar')
 

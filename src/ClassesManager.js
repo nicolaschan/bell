@@ -13,5 +13,5 @@
   }
 
   module.exports = ClassesManager
-    // window.ClassesManager = ClassesManager;
+  // window.ClassesManager = ClassesManager;
 })()

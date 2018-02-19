@@ -39,14 +39,14 @@ class AlarmManager {
     this.bellTimer = bellTimer
     this.cookman = cookman
     this.started = false
-        // DEBUG
+    // DEBUG
     this.timeScale = bellTimer.devMode ? bellTimer.timeScale : 1
   }
 
   start () {
     this.started = true
     var min = msToMin(this.bellTimer.getTimeRemainingNumber())
-        // initialize color properly
+    // initialize color properly
     browserAction.setIcon({ path: getIconImage(min) })
 
     this.msToNext = 0

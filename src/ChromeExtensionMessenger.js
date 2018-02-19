@@ -18,7 +18,7 @@ class ChromeExtensionMessenger {
       // TODO add client success/failure messages
       logger.log('Chrome extension connection attempted', 'ChromeExtensionMessenger')
       port.onMessage.addListener(
-                msg => port.postMessage(this.respond(msg)))
+        msg => port.postMessage(this.respond(msg)))
     }
   }
 

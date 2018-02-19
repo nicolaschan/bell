@@ -2,18 +2,18 @@ const path = require('path')
 
 module.exports = function (config) {
   config.set({
-        // ... normal karma configuration
+    // ... normal karma configuration
     files: [
-            // all files ending in "_test"
+      // all files ending in "_test"
       {
         pattern: 'test/*.js',
         watched: false
       }
-            // each file acts as entry point for the webpack configuration
+      // each file acts as entry point for the webpack configuration
     ],
     frameworks: ['mocha'],
     preprocessors: {
-            // add webpack as preprocessor
+      // add webpack as preprocessor
       'test/*.js': ['webpack']
     },
 
@@ -34,20 +34,20 @@ module.exports = function (config) {
     },
 
     webpack: {
-            // karma watches the test entry points
-            // (you don't need to specify the entry option)
-            // webpack watches dependencies
+      // karma watches the test entry points
+      // (you don't need to specify the entry option)
+      // webpack watches dependencies
 
-            // webpack configuration
+      // webpack configuration
 
       node: {
         fs: 'empty'
       },
 
-            // Instrument code that isn't test or vendor code.
+      // Instrument code that isn't test or vendor code.
       module: {
         rules: [
-                    // instrument only testing sources with Istanbul
+          // instrument only testing sources with Istanbul
           {
             test: /\.js$/,
             use: {
@@ -71,8 +71,8 @@ module.exports = function (config) {
     ],
 
     webpackMiddleware: {
-            // webpack-dev-middleware configuration
-            // i. e.
+      // webpack-dev-middleware configuration
+      // i. e.
       stats: 'errors-only'
     }
   })

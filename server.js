@@ -79,12 +79,12 @@ var getMeta = cache(60, async function (source) {
   return JSON.parse(meta)
 })
 var getSource = cache(60, async function (source) {
-        // if (source.substring(0, 3) == 'gh:') {
-        //     return {
-        //         location: 'github',
-        //         repo: source.substring(3).split(':').join('/')
-        //     };
-        // }
+  // if (source.substring(0, 3) == 'gh:') {
+  //     return {
+  //         location: 'github',
+  //         repo: source.substring(3).split(':').join('/')
+  //     };
+  // }
   source = await fs.readFileAsync(`data/${source}/source.json`)
   return JSON.parse(source.toString())
 })
@@ -131,13 +131,13 @@ app.get('/gh', (req, res) => {
   res.redirect('https://github.com/nicolaschan/bell')
 })
 
-    // if (config['enable redis'])
+// if (config['enable redis'])
 app.get('/stats', (req, res) => {
   res.render('stats', {
     version: getVersion()
   })
 })
-app.get('/api/stats', async(req, res) => {
+app.get('/api/stats', async (req, res) => {
   res.json({
     totalHits: (await analyticsHandler.getTotalDailyHits()).rows,
     uniqueHits: (await analyticsHandler.getUniqueDailyHits()).rows,
@@ -149,7 +149,7 @@ app.get('/api/stats', async(req, res) => {
   })
 })
 
-app.get('/api/sources', async(req, res) => {
+app.get('/api/sources', async (req, res) => {
   var directories = fs.readdirSync('data').filter(name => fs.lstatSync(path.join('data', name)).isDirectory())
 
   var sources = []
@@ -161,7 +161,7 @@ app.get('/api/sources', async(req, res) => {
 
   res.json(sources)
 })
-app.get('/api/sources/names', async(req, res) => {
+app.get('/api/sources/names', async (req, res) => {
   var directories = fs.readdirSync('data').filter(name => fs.lstatSync(path.join('data', name)).isDirectory())
   res.json(directories)
 })
@@ -208,7 +208,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 app.set('view engine', 'pug')
 app.use('/timesync', timesyncServer.requestHandler)
 
-app.post('/api/analytics', async(req, res) => {
+app.post('/api/analytics', async (req, res) => {
   await analyticsHandler.recordHit({
     id: req.body.id,
     userAgent: req.body.userAgent,
@@ -219,7 +219,7 @@ app.post('/api/analytics', async(req, res) => {
   })
   return res.json({ success: true })
 })
-app.post('/api/errors', async(req, res) => {
+app.post('/api/errors', async (req, res) => {
   await analyticsHandler.recordError({
     id: req.body.id,
     userAgent: req.body.userAgent,

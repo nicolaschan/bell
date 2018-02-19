@@ -26,7 +26,7 @@ class BellTimer {
   loadCustomCourses () {
     var courses = this.cookieManager.get('courses')
 
-        // Make sure there is at least one section, otherwise it will infinite loop
+    // Make sure there is at least one section, otherwise it will infinite loop
     var foundSection = false
     for (let id in courses) {
       var course = courses[id]
@@ -41,7 +41,7 @@ class BellTimer {
           name: 'No sections',
           sections: [
             ['Wednesday', [0, 0],
-                            [24, 0]
+              [24, 0]
             ]
           ]
         }
@@ -169,12 +169,12 @@ class BellTimer {
     })
 
     ts.on('change', offset =>
-            this.debug('Timesync offset: ' + offset))
+      this.debug('Timesync offset: ' + offset))
 
     this.ts = ts
 
     return new Promise((resolve, reject) =>
-            ts.on('sync', _.once(() => resolve(ts))))
+      ts.on('sync', _.once(() => resolve(ts))))
   }
 
   setCorrection (correction) {

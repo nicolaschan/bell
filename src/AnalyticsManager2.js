@@ -5,7 +5,7 @@ class AnalyticsManager {
     this.requestManager = requestManager
     this.logger = logger
 
-        // Report analytics counts as a page hit
+    // Report analytics counts as a page hit
     this.newPageLoad = true
   }
 
