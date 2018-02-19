@@ -23,7 +23,7 @@ const Index = {
         })
       ]),
       m('.footer-right', (navigator.onLine) ? m('a[href=/settings]', {oncreate: m.route.link},
-                        m('i.settings-icon.icon.material-icons', 'settings')) : m('span', 'Settings not available offline'))
+        m('i.settings-icon.icon.material-icons', 'settings')) : m('span', 'Settings not available offline'))
     ]), m(Popup, {
       model: uiModel
     }), m(SchoolIndicator, {

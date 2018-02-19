@@ -30,18 +30,18 @@ const PeriodEntry = {
               disabled: !((vnode.state.enabled) ? vnode.state.enabled[period] : false)
             })),
             m('td.tableCheckbox',
-            m('label.control.control--checkbox', [
-              m('input.checkbox[type=checkbox]', {
-                onclick: m.withAttr('checked', checked => {
-                  var periods = vnode.attrs.uiModel.cookieManager.get('periods', {})
-                  periods[period] = checked ? period : 'Free'
-                  vnode.attrs.uiModel.cookieManager.set('periods', periods)
-                  vnode.state.enabled[period] = checked
+              m('label.control.control--checkbox', [
+                m('input.checkbox[type=checkbox]', {
+                  onclick: m.withAttr('checked', checked => {
+                    var periods = vnode.attrs.uiModel.cookieManager.get('periods', {})
+                    periods[period] = checked ? period : 'Free'
+                    vnode.attrs.uiModel.cookieManager.set('periods', periods)
+                    vnode.state.enabled[period] = checked
+                  }),
+                  checked: (vnode.state.enabled) ? vnode.state.enabled[period] : false
                 }),
-                checked: (vnode.state.enabled) ? vnode.state.enabled[period] : false
-              }),
-              m('.control__indicator')
-            ]))
+                m('.control__indicator')
+              ]))
           ])))),
       m('.footer-right[style=position: fixed;]', m('a[href=/settings]', {
         oncreate: m.route.link
