@@ -12,12 +12,12 @@ class Period {
 
   getTimestamp (date) {
     return new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDate(),
-            this.time.hour,
-            this.time.min,
-            0, 0)
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      this.time.hour,
+      this.time.min,
+      0, 0)
   }
 }
 

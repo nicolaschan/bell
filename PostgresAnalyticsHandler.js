@@ -2,7 +2,7 @@ const UAParser = require('useragent')
 const config = require('./config.json')
 
 const {
-    Client
+  Client
 } = require('pg')
 const db = new Client(config.postgres)
 
@@ -13,7 +13,7 @@ var getDevice = function (result) {
 }
 
 const PostgresAnalyticsHandler = {
-  initialize: async() => {
+  initialize: async () => {
     db.connect()
     await db.query(`CREATE TABLE IF NOT EXISTS hits (
         id SERIAL,
@@ -55,10 +55,10 @@ const PostgresAnalyticsHandler = {
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
   },
-  disconnect: async() => {
+  disconnect: async () => {
     return db.end()
   },
-  recordHit: async(user) => {
+  recordHit: async (user) => {
     var result = UAParser.parse(user.userAgent)
     var device = getDevice(result)
     return db.query({
@@ -68,7 +68,7 @@ const PostgresAnalyticsHandler = {
         user.id, user.userAgent, result.family, device, result.os.family, user.theme, user.source, user.ip, user.version
       ]})
   },
-  recordServer: async(user) => {
+  recordServer: async (user) => {
     return db.query({
       text: `INSERT INTO hits (userId, ip, version, timestamp) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TIMESTAMP 'now')`,
@@ -76,7 +76,7 @@ const PostgresAnalyticsHandler = {
         user.id, user.ip, user.version, user.os.platform, user.os.release, user.os.type, user.os.arch, user.node
       ]})
   },
-  recordError: async(user) => {
+  recordError: async (user) => {
     var result = UAParser.parse(user.userAgent)
     var device = getDevice(result)
     return db.query({
@@ -86,7 +86,7 @@ const PostgresAnalyticsHandler = {
         user.id, user.userAgent, result.family, device, result.os.family, user.theme, user.source, user.ip, user.error, user.version
       ]})
   },
-  getBrowserStats: async() => db.query(`WITH users_timestamp AS (
+  getBrowserStats: async () => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
@@ -96,7 +96,7 @@ const PostgresAnalyticsHandler = {
       ORDER BY hits.timestamp
     )
     SELECT browser, COUNT(DISTINCT userId) AS count FROM users GROUP BY browser`),
-  getOSStats: async() => db.query(`WITH users_timestamp AS (
+  getOSStats: async () => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
@@ -106,7 +106,7 @@ const PostgresAnalyticsHandler = {
       ORDER BY hits.timestamp
       )
     SELECT os, count(DISTINCT userId) AS count FROM users GROUP BY os`),
-  getDeviceStats: async() => db.query(`WITH users_timestamp AS (
+  getDeviceStats: async () => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
@@ -116,7 +116,7 @@ const PostgresAnalyticsHandler = {
       ORDER BY hits.timestamp
       )
     SELECT device, count(DISTINCT userId) AS count FROM users GROUP BY device`),
-  getThemeStats: async() => db.query(`WITH users_timestamp AS (
+  getThemeStats: async () => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
@@ -126,7 +126,7 @@ const PostgresAnalyticsHandler = {
       ORDER BY hits.timestamp
       )
     SELECT theme, count(DISTINCT userId) AS count FROM users GROUP BY theme`),
-  getSourceStats: async() => db.query(`WITH users_timestamp AS (
+  getSourceStats: async () => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
@@ -136,7 +136,7 @@ const PostgresAnalyticsHandler = {
       ORDER BY hits.timestamp
       )
     SELECT source, count(DISTINCT user) AS count FROM users GROUP BY source`),
-  getUsers: async() => db.query(`WITH users_timestamp AS (
+  getUsers: async () => db.query(`WITH users_timestamp AS (
       SELECT userId, MAX(timestamp) AS timestamp
       FROM hits GROUP BY userId),
     users AS (
@@ -146,9 +146,9 @@ const PostgresAnalyticsHandler = {
       ORDER BY hits.timestamp
       )
     SELECT * FROM users`),
-  getTotalDailyHits: async() => db.query(`SELECT timestamp::date AS date, count(*) AS count 
+  getTotalDailyHits: async () => db.query(`SELECT timestamp::date AS date, count(*) AS count 
     FROM hits GROUP BY date`),
-  getUniqueDailyHits: async() => db.query(`SELECT timestamp::date AS date, count(DISTINCT userId) AS count 
+  getUniqueDailyHits: async () => db.query(`SELECT timestamp::date AS date, count(DISTINCT userId) AS count 
     FROM hits GROUP BY date`)
 }
 module.exports = PostgresAnalyticsHandler

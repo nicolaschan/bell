@@ -6,7 +6,7 @@ class Schedule {
 
     this.periods = periods.sort((a, b) => (a.time.hour * 60 + a.time.min) - (b.time.hour * 60 + b.time.min))
 
-        // Remove consecutive free periods
+    // Remove consecutive free periods
     var i = 0
     while (i < this.periods.length) {
       if (this.periods[i].display(this.bindings) === 'Free' || this.periods[i].display(this.bindings) === 'Passing to Free') {
@@ -20,7 +20,7 @@ class Schedule {
       i++
     }
 
-        // Calculate number of periods
+    // Calculate number of periods
     var count = 0
     var previous
     for (let i = 0; i < this.periods.length; i++) {

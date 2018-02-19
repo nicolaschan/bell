@@ -26,7 +26,7 @@ class CookieManager {
 
   getAll () {
     return cookieSerializer.deserializeAll(
-            JSON.parse(JSON.stringify(localStorage)))
+      JSON.parse(JSON.stringify(localStorage)))
   }
 }
 

@@ -9,7 +9,7 @@ class CookieManager {
   constructor (cookies) {
     this.cookies = cookies
     chrome.storage.local.clear(() =>
-            chrome.storage.local.set(cookies))
+      chrome.storage.local.set(cookies))
   }
 
   get (key, defaultValue) {
@@ -32,25 +32,25 @@ class CookieManager {
 }
 
 var CookieManagerFactory = async function () {
-    // Offline => get cookies from local storage
+  // Offline => get cookies from local storage
   var items = await new Promise((resolve, reject) =>
-        chrome.storage.local.get(resolve))
+    chrome.storage.local.get(resolve))
   var cookieManager = new CookieManager(items);
 
-  (async() => {
-        // Load data in the background (so it opens faster)
+  (async () => {
+    // Load data in the background (so it opens faster)
     var frame = $('<iframe src="https://countdown.zone"></iframe>')
     $('#iframe').append(frame)
 
     var port = await new Promise((resolve, reject) =>
-            chrome.runtime.onConnectExternal.addListener(resolve))
+      chrome.runtime.onConnectExternal.addListener(resolve))
     var cookies = await new Promise((resolve, reject) => {
       port.onMessage.addListener(msg => resolve(msg.value))
     })
     cookies = cookieSerializer.serializeAll(cookies)
     cookieManager.cookies = cookies
     chrome.storage.local.clear(() =>
-            chrome.storage.local.set(cookies))
+      chrome.storage.local.set(cookies))
   })()
 
   return cookieManager

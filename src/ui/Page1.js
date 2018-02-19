@@ -47,7 +47,7 @@ var ScheduleName = {
   }
 }
 var updateGraphics = function (vnode) {
-    // return;
+  // return;
   var c = vnode.dom
   var bellTimer = vnode.attrs.model.bellTimer
   var themeManager = vnode.attrs.model.themeManager
