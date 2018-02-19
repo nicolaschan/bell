@@ -21,9 +21,9 @@ class Calendar {
 
   getSchedule (date) {
     var {
-            name,
-            display
-        } = this.special[Calendar.dateToString(date)] || this.week[Calendar.dayOfWeek(date)]
+      name,
+      display
+    } = this.special[Calendar.dateToString(date)] || this.week[Calendar.dayOfWeek(date)]
     var schedule = this.schedules[name]
     schedule = schedule.overrideDisplay(display)
     return schedule

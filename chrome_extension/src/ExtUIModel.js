@@ -3,9 +3,9 @@ class ExtUIModel {
     this.bellTimer = bellTimer
     this.cookieManager = cookieManager
     this.themeManager = themeManager
-        // this.analyticsManager = analyticsManager;
+    // this.analyticsManager = analyticsManager;
     this.requestManager = requestManager
-        // this.popupModel = popupModel;
+    // this.popupModel = popupModel;
     this.state = {
       loadingMessage: {
         visible: true,

@@ -1,5 +1,5 @@
 module.exports = function (url, cookieManager) {
-    // from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+  // from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
   var getParameterByName = function (name, url) {
     name = name.replace(/[[\]]/g, '\\$&')
     var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)')
@@ -8,7 +8,7 @@ module.exports = function (url, cookieManager) {
     if (!results[2]) return ''
     return decodeURIComponent(results[2].replace(/\+/g, ' '))
   }
-    // end stackoverflow
+  // end stackoverflow
 
   var secretParameter = getParameterByName('secret', url)
   var enabledSecrets = cookieManager.get('secrets', [])

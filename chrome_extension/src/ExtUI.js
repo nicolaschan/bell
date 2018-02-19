@@ -51,10 +51,10 @@ class ExtUI {
         }, [m(Page1, {
           model: uiModel
         }), m('.centered'),
-          m('.footer-right', m(`a[href=${hostname}/settings]`,
-                        m('i.settings-icon.material-icons', {
-                          onclick: openSettingsTab
-                        }, 'settings')))
+        m('.footer-right', m(`a[href=${hostname}/settings]`,
+          m('i.settings-icon.material-icons', {
+            onclick: openSettingsTab
+          }, 'settings')))
         ]), m(SchoolIndicator, {
           model: uiModel
         })]

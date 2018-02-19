@@ -62,12 +62,12 @@ var getTime = function (time) { // time is a string array
 }
 // like the old parsing function, but with more validation
 var parseTime = function (timestring) {
-    /**
+  /**
      * 1) user enters either a single number (hour) or hour:min
      * 2) user enters either 24hr or am/pm
      */
   timestring = timestring.trim()
-    // check if AM/PM is specified
+  // check if AM/PM is specified
   var tokens = timestring.split(/\s/)
 
   var word = (arr, x) => arr.toUpperCase().indexOf(x) > -1
@@ -142,7 +142,7 @@ var setFormState = function (courseId) {
     name: '',
     sections: [
       ['Monday', [],
-                []
+        []
       ]
     ]
   }
@@ -150,7 +150,7 @@ var setFormState = function (courseId) {
   $('#course-name').val(course.name)
   for (var section of course.sections) {
     $('#enter-section').append(
-            generateSectionInputField(section[0], displayTimeArray(section[1]), displayTimeArray(section[2])))
+      generateSectionInputField(section[0], displayTimeArray(section[1]), displayTimeArray(section[2])))
   }
 }
 

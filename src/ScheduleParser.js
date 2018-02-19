@@ -1,9 +1,9 @@
 const {
-    lex,
-    drop,
-    trim,
-    concat,
-    remove
+  lex,
+  drop,
+  trim,
+  concat,
+  remove
 } = require('./Lexer')
 
 const Schedule = require('./Schedule')
@@ -12,7 +12,7 @@ const Period = require('./Period')
 var parseLine = function (line) {
   var [head, ...tokens] = drop(' ', lex(line))
   if (head === '*') {
-        // it is a schedule header
+    // it is a schedule header
     tokens = trim(' ', tokens)
     var name = tokens[0]
     tokens = tokens.slice(1)
@@ -25,7 +25,7 @@ var parseLine = function (line) {
       display: display || name
     }
   } else {
-        // it is a schedule entry
+    // it is a schedule entry
     var [hour, min] = head.split(':')
     var time = {
       hour: parseInt(hour),
