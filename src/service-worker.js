@@ -17,16 +17,6 @@ const cachedResources = [
   '/api/error'
 ]
 
-const urlMatch = function (url, ...matching) {
-  url = url.split('/').slice(3)
-  for (let i = 0; i < matching.length; i++) {
-    if (url[i] !== matching[i]) {
-      return false
-    }
-  }
-  return true
-}
-
 async function fromCache (request) {
   var cache = await caches.open(CACHE)
   var matching = await cache.match(request)
@@ -74,12 +64,12 @@ self.addEventListener('activate', evt => {
 self.addEventListener('fetch', function (evt) {
   evt.respondWith(
     fromNetwork(evt.request, 4000)
-    .catch(function (e) {
-      logger.log(`${evt.request.url} serving from cached`, 'ServiceWorker')
-      return fromCache(evt.request)
-    })
-    .catch(function (e) {
-      return fromCache('/api/error')
-    })
+      .catch(function (e) {
+        logger.log(`${evt.request.url} serving from cached`, 'ServiceWorker')
+        return fromCache(evt.request)
+      })
+      .catch(function (e) {
+        return fromCache('/api/error')
+      })
   )
 })
