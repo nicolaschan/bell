@@ -4,6 +4,7 @@ const root = document.body
 const Index = require('./ui/Index')
 const Settings = require('./ui/Settings')
 const PeriodEntry = require('./ui/PeriodEntry')
+const Classes = require('./ui/Classes')
 
 const addUIModel = function (element, uiModel) {
   return {
@@ -35,7 +36,8 @@ class MithrilUI {
     m.route(root, '/', {
       '/': addUIModel(Index, uiModel),
       '/settings': addUIModel(Settings, uiModel),
-      '/periods': addUIModel(PeriodEntry, uiModel)
+      '/periods': addUIModel(PeriodEntry, uiModel),
+      '/classes': addUIModel(Classes, uiModel)
     })
   }
 

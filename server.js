@@ -14,6 +14,7 @@ const request = Promise.promisifyAll(require('request'))
 const os = require('os')
 const timesyncServer = require('timesync/server')
 
+const cacheTime = 10
 const analyticsHandler = config.postgres.enabled ? require('./PostgresAnalyticsHandler') : require('./SqliteAnalyticsHandler')
 
 var previousCheck = 0
@@ -38,10 +39,10 @@ var cache = function (time, f) {
   }
 }
 
-var getVersion = cache(60, function () {
+var getVersion = cache(cacheTime, function () {
   return JSON.parse(fs.readFileSync('./package.json').toString()).version
 })
-var getMessage = cache(60, function () {
+var getMessage = cache(cacheTime, function () {
   return JSON.parse(fs.readFileSync(`./data/message.json`).toString())
 })
 
@@ -63,20 +64,20 @@ var fetch = async function (source, file) {
       return res.body
   }
 }
-var getCorrection = cache(60, async function (source) {
+var getCorrection = cache(cacheTime, async function (source) {
   return fetch(source, 'correction.txt')
 })
-var getSchedules = cache(60, async function (source) {
+var getSchedules = cache(10, async function (source) {
   return fetch(source, 'schedules.bell')
 })
-var getCalendar = cache(60, async function (source) {
+var getCalendar = cache(cacheTime, async function (source) {
   return fetch(source, 'calendar.bell')
 })
-var getMeta = cache(60, async function (source) {
+var getMeta = cache(cacheTime, async function (source) {
   var meta = await fetch(source, 'meta.json')
   return JSON.parse(meta)
 })
-var getSource = cache(60, async function (source) {
+var getSource = cache(cacheTime, async function (source) {
   // if (source.substring(0, 3) == 'gh:') {
   //     return {
   //         location: 'github',
@@ -343,7 +344,7 @@ var checkForNewVersion = async function () {
     logger.warn('You may not be online — check your internet connection')
   }
 }
-setInterval(checkForNewVersion, 24 * 60 * 60 * 1000)
+setInterval(checkForNewVersion, 24 * cacheTime * cacheTime * 1000)
 
 analyticsHandler.initialize()
   .then(startWebServer)

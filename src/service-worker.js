@@ -1,7 +1,7 @@
 /* global self, caches, fetch */
 // Based on https://serviceworke.rs/strategy-network-or-cache_service-worker_doc.html
 
-const VERSION = require('../package.json').version + 'g'
+const VERSION = require('../package.json').version
 var CACHE = `cache-${VERSION}`
 const SimpleLogger = require('./SimpleLogger')
 const logger = new SimpleLogger()
