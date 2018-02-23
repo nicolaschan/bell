@@ -1,0 +1,278 @@
+body {
+    font-family: Roboto, sans-serif;
+    transition: background-color 3s ease;
+    margin: 0;
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    overflow-x: hidden;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/roboto/Roboto-Regular.eot); /* For IE6-8 */
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url(/fonts/roboto/Roboto-Regular.woff2) format('woff2'),
+    url(/fonts/roboto/Roboto-Regular.woff) format('woff'),
+    url(/fonts/roboto/Roboto-Regular.ttf) format('truetype');
+}
+
+
+/* from http://google.github.io/material-design-icons/#icon-font-for-the-web */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/icons/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url(/icons/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
+    url(/icons/iconfont/MaterialIcons-Regular.woff) format('woff'),
+    url(/icons/iconfont/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.container {
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    position: relative;
+    -webkit-backface-visibility: hidden;
+    overflow-x: hidden;
+    background-position: center;
+    animation: fade-in 0.5s;
+    overflow-y: hidden;
+}
+
+.background {
+    transition: opacity 3s ease;
+}
+
+.fill-parent {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.no-classes {
+    color: #999999;
+    font-style: italic;
+    font-size: 1.5em;
+}
+
+.school-indicator {
+    animation: fade-out-school-indicator 4s;
+    opacity: 0;
+    transition: opacity 2s ease;
+}
+.school-indicator:hover {
+    opacity: 0.5;
+}
+@keyframes fade-out-school-indicator {
+    from {opacity: 0.5;}
+    to {opacity: 0;}
+}
+
+.loading {
+    text-align: center;
+    font-size: 1.5em;
+    position: fixed;
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+}
+
+.loading-icon {
+    font-size: 6em;
+}
+.spin {
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { 100% { transform:rotate(-360deg); } }
+
+.no-decoration {
+    text-decoration: none;
+}
+.popup {
+    margin: 1em;
+    font-size: 0.8em;
+    padding: 0.2em;
+}
+.link:link, .link:visited {
+    text-decoration: none;
+}
+.link:hover {
+    text-decoration: underline;
+}
+.dismiss-icon {
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+    font-size: 1em;
+}
+.dismiss {
+    font-size: 1em;
+}
+.dismiss:link, .dismiss:visited {
+    color: #aaaaaa;
+    transition: color 0.5s ease;
+}
+.dismiss:hover {
+    color: red;
+}
+
+.faded {
+    opacity: 0.5;
+}
+
+.top {
+    position: absolute;
+    top: 0px;
+}
+.right {
+    position: absolute;
+    right: 0px;
+}
+.left {
+    position: absolute;
+    left: 0px;
+}
+.bottom {
+    position: absolute;;
+    bottom: 0px;
+}
+
+.down-arrow {
+    position: fixed;
+    bottom: 5%;
+    left: 50%;
+    transform: translate(-50%, -5%);
+    transition: opacity 1s linear;
+    font-size: 8em;
+    cursor: pointer;
+}
+.pulse {
+    animation: pulse 4s linear infinite;
+}
+@keyframes pulse { 
+    0% { opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0; }
+}
+
+.footer-right {
+    position: absolute;
+    right: 1em;
+    bottom: 1em;
+    color: #aaa;
+}
+.settings-icon {
+    color: #aaa;
+    cursor: pointer;
+    transition: color 1s ease, transform 1s ease;
+    font-size: 4em;
+}
+.settings-icon:hover {
+    color: black;
+    transform: rotate(2rad);
+}
+
+#page1 {
+    background-color: yellow;
+}
+
+.time-text {
+    z-index: 1;
+}
+
+.fade-in {
+    animation: fade-in 0.5s;
+}
+@keyframes fade-in {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+.fade-out {
+    animation: fade-out 0.5s;
+}
+@keyframes fade-out {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
+div.time {
+    font-size: 10em;
+    transition: color 3s ease;
+}
+.period {
+    font-size: 3em;
+    transition: color 3s ease;
+}
+.schedule {
+    font-size: 3em;
+    transition: color 3s ease;
+    opacity: 0.3;
+}
+
+table {
+    font-size: 1.2em;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+td {
+    padding: 0.5em;
+}
+td.time {
+    color: #999;
+    text-align: right;
+}
+tr.current {
+    background-color: #eee;
+    font-size: 1.75em;
+}
+tr.current td {
+    padding: 0.3em;
+}
+tr.completed {
+    color: #999;
+    text-decoration: line-through;
+}
+
+canvas {
+    opacity: 0.1;
+}
+

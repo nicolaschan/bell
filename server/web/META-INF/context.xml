@@ -1,0 +1,17 @@
+
+<Context>  
+    <Resource name="jdbc/bell" 
+              auth="Container" 
+              type="javax.sql.DataSource" 
+              driverClassName="org.sqlite.JDBC"
+              url="jdbc:sqlite://Users/jhshi/Documents/web/apache-tomcat-9.0.2/analytics.sqlite"
+              factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory">
+    </Resource>
+
+    <Resource name="bean/ErrorBean" auth="Container"
+              type="com.countdownzone.server.ErrorBean"
+              factory="org.apache.naming.factory.BeanFactory"
+              dbURL="jdbc:sqlite://Users/jhshi/Documents/web/apache-tomcat-9.0.2/analytics.sqlite"
+              postgres="false">
+    </Resource>
+</Context>

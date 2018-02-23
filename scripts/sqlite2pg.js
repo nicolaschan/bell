@@ -12,7 +12,7 @@ const pgHandler = require('../PostgresAnalyticsHandler.js')
 var getDevice = function (result) {
   return (result.device.family || (result.device.vendor && result.device.model))
     ? (result.device.family || `${result.device.vendor} ${result.device.model}`)
-    : 'Unknown device'
+    : 'Other'
 }
 
 var recordHit = async function (row) {
@@ -43,12 +43,12 @@ var recordError = async function (row) {
   var error = row.error
   var result = UAParser.parse(uaStr)
   var device = getDevice(result)
-  console.log(user, uaStr, result.ua.family, device, result.os.family, theme, source, ip, error, timestamp)
+  console.log(user, result.family, device, result.os.family, theme, source, ip, error, timestamp)
   return pgDb.query({
     text: `INSERT INTO errors (userId, userAgent, browser, device, os, theme, source, ip, error, timestamp) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
     values: [
-      user, uaStr, result.ua.family, device, result.os.family, theme, source, ip, error, timestamp
+      user, uaStr, result.family, device, result.os.family, theme, source, ip, error, timestamp
     ]})
 }
 
