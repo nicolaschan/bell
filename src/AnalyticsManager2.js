@@ -29,7 +29,8 @@ class AnalyticsManager {
         newPageLoad: this.newPageLoad,
         theme: this.themeManager.currentThemeName,
         userAgent: window.navigator.userAgent,
-        source: this.cookieManager.get('source')
+        source: this.cookieManager.get('source'),
+        version: require('../package.json').version
       })
     } catch (e) {
       this.logger.warn('Analytics sending failed')
