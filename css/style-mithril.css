@@ -110,6 +110,31 @@ body {
     font-size: 1.5em;
 }
 
+#enter-section input,
+#enter-section select {
+    margin: 0.1em 0.5em;
+}
+select {
+    -webkit-appearance: none;
+    -webkit-border-radius: 0px;
+    width: 13em;
+    font-family: 'Roboto', sans-serif;
+    border: 1px solid #dddddd;
+    border-radius: 0px;
+    font-size: 20px;
+    padding: 10px;
+    background: white;
+    outline: none;
+    transition: border-color 1s ease;
+}
+select:focus {
+    border-color: darkturquoise;
+}
+
+.course-input {
+    text-align: center;
+}
+
 .school-indicator {
     animation: fade-out-school-indicator 4s;
     opacity: 0;
@@ -121,6 +146,30 @@ body {
 @keyframes fade-out-school-indicator {
     from {opacity: 0.5;}
     to {opacity: 0;}
+}
+
+.selectize-dropdown, .selectize-input {
+    border-radius: 0;
+    border: 1px solid #fff;
+    line-height: 32px;
+    font-size: 16px;
+}
+.selectize-input input {
+    font-size: 16px;
+}
+.selectize-input.dropdown-active {
+    border-radius: 0;
+    border-color: darkturquoise;
+}
+
+.selectize-control.single .selectize-input {
+    background-color: white;
+    background-image: none;
+    border-color: #eee;
+}
+
+.selectize-dropdown.single {
+    border-color: #eee;
 }
 
 .loading {
@@ -153,6 +202,18 @@ body {
 .link:hover {
     text-decoration: underline;
 }
+
+.dismiss-enter i {
+    font-size: 16px;
+}
+.dismiss-enter:link, .dismiss-enter:visited {
+    color: #aaaaaa;
+    transition: color 0.5s ease;
+}
+.dismiss-enter:hover {
+    color: red;
+}
+
 .dismiss-icon {
     margin-top: 0.3em;
     margin-bottom: 0.3em;
@@ -202,6 +263,67 @@ body {
 .pulse {
     animation: pulse 4s linear infinite;
 }
+
+input.course-name {
+    margin: 2em 0.5em;
+    width: 20em;
+}
+input.subscribe-name {
+    margin-bottom: 0.3em;
+}
+
+ul.class-list {
+    padding: 0;
+}
+
+ul.class-list li {
+    font-size: 1.2em;
+    list-style: none;
+    margin: 0.2em 8em;
+    padding: 0.3em;
+    border: 1px solid #ddd;
+    font-weight: 700;
+}
+
+table.sections tbody tr td {
+    color: #555;
+    font-size: 0.7em;
+    font-weight: 400;
+    margin: 0;
+    border: none;
+    padding: 0;
+    padding-right: 0.4em;
+}
+table.sections tbody tr td.day {
+    font-weight: 800;
+}
+
+a.delete-link:link,
+a.delete-link:visited {
+    font-weight: 300;
+    text-decoration: none;
+    font-size: 0.7em;
+    color: #aaa;
+}
+a.delete-link:hover {
+    color: red;
+}
+a.delete-link {
+    transition: color 0.6s ease;
+}
+
+a.course-link:link,
+a.course-link:visited {
+    color: #000;
+    text-decoration: none;
+}
+a.course-link:hover {
+    color: darkturquoise;
+}
+a.course-link {
+    transition: color 0.6s ease;
+}
+
 @keyframes pulse { 
     0% { opacity: 0; }
     50% { opacity: 0.5; }

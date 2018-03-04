@@ -101,19 +101,19 @@ app.get('/m', (req, res) => {
   })
 })
 app.get('/periods', (req, res) => {
-  res.render('periods')
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
 app.get('/classes', (req, res) => {
-  res.render('classes')
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
 app.get('/enter', (req, res) => {
-  res.render('enter')
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
 app.get('/settings', (req, res) => {
-  res.render('settings')
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
 app.get('/blog', (req, res) => {
-  res.render('blog')
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
 app.get('/bin/service-worker.js', (req, res) => {
   res.set('Service-Worker-Allowed', '/')

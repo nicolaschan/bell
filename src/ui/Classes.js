@@ -1,11 +1,57 @@
 const m = require('mithril')
 
-const Index = {
+var displayTimeArray = function (time) {
+  var [hour, min] = time
+  var part = (hour >= 12) ? 'pm' : 'am'
+
+  hour = (hour > 12) ? hour - 12 : hour
+  min = min ? ':' + padNumber(min, 2) : ''
+
+  return hour + min + part
+}
+
+var padNumber = function (number, padding) {
+  var string = number.toString()
+  while (string.length < padding) { string = '0' + string }
+  return string
+}
+
+var deleteClass = function (id, cookieManager) {
+  var classes = cookieManager.get('courses', {})
+  delete classes[id]
+  cookieManager.set('classes', classes)
+}
+
+const Classes = {
   view: function (vnode) {
     return [
-      m('.header', m('h1', 'Enter Classes'))
+      m('.header', m('h1', 'Enter Classes')),
+      m('.add-link', m('a.add[href=/enter]', {
+        oncreate: m.route.link
+      }, '+ Add Class')),
+      m('ul.class-list#class-list', Object.keys(
+        vnode.attrs.uiModel.cookieManager.get('courses', {})).map(id => m('li', [
+        m('a.course-link', {
+          href: `/enter?course=${id}`,
+          oncreate: m.route.link
+        }, vnode.attrs.uiModel.cookieManager.get('courses', {})[id].name),
+        m('table.sections', m('tbody', [
+          ...vnode.attrs.uiModel.cookieManager.get('courses', {})[id].sections.map(section => m('tr', [
+            m('td.day', section[0]),
+            m('td', `${displayTimeArray(section[1])} - ${displayTimeArray(section[2])}`)
+          ])),
+          m('tr', [
+            m('a.delete-link[href=javascript:void(0);]', {
+              onclick: () => deleteClass(id, vnode.attrs.uiModel.cookieManager)
+            }, 'Delete')
+          ])
+        ]))
+      ]))),
+      m('.footer-right[style=position: fixed;]', m('a[href=/settings]', {
+        oncreate: m.route.link
+      }, m('i.done-icon.icon.material-icons', 'done')))
     ]
   }
 }
 
-module.exports = Index
+module.exports = Classes

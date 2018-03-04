@@ -37,8 +37,11 @@ const Settings = {
         }, 'Edit Classes') : m('a.add#edit-classes-button[href=/periods]', {
           oncreate: m.route.link
         }, 'Edit Periods')),
-        m('.footer-right[style=position: fixed;]', m('a[href=/]', {
-          oncreate: m.route.link
+        m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
+          onclick: () => {
+            vnode.attrs.uiModel.bellTimer.reloadData()
+            m.route.set('/')
+          }
         }, m('i.done-icon.icon.material-icons', 'done')))
       ])
     ]
