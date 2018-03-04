@@ -59,6 +59,7 @@ setInterval(function () {
 }, 60 * 1000)
 
 $(window).on('load', async function () {
+  logger.info(`bell-countdown version ${VERSION}`)
   uiModel.setLoadingMessage('Loading')
   await cookieManager.initialize()
   processQuery(window.location.href, cookieManager)
