@@ -7,7 +7,7 @@
 [![devDependencies Status](https://david-dm.org/nicolaschan/bell/dev-status.svg)](https://david-dm.org/nicolaschan/bell?type=dev)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/users/pkeeekfbjjpdkbijkjfljamglegfaikc.svg)](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc)
 
-> Waiting for class to end since 2016
+> It doesn't matter what time it is if you don't know when you have to do it
 
 Bell is a **synchronized timer that counts down to the next time the bell rings at school**. A live instance of this program is currently running at [countdown.zone](https://countdown.zone) (formerly [bell.lahs.club](https://bell.lahs.club)).
 - [Chrome extension](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc) originally developed by [noloerino](https://github.com/noloerino/bell).
