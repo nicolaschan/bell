@@ -45,7 +45,8 @@ global.requestManager = requestManager
 global.uiModel = uiModel
 global.mithrilUI = mithrilUI
 global.m = require('mithril')
-global.VERSION = require('../package.json').version
+const VERSION = require('../package.json').version
+global.VERSION = VERSION
 
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging')
 
