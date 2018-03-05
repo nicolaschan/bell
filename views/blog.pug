@@ -1,0 +1,135 @@
+extends generic.pug
+block body
+  script(type="text/javascript", src="/timesync/timesync.js")
+  script(type="text/javascript", src="/bin/client.js?v=" + version)
+  .blog-header#page1
+    h1.time bell.lahs.club blog
+  .blog-container
+    //- a(href="https://goo.gl/forms/z0WEO9XZFKxJP9VG2", target="_blank")
+    //-   .message-header Take the bell.lahs.club survey!
+    .article-header
+      h2 End of the year
+      span.blog-subtitle Nicolas Chan &mdash; May 22, 2017
+    .article-body
+      p What a weird experience. Last semester, I was fed up with remembering the schedule so I made a timer. Then lots of people started using my timer. And before I knew it, the news of my fancy timer had spread like wildfire across the school, generating hundreds of hits per day from teachers and students alike. 
+      p I&#8217;d like to know what you all thought about using my timer, so 
+        a(href="https://goo.gl/forms/z0WEO9XZFKxJP9VG2", target="_blank") I made a short survey
+        | . I really value your feedback because if it weren&#8217;t for you, the hundreds of timer users, page 35 of the yearbook would be a lot less exciting without me on it.
+      p Next year, I&#8217;m off to college and the future of my timer is uncertain. I think I will maintain it for at least next year, but it will be more difficult without being here at Los Altos to hear the announcements. I have some plans in mind for a more long-term solution which involves allowing users to set personal schedules.
+      p If you have any ideas or want to contact me for any other reason, you can include your message in your survey response or email me at 
+        a(href="mailto:bell@lahs.club") bell@lahs.club
+        | . If you happen to know a bit of JavaScript, you can also 
+        a(href="https://github.com/nicolaschan/bell", target="_blank") contribute to the project
+        | .
+      p Have a great summer! 
+        span#timerSentence You only have 
+          span#hours
+          span#minutes
+          span#seconds
+          |  left until school starts up again.
+        script.
+          var endDate = new Date('2017-08-14 8:05').getTime();
+          var updateSentence = function() {
+          var secondsRemaining = Math.round((endDate - new Date().getTime()) / 1000);
+          if (secondsRemaining < 0)
+            return $('#timerSentence').hide();
+          var hours = Math.floor(secondsRemaining / 60 / 60);
+          var minutes = Math.floor(secondsRemaining / 60 % 60);
+          var seconds = Math.floor(secondsRemaining % 60);
+          if (hours == 0)
+            $('#hours').hide();
+          else
+            $('#hours').show();
+          if (minutes == 0)
+            $('#minutes').hide();
+          else
+            $('#minutes').show();
+          $('#hours').text(hours + ' ' + ((hours == 1) ? 'hour' : 'hours') + ((minutes == 0) ? ' and ' : ', '));
+          $('#minutes').text(minutes + ' ' + ((minutes == 1) ? 'minute' : 'minutes') + ((hours == 0) ? '' : ',') + ' and ');
+          $('#seconds').text(seconds + ' ' + ((seconds == 1) ? 'second' : 'seconds'));
+          };
+          updateSentence();
+          setInterval(updateSentence, 1000);
+      p.signature &mdash; Nick
+    .article-header
+      h2 -4294967295
+      span.blog-subtitle Jonathan Shi &mdash; May 21, 2017
+    .article-body
+      p Nicolas approached me a couple days ago and told me he would be starting a blog for bell.lahs.club, which is especially interesting given that we&#8217;ll be graduating in less than two weeks. I&#8217;m told the domain is being passed on though, so I guess this is for posterity.
+      p I guess an introduction is in order. I&#8217;m Jonathan Shi, graduating senior, headed to Berkeley in EECS next year. I wrote the Chrome extension for bell (which is the reason Nick said I could write a post, 
+        a(href="https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc", target="_blank") downloadable here
+        | ), and I&#8217;m one of Nick&#8217;s roommates next year. He told me I could write about anything here, so I&#8217;ll write about a few things: 1) my prior programming experience, 2) the reason I undertook this project, and 3) a little bit of the technical side of stuff that happened over the course of this project.
+      h3 My life story
+      p Anyway, here&#8217;s my life story.
+      p Somewhat ironically, I didn&#8217;t really get into coding until this year, after my mom forced me to take an online intro Java course throughout second semester junior year. It was interesting, but not all that inspiring. Then I did a summer thing at COSMOS UC Davis, and one of the things I did was a lot of coding in GNU Octave (a free version of Matlab). I thought it was interesting, so I started learning more code. Throughout the past year, I&#8217;ve learned a decent amount of Java (thanks to APCS), Python (thanks to Francis in Computer/Programming Club meetings), a decent amount of Haskell (thanks to Nick and 
+        a(href="http://learnyouahaskell.com/chapters", target="_blank") Learn You a Haskell
+        | , and, obviously, a decent amount of Javascript.
+      p Long story short, it doesn&#8217;t take a whole lot of programming experience to do something fairly substantive if you put a lot of effort into it; while writing the Chrome extension wasn&#8217;t all that difficult since most of the difficult code (like that governing the bell schedule and stuff) was already written by Nick, I still managed to figure things out with barely a year of coding experience.
+      h3 Why I did this
+      p The inspiration for this project wasn&#8217;t entirely altruistic &mdash; my labor of Javascript love/hate was 
+        a(href="https://physics.lahs.club", target="_blank") physics.lahs.club
+        | , if you&#8217;ll excuse the shameless self-promotion. Rather, one of the requirements for the senior project (a really big research project on a topic of your choice in senior English that also requires a &#8220;hands-on project&#8221; related to your topic).
+      p I actually made the Chrome extension for my project. Take a guess at what my topic was.
+      br
+      br
+      br
+      p Copyright law.
+      p It&#8217;s related, trust me. Here&#8217;s how:
+      ul
+        li The DMCA (Digital Millenium Copyright Act, 1998) governs the enforcement of copyright on the Internet and on digital devices, and its second provision (17 USC §1201) makes it illegal to circumvent &#8220;technological measure that effectively controls access to a work protected under this title&#8221; (
+          a(href="https://www.law.cornell.edu/uscode/text/17/1201", target="_blank") source
+          | ). Basically, if a company encrypts their software/firmware, its illegal for users to break that encryption.
+        li One of the many problems this causes is that users have no way of knowing what their software might be doing because the source code is unviewable, leading to situations where companies are being evil in a Google &#8220;don&#8217;t be evil&#8221; kind of way. That is, they&#8217;re taking their users&#8217; information, or worse, creating security vulnerabilities (which I don&#8217;t feel like explaining right now, if you want to read more, refer to 
+          a(href="https://www.theguardian.com/technology/blog/2014/feb/05/digital-rights-management", target="_blank") this piece
+          | ). One possible solution to this issue is…
+        li Free software, where, as defined by the 
+          a(href="https://www.gnu.org/philosophy/free-sw.en.html", target="_blank") GNU Project
+          | , is software that lets users run, study, redistribute, and modify the program at leisure. The license with which a project is distributed, indicating how it may/may not be used, is protected by copyright law.
+        li Free and open source software are not technically the same thing, but the nice thing about bell is that it&#8217;s both. So I joined it.
+      p However, bell was not the first open source project I tried to work on. I spent a couple weeks trawling github and various other sites for a project within my skill range, until I finally found a fairly large one that looked good. Then I tried installing all the dependencies (vagrant, docker, and some other random node stuff that I don&#8217;t want to deal with) and it failed, so I gave up and asked Nick if I could help with bell somehow. Even after that, a Chrome extension was not my first option.
+      p First, I wanted to write an iOS app (although its usefulness would be rather dubious), tried learning Swift and Xcode, but gave up after trying to figure out how to parse JSON and send HTTP requests and then learning that stackoverflow answers applying to Swift 2 might not work in Swift 3.
+      p I then tried to write an Android app, because Android is written in Java/XML and I know Java. But Android&#8217;s libraries are kind of messy, and I didn&#8217;t want to deal with JSON in a strongly typed language, so I gave up on that.
+      p That left me good old Javascript. Turns out Chrome extensions are written in Javascript with fairly straightforward APIs, so I settled on that. After a couple weeks of coding (and heavy consulting with Nick throughout the process), I got a working version. The experience made me learn to both appreciate and hate Javascript more, for reasons that I&#8217;m sure are already well-documented elsewhere.
+      h3 What I actually did
+      p Throughout most of the process of making the extension, I was working in parallel with Nick. Most of the Chrome-exclusive stuff is my work only, but I asked him a lot of questions about how to do things, and also how to use the bell libraries he wrote for the main site.
+      p Writing new code actually wasn&#8217;t the only thing I did. I also helped squish bugs in the code for the main site: for example, you know that bug where class/theme cookies would disappear after a session instead of a year like they were supposed to? Turns out that was a flipped conditional operator in CookieManager that I noticed in Wind Ensemble with Nick one day. You&#8217;re welcome.
+      p I also wrote a bunch of documentation; in some places it was easier than others. If I recall correctly, about a third of the BellTimer API and most of ThemeManager and CookieManager are documented, hopefully accurately.
+      p A few internal changes on the site also happened while I was working with Nick; for example, you&#8217;ll now notice that the site&#8217;s cookies are stored in base64. That mostly happened because Google&#8217;s cookies API is super weird about how it deals with plaintext, so he decided to store everything in base64 mostly for my benefit. Schedule data is now also stored in cookies for potential offline use. Another, even less noticable thing is that the BellTimer class (at least the version in my fork) now allows you to retrive schedule data from any chosen host, so Bell should now hopefully work with any site that specifies 
+        code /timesync
+        | , 
+        code /api/version
+        | , 
+        code /api/schedules
+        | , 
+        code /api/calendar
+        | , and 
+        code /api/correction
+        | .
+      p Also, turns out git is weird. Here&#8217;s a snapshot of a Hangouts conversation I had with Nicolas:
+      blockquote J: how do i pull changes from an upstream repo
+        br
+        | N: you've done it before, right?
+        br
+        | J: maybe
+        br
+        | N: i dont actually know how
+        br
+        | J: nvm i googled it
+        br
+        | N: something like git pull remote branch
+        br
+        | or something
+        br
+        | J: aaand there's a conflict
+        br
+        | N: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        br
+        | there is a conflict in syria
+      p The final version of the extension is listed under Nick&#8217;s name because making a developer account requires you to pay a one-time $5 fee, which I was too lazy to do. Nick already made an extension for image stamps or something, so I just asked him to host it for me.
+      p Don&#8217;t tell anyone, but the first version that was pushed turned out to be something like 9 MiB (Google&#8217;s choice of units, not mine). I made the mistake of not removing 
+        code node_modules
+        | . As of version 1.0.2, the extension should only include necessary HTML, images, and bundled js, which brings it down to about 300 KiB.
+      p Thanks for following along with this stream of consciousness dev post. Maybe I&#8217;ll do another one of these again someday.
+      p.signature &mdash; Jonathan Shi (
+        a(href="https://github.com/noloerino", target="_blank") github
+        | )

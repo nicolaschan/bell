@@ -1,0 +1,16 @@
+extends generic.pug
+block body
+  script(src='/bin/settings.js')
+  .blog-header
+    h1 Settings 
+  div(style="margin:1em auto;width:24em;")
+    .desc Schedule source or Custom
+      br
+      | (No guarantee of correctness. Check with school for official schedules.)  
+    select#source(placeholder="Schedule source")
+    .desc Theme
+    select#theme(placeholder="Theme")
+    .add-link
+      a.add#edit-classes-button(href='/classes') Edit Classes
+  .footer-right(style='position:fixed;')
+      i.material-icons#doneIcon done

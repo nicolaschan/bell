@@ -1,0 +1,52 @@
+extends generic.pug
+block body
+  script(type="text/javascript", src="/timesync/timesync.js")
+  script(type="text/javascript", src="/bin/client.js")
+  .container#page1
+    .centered#countdown
+      span.time#time
+      br
+      span.subtitle
+        span#subtitle
+        br
+        span.subtitle#scheduleName
+    canvas.centered#circle
+    .bottom.alert-message#alert-container
+      .alert-text#alert
+    .top.left.source
+      .sourceName
+        span#sourceName
+    .top.right.extension#extension
+      table
+        tr
+          td#popup
+              //- a.link.center-vertical(href=message.href, target="_blank")
+              //-   span#extension-text #{message.message}
+          td
+            a.dismiss.center-vertical#dismiss(href="#")
+              i.material-icons cancel
+  .container#page2
+    .centered
+      span#scheduleDisplay
+        span.period#noClasses
+        span#schedule
+          table#scheduleTable
+      span#scheduleEntry
+        table#scheduleEntryTable
+        hr
+        table
+          tr
+            td.tableLabel Theme
+            td#themeSelectColumn
+              select#themeSelect
+                option(selected) Default - Light
+    .footer-right#icons
+      i.material-icons#settingsIcon settings
+      i.material-icons#doneIcon done
+    .footer-left
+  .centered.loading
+    i.material-icons#loadingIcon sync
+    br
+    span#loadingMessage Loading
+  .downArrow
+    i.material-icons#downIcon keyboard_arrow_down
