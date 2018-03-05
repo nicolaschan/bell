@@ -3,6 +3,7 @@ require('webpack')
 const path = require('path')
 
 module.exports = {
+  mode: 'production',
   entry: {
     popup: ['./src/popup.js'],
     contentScript: ['./src/contentScript.js'],
