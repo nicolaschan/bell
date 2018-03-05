@@ -9,8 +9,9 @@ const server = http.createServer(app)
 const fs = Promise.promisifyAll(require('fs'))
 const path = require('path')
 const shortid = require('shortid')
+const uuid = require('uuid/v4')
 const request = Promise.promisifyAll(require('request'))
-const crypto = require('crypto')
+const os = require('os')
 const timesyncServer = require('timesync/server')
 
 const analyticsHandler = config.postgres.enabled ? require('./PostgresAnalyticsHandler') : require('./SqliteAnalyticsHandler')
@@ -37,11 +38,8 @@ var cache = function (time, f) {
   }
 }
 
-var currentVersion
 var getVersion = cache(60, function () {
-  var hash = crypto.createHash('md5')
-  currentVersion = hash.update(fs.readFileSync('data/version.txt').toString()).digest('hex')
-  return currentVersion
+  return JSON.parse(fs.readFileSync('./package.json').toString()).version
 })
 var getMessage = cache(60, function () {
   return JSON.parse(fs.readFileSync(`./data/message.json`).toString())
@@ -214,6 +212,18 @@ app.post('/api/analytics', async (req, res) => {
     userAgent: req.body.userAgent,
     theme: req.body.theme,
     source: req.body.source,
+    version: req.body.version,
+    // https://stackoverflow.com/a/10849772/
+    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+  })
+  return res.json({ success: true })
+})
+app.post('/api/analytics/server', async (req, res) => {
+  await analyticsHandler.recordServer({
+    id: req.body.id,
+    version: req.body.version,
+    os: req.body.os,
+    node: req.body.node,
     // https://stackoverflow.com/a/10849772/
     ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
   })
@@ -226,6 +236,7 @@ app.post('/api/errors', async (req, res) => {
     theme: req.body.theme,
     source: req.body.source,
     error: JSON.stringify(req.body.error),
+    version: req.body.version,
     // https://stackoverflow.com/a/10849772/
     ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
   })
@@ -260,6 +271,77 @@ var startWebServer = function () {
   })
 }
 
+var getServerID = async function () {
+  var idFile = path.join(__dirname, 'data', 'id.txt')
+  try {
+    var id = await fs.readFileAsync(idFile)
+    return id
+  } catch (e) {
+    var newId = uuid()
+    await fs.writeFileAsync(idFile, newId)
+    return newId
+  }
+}
+
+var reportUsage = async function () {
+  var serverId = await getServerID()
+  try {
+    await request.postAsync('http://localhost:8080/api/analytics/server', {
+      form: {
+        id: serverId,
+        os: {
+          platform: os.platform(),
+          release: os.release(),
+          type: os.type(),
+          arch: os.arch()
+        },
+        node: process.version,
+        version: getVersion()
+      }
+    })
+  } catch (e) {
+    // Failed to report this server instance
+  }
+}
+
+var newestVersion
+var getNewestVersion = async function () {
+  try {
+    var newestPackage = (await request.getAsync('https://raw.githubusercontent.com/nicolaschan/bell/master/package.json')).body
+    newestPackage = JSON.parse(newestPackage)
+    return newestPackage.version
+  } catch (e) {
+    // Failed to check for a new version
+    throw new Error('Failed to get newest version')
+  }
+}
+var alertAboutVersionChange = function (currentVersion, newVersion) {
+  if (currentVersion !== newVersion) {
+    logger.warn('There is a new version of bell-countdown available')
+    logger.warn(`You are using ${currentVersion} while the newest version available is ${newVersion}`)
+    logger.warn('Please update by visiting https://countdown.zone/gh')
+    return false
+  } else {
+    logger.log(`bell-countdown is up to date (version ${currentVersion})`)
+    return true
+  }
+}
+
+var checkForNewVersion = async function () {
+  try {
+    var version = await getNewestVersion()
+    if (version !== newestVersion) {
+      newestVersion = version
+      alertAboutVersionChange(getVersion(), newestVersion)
+    }
+  } catch (e) {
+    logger.warn('You may not be online — check your internet connection')
+  }
+}
+setInterval(checkForNewVersion, 24 * 60 * 60 * 1000)
+
 analyticsHandler.initialize()
   .then(startWebServer)
+  .then(reportUsage)
+  .then(checkForNewVersion)
   .then(() => logger.success('Ready'))
