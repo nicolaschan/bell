@@ -94,12 +94,6 @@ app.get('/', (req, res) => {
 app.get('/offline', (req, res) => {
   res.sendFile(path.join(__dirname, 'html', 'offline.html'))
 })
-app.get('/m', (req, res) => {
-  res.render('client-mithril', {
-    version: getVersion(),
-    server: config['server name']
-  })
-})
 app.get('/periods', (req, res) => {
   res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
@@ -115,6 +109,10 @@ app.get('/settings', (req, res) => {
 app.get('/blog', (req, res) => {
   res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
+app.get('/stats', (req, res) => {
+  res.sendFile(path.join(__dirname, 'html', 'stats.html'))
+})
+
 app.get('/bin/service-worker.js', (req, res) => {
   res.set('Service-Worker-Allowed', '/')
   res.set('Cache-Control', 'no-cache, public')
@@ -130,12 +128,6 @@ app.get('/gh', (req, res) => {
   res.redirect('https://github.com/nicolaschan/bell')
 })
 
-// if (config['enable redis'])
-app.get('/stats', (req, res) => {
-  res.render('stats', {
-    version: getVersion()
-  })
-})
 app.get('/api/stats', async (req, res) => {
   res.json({
     totalHits: (await analyticsHandler.getTotalDailyHits()).rows,
@@ -209,7 +201,6 @@ app.use(bodyParser.json()) // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
   extended: true
 }))
-app.set('view engine', 'pug')
 app.use('/timesync', timesyncServer.requestHandler)
 
 app.post('/api/analytics', async (req, res) => {
@@ -254,6 +245,12 @@ app.get('/api/themes', (req, res) => {
 })
 app.get('/css/selectize.css', (req, res) => {
   res.sendFile(path.join(__dirname, 'node_modules', 'selectize', 'dist', 'css', 'selectize.default.css'))
+})
+app.get('/css/bootstrap.min.css', (req, res) => {
+  res.sendFile(path.join(__dirname, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css'))
+})
+app.get('/css/bootstrap.min.css.map', (req, res) => {
+  res.sendFile(path.join(__dirname, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css.map'))
 })
 
 app.use('/favicons', express.static('favicons'))

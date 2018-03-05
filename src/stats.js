@@ -3,18 +3,21 @@ const $ = require('jquery')
 /* eslint-disable no-new */
 const Chart = require('chart.js')
 
-const CookieManager = require('./CookieManager3')
 const RequestManager = require('./RequestManager')
 
-var cookieManager = new CookieManager()
-var requestManager = new RequestManager(cookieManager, null, null, null, 10000)
+var request = {
+  get: async (url) => {
+    return $.get(url)
+  },
+  post: async (url, data) => {
+    return $.post(url, data)
+  }
+}
+var requestManager = new RequestManager(request)
 
 global.requestManager = requestManager
-global.cookieManager = cookieManager
 $(window).on('load', async function () {
-  await cookieManager.initialize()
-  var data = await requestManager.getNoCache('/api/stats')
-  console.log(data)
+  var data = await requestManager.get('/api/stats')
 
   var hits = data.totalHits.map(d => {
     return {
@@ -58,7 +61,7 @@ $(window).on('load', async function () {
     options: {
       title: {
         display: true,
-        text: 'Daily stats for bell.lahs.club'
+        text: 'Daily Stats'
       },
       scales: {
         xAxes: [{
@@ -89,7 +92,7 @@ $(window).on('load', async function () {
         mode: 'single',
         callbacks: {
           title: function (tooltipItems, data) {
-            var date = tooltipItems[0].xLabel
+            var date = new Date(tooltipItems[0].xLabel)
             return date.toLocaleDateString()
           }
         }
