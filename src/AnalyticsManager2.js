@@ -30,7 +30,7 @@ class AnalyticsManager {
         theme: this.themeManager.currentThemeName,
         userAgent: window.navigator.userAgent,
         source: this.cookieManager.get('source'),
-        version: require('../package.json').version
+        version: require('./Version')
       })
     } catch (e) {
       this.logger.warn('Analytics sending failed')
