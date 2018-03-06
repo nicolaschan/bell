@@ -113,6 +113,10 @@ app.get('/stats', (req, res) => {
   res.sendFile(path.join(__dirname, 'html', 'stats.html'))
 })
 
+app.get('/manifest.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'manifest.json'))
+})
+
 app.get('/bin/service-worker.js', (req, res) => {
   res.set('Service-Worker-Allowed', '/')
   res.set('Cache-Control', 'no-cache, public')
@@ -310,9 +314,8 @@ var reportUsage = async function () {
 var newestVersion
 var getNewestVersion = async function () {
   try {
-    var newestPackage = (await request.getAsync('https://raw.githubusercontent.com/nicolaschan/bell/master/package.json')).body
-    newestPackage = JSON.parse(newestPackage)
-    return newestPackage.version
+    var version = (await request.getAsync('https://countdown.zone/api/version')).body
+    return version
   } catch (e) {
     // Failed to check for a new version
     throw new Error('Failed to get newest version')
