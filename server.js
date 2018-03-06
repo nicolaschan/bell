@@ -14,7 +14,7 @@ const request = Promise.promisifyAll(require('request'))
 const os = require('os')
 const timesyncServer = require('timesync/server')
 
-const cacheTime = 10
+const cacheTime = 60
 const analyticsHandler = config.postgres.enabled ? require('./PostgresAnalyticsHandler') : require('./SqliteAnalyticsHandler')
 
 var previousCheck = 0
@@ -67,7 +67,7 @@ var fetch = async function (source, file) {
 var getCorrection = cache(cacheTime, async function (source) {
   return fetch(source, 'correction.txt')
 })
-var getSchedules = cache(10, async function (source) {
+var getSchedules = cache(cacheTime, async function (source) {
   return fetch(source, 'schedules.bell')
 })
 var getCalendar = cache(cacheTime, async function (source) {

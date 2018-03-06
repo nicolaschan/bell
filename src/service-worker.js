@@ -63,7 +63,7 @@ self.addEventListener('activate', evt => {
 })
 self.addEventListener('fetch', function (evt) {
   evt.respondWith(
-    fromNetwork(evt.request, 8000)
+    fromNetwork(evt.request, 6000)
       .catch(function (e) {
         logger.log(`${evt.request.url} serving from cached`, 'ServiceWorker')
         return fromCache(evt.request)
