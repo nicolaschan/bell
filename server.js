@@ -325,7 +325,7 @@ var alertAboutVersionChange = function (currentVersion, newVersion) {
     logger.warn('Please update by visiting https://countdown.zone/gh')
     return false
   } else {
-    logger.log(`bell-countdown is up to date (version ${currentVersion})`)
+    logger.log(`bell-countdown@${currentVersion} is up to date`)
     return true
   }
 }
