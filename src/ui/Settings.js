@@ -42,7 +42,10 @@ const Settings = {
             vnode.attrs.uiModel.bellTimer.reloadData()
             m.route.set('/')
           }
-        }, m('i.done-icon.icon.material-icons', 'done')))
+        }, m('i.done-icon.icon.material-icons', 'done'))),
+        m('.footer-left', m('a', {
+          href: 'https://countdown.zone/gh'
+        }, 'About'))
       ])
     ]
   },

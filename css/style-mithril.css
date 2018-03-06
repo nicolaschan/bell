@@ -336,6 +336,21 @@ a.course-link {
     bottom: 1em;
     color: #aaa;
 }
+.footer-left {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+}
+.footer-left a:link,
+.footer-left a:visited {
+    color: #aaa;
+    text-decoration: none;
+    transition: color 1s ease;
+}
+.footer-left a:hover {
+    color: #000;
+}
+
 .icon {
     color: #aaa;
     cursor: pointer;
