@@ -40,10 +40,18 @@ var cache = function (time, f) {
 }
 
 var getVersion = cache(cacheTime, function () {
-  return JSON.parse(fs.readFileSync('./package.json').toString()).version
+  try {
+    return JSON.parse(fs.readFileSync('./package.json').toString()).version
+  } catch (e) {
+    logger.error(e)
+  }
 })
 var getMessage = cache(cacheTime, function () {
+  try {
   return JSON.parse(fs.readFileSync(`./data/message.json`).toString())
+  } catch (e) {
+    logger.error(e)
+  }
 })
 
 var fetch = async function (source, file) {
@@ -161,20 +169,40 @@ app.get('/api/sources/names', async (req, res) => {
   res.json(directories)
 })
 
-app.get('/api/data/:source/meta', (req, res) => {
-  getMeta(req.params.source).then(meta => res.json(meta))
+app.get('/api/data/:source/meta', async (req, res) => {
+  try {
+    var meta = await getMeta(req.params.source)
+    return res.json(meta)
+  } catch (e) {
+    next()
+  }
 })
-app.get('/api/data/:source/correction', (req, res) => {
+app.get('/api/data/:source/correction', async (req, res) => {
   res.set('Content-Type', 'text/plain')
-  getCorrection(req.params.source).then(correction => res.send(correction ? correction.toString() : '0'))
+  try {
+    var correction = await getCorrection(req.params.source)
+    return res.send(correction ? correction.toString() : '0')
+  } catch (e) {
+    next()
+  }
 })
-app.get('/api/data/:source/calendar', (req, res) => {
+app.get('/api/data/:source/calendar', async (req, res) => {
   res.set('Content-Type', 'text/plain')
-  getCalendar(req.params.source).then(calendar => res.send(calendar))
+  try {
+    var calendar = await getCalendar(req.params.source)
+    return res.send(calendar)
+  } catch (e) {
+    next()
+  }
 })
-app.get('/api/data/:source/schedules', (req, res) => {
+app.get('/api/data/:source/schedules', async (req, res) => {
   res.set('Content-Type', 'text/plain')
-  getSchedules(req.params.source).then(schedules => res.send(schedules))
+  try {
+    var schedules = await getSchedules(req.params.source)
+    return res.send(schedules)
+  } catch (e) {
+    next()
+  }
 })
 app.get('/api/version', (req, res) => {
   res.set('Content-Type', 'text/plain')
@@ -208,27 +236,37 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 app.use('/timesync', timesyncServer.requestHandler)
 
 app.post('/api/analytics', async (req, res) => {
-  await analyticsHandler.recordHit({
-    id: req.body.id,
-    userAgent: req.body.userAgent,
-    theme: req.body.theme,
-    source: req.body.source,
-    version: req.body.version,
-    // https://stackoverflow.com/a/10849772/
-    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
-  })
-  return res.json({ success: true })
+  try {
+    await analyticsHandler.recordHit({
+      id: req.body.id,
+      userAgent: req.body.userAgent,
+      theme: req.body.theme,
+      source: req.body.source,
+      version: req.body.version,
+      // https://stackoverflow.com/a/10849772/
+      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+    })
+    return res.json({ success: true })
+  } catch (e) {
+    logger.error(e)
+    return res.json({ success: false })
+  }
 })
 app.post('/api/analytics/server', async (req, res) => {
-  await analyticsHandler.recordServer({
-    id: req.body.id,
-    version: req.body.version,
-    os: req.body.os,
-    node: req.body.node,
-    // https://stackoverflow.com/a/10849772/
-    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
-  })
-  return res.json({ success: true })
+  try {
+    await analyticsHandler.recordServer({
+      id: req.body.id,
+      version: req.body.version,
+      os: req.body.os,
+      node: req.body.node,
+      // https://stackoverflow.com/a/10849772/
+      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+    })
+    return res.json({ success: true })
+  } catch (e) {
+    logger.error(e)
+    return res.json({ success: false })
+  }
 })
 app.post('/api/errors', async (req, res) => {
   await analyticsHandler.recordError({
@@ -346,7 +384,10 @@ var checkForNewVersion = async function () {
 }
 setInterval(checkForNewVersion, 24 * cacheTime * cacheTime * 1000)
 
-analyticsHandler.initialize()
+Promise.resolve()
+  .then(() => logger.info('Initializing analytics handler'))
+  .then(analyticsHandler.initialize)
+  .then(() => logger.info('Starting web server'))
   .then(startWebServer)
   .then(reportUsage)
   .then(checkForNewVersion)
