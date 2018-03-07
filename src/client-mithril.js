@@ -16,7 +16,18 @@ logger.setLevel('info')
 
 var cookieManager = new CookieManager3()
 
-var requestManager = new RequestManager(cookieManager)
+var request = {
+  get: async (url) => {
+    return $.get(url)
+  },
+  post: async (url, data) => {
+    return $.post(url, data)
+  }
+}
+var requestManager = new RequestManager(request)
+// Clean up old request cache
+cookieManager.remove('requestCache')
+
 var themeManager = new ThemeManager(cookieManager)
 var analyticsManager = new AnalyticsManager(cookieManager, themeManager, requestManager, logger)
 var bellTimer = new BellTimer(cookieManager, requestManager)
@@ -33,7 +44,9 @@ global.$ = $
 global.requestManager = requestManager
 global.uiModel = uiModel
 global.mithrilUI = mithrilUI
-global.VERSION = require('../package.json').version
+global.m = require('mithril')
+const VERSION = require('./Version')
+global.VERSION = VERSION
 
 logger.info('Type `logger.setLevel(\'debug\')` to enable debug logging')
 
@@ -44,9 +57,10 @@ setInterval(function () {
   logger.debug('Refreshing data')
   bellTimer.reloadData()
   popupModel.refresh()
-}, 4 * 60 * 1000)
+}, 60 * 1000)
 
 $(window).on('load', async function () {
+  logger.info(`bell-countdown version ${VERSION}`)
   uiModel.setLoadingMessage('Loading')
   await cookieManager.initialize()
   processQuery(window.location.href, cookieManager)
@@ -83,7 +97,7 @@ window.onunhandledrejection = async function (e) {
           message: e.reason.message,
           stack: e.reason.stack
         },
-        version: require('../package.json').version
+        version: require('./Version')
       })
     }
   } catch (requestError) {

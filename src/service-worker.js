@@ -1,7 +1,7 @@
 /* global self, caches, fetch */
 // Based on https://serviceworke.rs/strategy-network-or-cache_service-worker_doc.html
 
-const VERSION = 'v3.1.3'
+const VERSION = require('../package.json').version
 var CACHE = `cache-${VERSION}`
 const SimpleLogger = require('./SimpleLogger')
 const logger = new SimpleLogger()
@@ -13,28 +13,17 @@ const cachedResources = [
   '/bin/client-mithril.js',
   '/timesync/timesync.js',
   '/icons/iconfont/MaterialIcons-Regular.woff2',
-  '/fonts/roboto/Roboto-Regular.woff2'
+  '/fonts/roboto/Roboto-Regular.woff2',
+  '/api/error',
+  '/api/sources',
+  '/api/sources/names'
 ]
-
-const urlMatch = function (url, ...matching) {
-  url = url.split('/').slice(3)
-  for (let i = 0; i < matching.length; i++) {
-    if (url[i] !== matching[i]) {
-      return false
-    }
-  }
-  return true
-}
 
 async function fromCache (request) {
   var cache = await caches.open(CACHE)
   var matching = await cache.match(request)
   if (!matching) {
-    if (urlMatch(request.url, 'api')) {
-      throw new Error('No cached data')
-    } else {
-      return caches.match('/offline')
-    }
+    throw new Error(`No cached data for ${request.method}: ${request.url}`)
   }
   return matching
 }
@@ -44,7 +33,12 @@ function fromNetwork (request, timeout) {
     var timeoutId = setTimeout(reject, timeout)
     fetch(request).then(function (response) {
       clearTimeout(timeoutId)
-      resolve(response)
+      if (request.method === 'GET') {
+        caches.open(CACHE).then(cache => {
+          cache.put(request, response.clone())
+        })
+      }
+      resolve(response.clone())
     }, reject)
   })
 }
@@ -70,8 +64,14 @@ self.addEventListener('activate', evt => {
   )
 })
 self.addEventListener('fetch', function (evt) {
-  evt.respondWith(fromNetwork(evt.request, 4000).catch(function () {
-    logger.log(`${evt.request.url} serving from cached`, 'ServiceWorker')
-    return fromCache(evt.request)
-  }))
+  evt.respondWith(
+    fromNetwork(evt.request, 6000)
+      .catch(function (e) {
+        logger.log(`${evt.request.url} serving from cached`, 'ServiceWorker')
+        return fromCache(evt.request)
+      })
+      .catch(function (e) {
+        return fromCache('/api/error')
+      })
+  )
 })

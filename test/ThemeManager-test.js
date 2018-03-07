@@ -15,7 +15,7 @@ describe('ThemeManager', function () {
     var cookieManager = new CookieManager()
     await cookieManager.initialize()
     var themeManager = new ThemeManager(cookieManager)
-    var requestManager = new RequestManager(cookieManager, '', {
+    var requestManager = new RequestManager({
       get: async url => {
         url = url.split('?')[0]
 
@@ -23,7 +23,8 @@ describe('ThemeManager', function () {
           '/api/sources/names': ['school'],
           '/api/data/school/calendar': '* Default Week\nMon normal\nTue normal\nWed normal\nThu normal\nFri normal\nSat weekend\nSun holiday\n',
           '/api/data/school/correction': '0',
-          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 Free\n* weekend\n* holiday'
+          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 Free\n* weekend\n* holiday',
+          '/api/version': '2'
         }
 
         var result = data[url]

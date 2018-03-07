@@ -18,7 +18,7 @@ cd "chrome_extension"
 cd ..
 
 log "Copying manifest"
-cp "manifest.json" $DEST
+cp "chrome_extension/manifest.json" $DEST
 log "Copying icons"
 cp -r "icons" $DEST
 cp -r "favicons" $DEST

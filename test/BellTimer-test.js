@@ -19,7 +19,7 @@ describe('BellTimer', function () {
     })
     it('test request manager is set', function () {
       var cookieManager = new CookieManager()
-      var requestManager = new RequestManager(cookieManager)
+      var requestManager = new RequestManager()
       var bellTimer = new BellTimer(cookieManager, requestManager)
       bellTimer.requestManager.should.equal(requestManager)
     })
@@ -29,7 +29,7 @@ describe('BellTimer', function () {
         startDate: '2017-10-20',
         scale: 2
       })
-      var requestManager = new RequestManager(cookieManager)
+      var requestManager = new RequestManager()
       var bellTimer = new BellTimer(cookieManager, requestManager)
       bellTimer.devMode.should.equal(true)
       bellTimer.timeScale.should.equal(2)
@@ -44,14 +44,15 @@ describe('BellTimer', function () {
           '/api/sources/names': ['school'],
           '/api/data/school/calendar': '* Default Week\nMon normal\nTue normal\nWed normal\nThu normal\nFri normal\nSat normal\nSun normal\n* Special Days\n10/21/2017 special\n10/22/2017 special # Event Day',
           '/api/data/school/correction': '20000',
-          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 {Period 1}\n* special # Special Schedule\n10:00 {Period 0}\n11:00 Special Event'
+          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 {Period 1}\n* special # Special Schedule\n10:00 {Period 0}\n11:00 Special Event',
+          '/api/version': '1'
         }
 
         var result = data[url]
         if (result) { return result } else { throw new Error('Request failed') }
       }
       var cookieManager = new CookieManager()
-      var requestManager = new RequestManager(cookieManager, '', {
+      var requestManager = new RequestManager({
         get: fakeRequester,
         post: () => {}
       })
@@ -130,7 +131,8 @@ describe('BellTimer', function () {
           '/api/sources/names': ['school'],
           '/api/data/school/calendar': '* Default Week\nMon normal\nTue normal\nWed normal\nThu normal\nFri normal\nSat normal\nSun normal\n* Special Days\n10/21/2017 special\n10/22/2017 special # Event Day',
           '/api/data/school/correction': '20000',
-          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 {Period 1}\n* special # Special Schedule\n10:00 {Period 0}\n11:00 Special Event'
+          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 {Period 1}\n* special # Special Schedule\n10:00 {Period 0}\n11:00 Special Event',
+          '/api/version': '1'
         }
 
         var result = data[url]
@@ -169,14 +171,15 @@ describe('BellTimer', function () {
           '/api/sources/names': ['school'],
           '/api/data/school/calendar': '* Default Week\nMon normal\nTue normal\nWed normal\nThu normal\nFri normal\nSat normal\nSun normal\n* Special Days\n10/21/2017 special\n10/22/2017 special # Event Day',
           '/api/data/school/correction': '20000',
-          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 {Period 1}\n* special # Special Schedule\n10:00 {Period 0}\n11:00 Special Event'
+          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 {Period 1}\n* special # Special Schedule\n10:00 {Period 0}\n11:00 Special Event',
+          '/api/version': '1'
         }
 
         var result = data[url]
         if (result) { return result } else { throw new Error('Request failed') }
       }
       var cookieManager = new CookieManager()
-      var requestManager = new RequestManager(cookieManager, '', {
+      var requestManager = new RequestManager({
         get: fakeRequester,
         post: () => {}
       })
@@ -217,14 +220,15 @@ describe('BellTimer', function () {
           '/api/sources/names': ['school'],
           '/api/data/school/calendar': '* Default Week\nMon normal\nTue normal\nWed normal\nThu normal\nFri normal\nSat holiday\nSun normal\n* Special Days\n10/18/2017 special\n10/19/2017 holiday\n10/21/2017 special\n10/22/2017 special # Event Day',
           '/api/data/school/correction': '20000',
-          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 {Period 1}\n* special # Special Schedule\n10:00 {Period 0}\n11:00 Special Event\n* holiday # Holiday'
+          '/api/data/school/schedules': '* normal # Normal Schedule\n8:00 {Period 0}\n9:00 {Period 1}\n* special # Special Schedule\n10:00 {Period 0}\n11:00 Special Event\n* holiday # Holiday',
+          '/api/version': '3'
         }
 
         var result = data[url]
         if (result) { return result } else { throw new Error('Request failed') }
       }
       var cookieManager = new CookieManager()
-      var requestManager = new RequestManager(cookieManager, '', {
+      var requestManager = new RequestManager({
         get: fakeRequester,
         post: () => {}
       })

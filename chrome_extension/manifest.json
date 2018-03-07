@@ -1,0 +1,28 @@
+{
+    "manifest_version": 2,
+    "name": "Countdown Extension",
+    "description": "An extension that displays the time remaining in classes.",
+    "version": "3.1.0",
+    "content_security_policy": "script-src 'self' https://countdown.zone; object-src 'self';",
+    "browser_action": {
+        "default_icon": "favicons/lime.png",
+        "default_popup": "chrome_extension/popup.html",
+        "default_title": "Countdown"
+    },
+    "background": {
+        "page": "chrome_extension/background.html"
+    },
+    "permissions": [
+        "alarms",
+        "https://countdown.zone/*",
+        "http://countdown.zone/*",
+        "storage"
+    ],
+    "externally_connectable": {
+        "matches": ["http://countdown.zone/*", "https://countdown.zone/*"]
+    },
+    "icons": {
+        "128": "icons/icon128.png"
+    },
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtjVn1nSyHY5IOwTzcgZbTCqPBpYj8NQOIKeq+4GWQBDIEtk20gRb5/UMP0zsvyWUDfCurjT3YUEXFQjdW/JsmwEMzNWd3htkSe5lIlKlUqcw9dGsa4AhCByWGJKSByHNO221CZewVfZ+dTQeXWGjdgOhFfCu77OnLxoikhzdH65ww5xledPMZyjovzpqaxMivnE8piQn/FJzBtS8rJ3EFe0VzjMNjxqV6IHowFY09Dsqyr2Q2ulTEGIq5qvdUP2nz9j7vulUPYX/QVAKJVUnceBEEsyXNfXhHOdxJqB0xAJLITtdaism4my2K6VT6E5Xz52EOPz+8/WThVpytWR/KQIDAQAB"
+}

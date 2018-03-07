@@ -14,6 +14,7 @@ const request = Promise.promisifyAll(require('request'))
 const os = require('os')
 const timesyncServer = require('timesync/server')
 
+const cacheTime = 60
 const analyticsHandler = config.postgres.enabled ? require('./PostgresAnalyticsHandler') : require('./SqliteAnalyticsHandler')
 
 var previousCheck = 0
@@ -38,11 +39,19 @@ var cache = function (time, f) {
   }
 }
 
-var getVersion = cache(60, function () {
-  return JSON.parse(fs.readFileSync('./package.json').toString()).version
+var getVersion = cache(cacheTime, function () {
+  try {
+    return JSON.parse(fs.readFileSync('./package.json').toString()).version
+  } catch (e) {
+    logger.error(e)
+  }
 })
-var getMessage = cache(60, function () {
-  return JSON.parse(fs.readFileSync(`./data/message.json`).toString())
+var getMessage = cache(cacheTime, function () {
+  try {
+    return JSON.parse(fs.readFileSync(`./data/message.json`).toString())
+  } catch (e) {
+    logger.error(e)
+  }
 })
 
 var fetch = async function (source, file) {
@@ -63,20 +72,20 @@ var fetch = async function (source, file) {
       return res.body
   }
 }
-var getCorrection = cache(60, async function (source) {
+var getCorrection = cache(cacheTime, async function (source) {
   return fetch(source, 'correction.txt')
 })
-var getSchedules = cache(60, async function (source) {
+var getSchedules = cache(cacheTime, async function (source) {
   return fetch(source, 'schedules.bell')
 })
-var getCalendar = cache(60, async function (source) {
+var getCalendar = cache(cacheTime, async function (source) {
   return fetch(source, 'calendar.bell')
 })
-var getMeta = cache(60, async function (source) {
+var getMeta = cache(cacheTime, async function (source) {
   var meta = await fetch(source, 'meta.json')
   return JSON.parse(meta)
 })
-var getSource = cache(60, async function (source) {
+var getSource = cache(cacheTime, async function (source) {
   // if (source.substring(0, 3) == 'gh:') {
   //     return {
   //         location: 'github',
@@ -93,27 +102,29 @@ app.get('/', (req, res) => {
 app.get('/offline', (req, res) => {
   res.sendFile(path.join(__dirname, 'html', 'offline.html'))
 })
-app.get('/m', (req, res) => {
-  res.render('client-mithril', {
-    version: getVersion(),
-    server: config['server name']
-  })
-})
 app.get('/periods', (req, res) => {
-  res.render('periods')
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
 app.get('/classes', (req, res) => {
-  res.render('classes')
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
 app.get('/enter', (req, res) => {
-  res.render('enter')
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
 app.get('/settings', (req, res) => {
-  res.render('settings')
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
 app.get('/blog', (req, res) => {
-  res.render('blog')
+  res.sendFile(path.join(__dirname, 'html', 'index.html'))
 })
+app.get('/stats', (req, res) => {
+  res.sendFile(path.join(__dirname, 'html', 'stats.html'))
+})
+
+app.get('/manifest.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'manifest.json'))
+})
+
 app.get('/bin/service-worker.js', (req, res) => {
   res.set('Service-Worker-Allowed', '/')
   res.set('Cache-Control', 'no-cache, public')
@@ -129,12 +140,6 @@ app.get('/gh', (req, res) => {
   res.redirect('https://github.com/nicolaschan/bell')
 })
 
-// if (config['enable redis'])
-app.get('/stats', (req, res) => {
-  res.render('stats', {
-    version: getVersion()
-  })
-})
 app.get('/api/stats', async (req, res) => {
   res.json({
     totalHits: (await analyticsHandler.getTotalDailyHits()).rows,
@@ -164,20 +169,40 @@ app.get('/api/sources/names', async (req, res) => {
   res.json(directories)
 })
 
-app.get('/api/data/:source/meta', (req, res) => {
-  getMeta(req.params.source).then(meta => res.json(meta))
+app.get('/api/data/:source/meta', async (req, res) => {
+  try {
+    var meta = await getMeta(req.params.source)
+    return res.json(meta)
+  } catch (e) {
+    res.status(404).send('Not found')
+  }
 })
-app.get('/api/data/:source/correction', (req, res) => {
+app.get('/api/data/:source/correction', async (req, res) => {
   res.set('Content-Type', 'text/plain')
-  getCorrection(req.params.source).then(correction => res.send(correction ? correction.toString() : '0'))
+  try {
+    var correction = await getCorrection(req.params.source)
+    return res.send(correction ? correction.toString() : '0')
+  } catch (e) {
+    res.status(404).send('Not found')
+  }
 })
-app.get('/api/data/:source/calendar', (req, res) => {
+app.get('/api/data/:source/calendar', async (req, res) => {
   res.set('Content-Type', 'text/plain')
-  getCalendar(req.params.source).then(calendar => res.send(calendar))
+  try {
+    var calendar = await getCalendar(req.params.source)
+    return res.send(calendar)
+  } catch (e) {
+    res.status(404).send('Not found')
+  }
 })
-app.get('/api/data/:source/schedules', (req, res) => {
+app.get('/api/data/:source/schedules', async (req, res) => {
   res.set('Content-Type', 'text/plain')
-  getSchedules(req.params.source).then(schedules => res.send(schedules))
+  try {
+    var schedules = await getSchedules(req.params.source)
+    return res.send(schedules)
+  } catch (e) {
+    res.status(404).send('Not found')
+  }
 })
 app.get('/api/version', (req, res) => {
   res.set('Content-Type', 'text/plain')
@@ -197,37 +222,51 @@ app.get('/api/time', (req, res) => {
     time: Date.now()
   })
 })
+app.get('/api/error', (req, res) => {
+  res.json({
+    error: 'Request failed'
+  })
+})
 
 var bodyParser = require('body-parser')
 app.use(bodyParser.json()) // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
   extended: true
 }))
-app.set('view engine', 'pug')
 app.use('/timesync', timesyncServer.requestHandler)
 
 app.post('/api/analytics', async (req, res) => {
-  await analyticsHandler.recordHit({
-    id: req.body.id,
-    userAgent: req.body.userAgent,
-    theme: req.body.theme,
-    source: req.body.source,
-    version: req.body.version,
-    // https://stackoverflow.com/a/10849772/
-    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
-  })
-  return res.json({ success: true })
+  try {
+    await analyticsHandler.recordHit({
+      id: req.body.id,
+      userAgent: req.body.userAgent,
+      theme: req.body.theme,
+      source: req.body.source,
+      version: req.body.version,
+      // https://stackoverflow.com/a/10849772/
+      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+    })
+    return res.json({ success: true })
+  } catch (e) {
+    logger.error(e)
+    return res.json({ success: false })
+  }
 })
 app.post('/api/analytics/server', async (req, res) => {
-  await analyticsHandler.recordServer({
-    id: req.body.id,
-    version: req.body.version,
-    os: req.body.os,
-    node: req.body.node,
-    // https://stackoverflow.com/a/10849772/
-    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
-  })
-  return res.json({ success: true })
+  try {
+    await analyticsHandler.recordServer({
+      id: req.body.id,
+      version: req.body.version,
+      os: req.body.os,
+      node: req.body.node,
+      // https://stackoverflow.com/a/10849772/
+      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+    })
+    return res.json({ success: true })
+  } catch (e) {
+    logger.error(e)
+    return res.json({ success: false })
+  }
 })
 app.post('/api/errors', async (req, res) => {
   await analyticsHandler.recordError({
@@ -248,6 +287,12 @@ app.get('/api/themes', (req, res) => {
 })
 app.get('/css/selectize.css', (req, res) => {
   res.sendFile(path.join(__dirname, 'node_modules', 'selectize', 'dist', 'css', 'selectize.default.css'))
+})
+app.get('/css/bootstrap.min.css', (req, res) => {
+  res.sendFile(path.join(__dirname, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css'))
+})
+app.get('/css/bootstrap.min.css.map', (req, res) => {
+  res.sendFile(path.join(__dirname, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css.map'))
 })
 
 app.use('/favicons', express.static('favicons'))
@@ -286,7 +331,7 @@ var getServerID = async function () {
 var reportUsage = async function () {
   var serverId = await getServerID()
   try {
-    await request.postAsync('http://localhost:8080/api/analytics/server', {
+    await request.postAsync('https://countdown.zone/api/analytics/server', {
       form: {
         id: serverId,
         os: {
@@ -307,9 +352,8 @@ var reportUsage = async function () {
 var newestVersion
 var getNewestVersion = async function () {
   try {
-    var newestPackage = (await request.getAsync('https://raw.githubusercontent.com/nicolaschan/bell/master/package.json')).body
-    newestPackage = JSON.parse(newestPackage)
-    return newestPackage.version
+    var version = (await request.getAsync('https://countdown.zone/api/version')).body
+    return version
   } catch (e) {
     // Failed to check for a new version
     throw new Error('Failed to get newest version')
@@ -322,7 +366,7 @@ var alertAboutVersionChange = function (currentVersion, newVersion) {
     logger.warn('Please update by visiting https://countdown.zone/gh')
     return false
   } else {
-    logger.log(`bell-countdown is up to date (version ${currentVersion})`)
+    logger.log(`bell-countdown@${currentVersion} is up to date`)
     return true
   }
 }
@@ -338,9 +382,12 @@ var checkForNewVersion = async function () {
     logger.warn('You may not be online — check your internet connection')
   }
 }
-setInterval(checkForNewVersion, 24 * 60 * 60 * 1000)
+setInterval(checkForNewVersion, 24 * cacheTime * cacheTime * 1000)
 
-analyticsHandler.initialize()
+Promise.resolve()
+  .then(() => logger.info('Initializing analytics handler'))
+  .then(analyticsHandler.initialize)
+  .then(() => logger.info('Starting web server'))
   .then(startWebServer)
   .then(reportUsage)
   .then(checkForNewVersion)

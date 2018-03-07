@@ -14,7 +14,7 @@ class AnalyticsManager {
 
     var uuid = this.cookieManager.get('id')
     if (!uuid) {
-      uuid = (await this.requestManager.getNoCache('/api/uuid')).id
+      uuid = (await this.requestManager.get('/api/uuid')).id
       this.cookieManager.set('id', uuid)
     }
   }
@@ -30,7 +30,7 @@ class AnalyticsManager {
         theme: this.themeManager.currentThemeName,
         userAgent: window.navigator.userAgent,
         source: this.cookieManager.get('source'),
-        version: require('../package.json').version
+        version: require('./Version')
       })
     } catch (e) {
       this.logger.warn('Analytics sending failed')
@@ -39,7 +39,11 @@ class AnalyticsManager {
 
     this.newPageLoad = false
 
-    if (send.success) { this.logger.success('Analytics data sent successfully') } else { this.logger.warn('Analytics are disabled') }
+    if (send.success) {
+      this.logger.success('Analytics data sent successfully')
+    } else {
+      this.logger.warn('Analytics are disabled')
+    }
 
     return send
   }

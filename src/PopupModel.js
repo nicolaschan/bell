@@ -28,7 +28,7 @@ class PopupModel {
   }
 
   async refresh () {
-    var messages = await this.requestManager.get('/api/message')
+    var messages = await this.requestManager.get('/api/message', [])
     var ua = UAParser(navigator.userAgent)
     for (var message of messages) {
       var matches = !message.agent || deepCompare(ua, message.agent)
