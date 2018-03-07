@@ -1,0 +1,126 @@
+* weekend
+
+* holiday
+
+* monday
+7:30 Passing to {Period 1}
+7:35 {Period 1}
+8:27 Passing to {Period 2}
+8:34 {Period 2}
+9:26 Brunch
+9:41 Passing to {Period 3}
+9:46 {Period 3}
+10:41 Passing to {Period 4}
+10:48 {Period 4}
+11:40 Lunch
+12:20 Passing to {Period 5}
+12:25 {Period 5}
+1:17 Passing to {Period 6}
+1:24 {Period 6}
+2:16 Passing to {Period 7}
+2:23 {Period 7}
+3:15 Free
+
+* flex-a # Tuesday schedule
+7:30 Passing to {Period 1}
+7:35 {Period 1}
+8:59 Brunch
+9:14 Passing to {Period 2}
+9:19 {Period 2}
+10:48 Passing to {FLEX}
+10:55 {FLEX}
+11:35 Lunch
+12:15 Passing to {Period 3}
+12:20 {Period 3}
+1:44 Passing to {Period 7}
+1:51 {Period 7}
+3:15 Free
+
+* flex-b # Wednesday schedule
+8:59 Brunch
+9:14 Passing to {Period 4}
+9:19 {Period 4}
+10:48 Passing to {FLEX}
+10:55 {FLEX}
+11:35 Lunch
+12:15 Passing to {Period 5}
+12:20 {Period 5}
+1:44 Passing to {Period 6}
+1:51 {Period 6}
+3:15 Free
+
+* a # Thursday schedule
+7:30 Passing to {Period 1}
+7:35 {Period 1}
+9:11 Brunch
+9:26 Passing to {Period 2}
+9:31 {Period 2}
+11:11 Lunch
+11:51 Passing to {Period 3}
+11:56 {Period 3}
+1:32 Passing to {Period 7}
+1:39 {Period 7}
+3:15 Free
+
+* b # Friday schedule
+8:25 Office Hours
+9:11 Brunch
+9:26 Passing to {Period 4}
+9:31 {Period 4}
+11:11 Lunch
+11:51 Passing to {Period 5}
+11:56 {Period 5}
+1:32 Passing to {Period 6}
+1:39 {Period 6}
+3:15 Free
+
+* hof-rally # Hall of Fame Rally
+8:40 {Period 4}
+10:11 HOF Rally
+11:06 Brunch
+11:21 Passing to {Period 5}
+11:27 {Period 5}
+12:58 Lunch
+1:38 Passing to {Period 6}
+1:44 {Period 6}
+3:15 Free
+
+# rally
+8:40 {Period 4}
+10:16 Rally
+10:52 Brunch
+11:07 Passing to {Period 5}
+11:13 {Period 5}
+12:53 Lunch
+1:33 Passing to {Period 6}
+1:39 {Period 6}
+3:15 Free
+
+* finals-4-7 # Friday finals schedule
+8:25 Office Hours
+8:45 Brunch
+8:55 Passing to {Period 4}
+9:00 {Period 4}
+11:00 Lunch
+11:40 Passing to {Period 7}
+11:45 {Period 7}
+1:45 Free
+
+* finals-1-3 # Tuesday finals schedule
+9:00 {Period 1}
+11:00 Lunch
+11:40 Passing to {Period 3}
+11:45 {Period 3}
+1:45 Free
+
+* finals-5-6 # Wednesday finals schedule
+9:00 {Period 5}
+11:00 Lunch
+11:40 Passing to {Period 6}
+11:45 {Period 6}
+1:45 Free
+
+* finals-2 # Thursday finals schedule
+9:00 {Period 2}
+11:00 Lunch
+11:40 Free
