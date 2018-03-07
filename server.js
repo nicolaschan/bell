@@ -48,7 +48,7 @@ var getVersion = cache(cacheTime, function () {
 })
 var getMessage = cache(cacheTime, function () {
   try {
-  return JSON.parse(fs.readFileSync(`./data/message.json`).toString())
+    return JSON.parse(fs.readFileSync(`./data/message.json`).toString())
   } catch (e) {
     logger.error(e)
   }
