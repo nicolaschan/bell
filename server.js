@@ -331,7 +331,7 @@ var getServerID = async function () {
 var reportUsage = async function () {
   var serverId = await getServerID()
   try {
-    await request.postAsync('http://localhost:8080/api/analytics/server', {
+    await request.postAsync('https://countdown.zone/api/analytics/server', {
       form: {
         id: serverId,
         os: {
