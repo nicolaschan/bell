@@ -55,13 +55,13 @@ const Settings = {
       valueField: 'id',
       searchField: ['name', 'id'],
       options: [],
-      create: (input) => {
-        var split = input.split(':')
-        return {
-          name: split[split.length - 1],
-          id: input
-        }
-      },
+      // create: (input) => {
+      //   var split = input.split(':')
+      //   return {
+      //     name: split[split.length - 1],
+      //     id: input
+      //   }
+      // },
       load: (query, callback) => {
         vnode.attrs.uiModel.requestManager.get(`/api/sources?query=${query}`).then(callback)
       },
