@@ -14,7 +14,9 @@ const cachedResources = [
   '/timesync/timesync.js',
   '/icons/iconfont/MaterialIcons-Regular.woff2',
   '/fonts/roboto/Roboto-Regular.woff2',
-  '/api/error'
+  '/api/error',
+  '/api/sources',
+  '/api/sources/names'
 ]
 
 async function fromCache (request) {
