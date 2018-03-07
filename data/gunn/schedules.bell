@@ -1,0 +1,189 @@
+* weekend # Weekend
+
+* holiday # Holiday
+
+* monday # Monday
+8:15 Passing to {A}
+8:25 {A}
+9:45 Brunch
+9:50 Passing to {B}
+10:00 {B}
+11:15 Passing to {C}
+11:25 {C}
+12:40 Lunch
+13:10 Passing to {F}
+13:20 {F}
+14:35 Free
+
+* tuesday # Tuesday
+8:15 Passing to {D}
+8:25 {D}
+9:45 Brunch
+9:50 Passing to {Flex}
+10:00 {Flex}
+10:50 Passing to {E}
+11:00 {E}
+12:15 Lunch
+12:45 Passing to {A}
+12:55 {A}
+14:15 Passing to {G}
+14:25 {G}
+15:40 Free
+
+* wednesday # Wednesday
+8:15 Passing to {B}
+8:25 {B}
+9:50 Brunch
+9:55 Passing to {C}
+10:05 {C}
+11:25 Passing to {D}
+11:35 {D}
+12:55 Lunch
+13:25 Passing to {F}
+13:25 {F}
+14:55 Free
+
+* thursday # Thursday
+8:15 Passing to {E}
+8:25 {E}
+9:50 Brunch
+9:55 Passing to {Flex}
+10:05 {Flex}
+10:55 Passing to {B}
+11:05 {B}
+12:15 Lunch
+12:45 Passing to {A}
+12:55 {A}
+14:05 Passing to {G}
+14:15 {G}
+15:35 Free
+
+* friday # Friday
+8:15 Passing to {C}
+8:25 {C}
+9:40 Brunch
+9:45 Passing to {D}
+9:55 {D}
+11:05 Passing to {E}
+11:15 {E}
+12:25 Lunch
+12:55 Passing to {F}
+13:05 {F}
+14:15 Passing to {G}
+14:25 {G}
+15:35 Free
+
+* 4-day-1 # 4 Day Week #1
+8:15 Passing to {A}
+8:25 {A}
+9:50 Brunch
+9:55 Passing to {B}
+10:05 {B}
+11:25 Passing to {C}
+11:35 {C}
+12:55 Lunch
+13:25 Passing to {F}
+13:35 {F}
+14:55 Free
+
+* 4-day-2 # 4 Day Week #2
+8:15 Passing to {D}
+8:25 {D}
+9:50 Brunch
+9:55 Passing to {Flex}
+10:05 {Flex}
+11:00 Passing to {E}
+11:10 {E}
+12:30 Extended Lunch
+13:25 Passing to {G}
+13:35 {G}
+14:55 Free
+
+* 4-day-3 # 4 Day Week #3
+8:15 Passing to {A}
+8:25 {A}
+9:50 Brunch
+9:55 Passing to {B}
+10:05 {B}
+11:25 Passing to {C}
+11:35 {C}
+12:55 Lunch
+13:25 Passing to {F}
+13:35 {F}
+14:55 Free
+
+* 4-day-4 # 4 Day Week #4
+8:15 Passing to {D}
+8:25 {D}
+9:50 Brunch
+9:55 Passing to {Flex}
+10:05 {Flex}
+11:25 Passing to {E}
+11:35 {E}
+12:55 Lunch
+13:25 Passing to {G}
+13:35 {G}
+14:55 Free
+
+* minimum-day-friday # Minimum Day Friday
+8:15 Passing to {C}
+8:25 {C}
+9:15 Passing to {D}
+9:25 {D}
+10:10 Brunch
+10:15 Passing to {E}
+10:25 {E}
+11:10 Passing to {F}
+11:20 {F}
+12:05 Passing to {G}
+12:15 {G}
+13:00 Free
+
+* 7-period # Seven Period Day
+8:15 Passing to {A}
+8:25 {A}
+9:17 Passing to {B}
+9:27 {B}
+10:14 Brunch
+10:19 Passing to {C}
+10:29 {C}
+11:16 Passing to {D}
+11:26 {D}
+12:13 Lunch
+12:47 Passing to {E}
+12:57 {E}
+13:44 Passing to {F}
+13:54 {F}
+14:41 Passing to {G}
+14:51 {G}
+15:38 Free
+
+* wednesday-finals # Wednesday Finals
+8:20 Passing to {B}
+8:30 {B}
+10:10 Brunch
+10:20 Passing to {D}
+10:30 {D}
+12:10 Break
+12:35 Passing to Zero and H Finals
+12:45 Zero and H Finals
+14:25 Free
+
+* thursday-finals # Thursday Finals
+8:20 Passing to {A}
+8:30 {A}
+10:10 Brunch
+10:20 Passing to {C}
+10:30 {C}
+12:10 Lunch
+12:35 Passing to {G}
+12:45 {G}
+14:25 Free
+
+* friday-finals # Friday Finals
+8:20 Passing to {E}
+8:30 {E}
+10:10 Brunch
+10:20 Passing to {F}
+10:30 {F}
+12:10 Free
