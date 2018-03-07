@@ -14,7 +14,7 @@
 
 ## About 
 
-Bell is a **synchronized timer that counts down to the next time the bell rings at school**. A live instance of this program is currently running at [countdown.zone](https://countdown.zone) (formerly [bell.lahs.club](https://bell.lahs.club)). This software continues to be developed by Los Altos High school alumni, [nicolaschan](https://github.com/nicolaschan) and [noloerino](https://github.com/noloerino), who began working on it during their senior year of high school.
+Bell is a **synchronized timer that counts down to the next time the bell rings at school**. A live instance of this program is currently running at [countdown.zone](https://countdown.zone) (formerly [bell.lahs.club](https://bell.lahs.club)). This software continues to be developed by Los Altos High School alumni, [nicolaschan](https://github.com/nicolaschan) and [noloerino](https://github.com/noloerino), who began working on it during their senior year of high school.
 - [Chrome extension](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc) originally developed by [noloerino](https://github.com/noloerino/bell).
 - Periodic announcements about the status of the website are posted to [blog.countdown.zone](https://blog.countdown.zone). 
 - Usage statistics are available at [countdown.zone/stats](https://countdown.zone/stats).
