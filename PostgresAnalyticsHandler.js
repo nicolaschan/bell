@@ -14,7 +14,7 @@ var getDevice = function (result) {
 
 const PostgresAnalyticsHandler = {
   initialize: async () => {
-    db.connect()
+    await db.connect()
     await db.query(`CREATE TABLE IF NOT EXISTS hits (
         id SERIAL,
         userId TEXT, 
@@ -63,14 +63,14 @@ const PostgresAnalyticsHandler = {
     var device = getDevice(result)
     return db.query({
       text: `INSERT INTO hits (userId, userAgent, browser, device, os, theme, source, ip, version, timestamp) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TIMESTAMP 'now')`,
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TIMESTAMP 'now')`,
       values: [
         user.id, user.userAgent, result.family, device, result.os.family, user.theme, user.source, user.ip, user.version
       ]})
   },
   recordServer: async (user) => {
     return db.query({
-      text: `INSERT INTO hits (userId, ip, version, timestamp) 
+      text: `INSERT INTO servers (userId, ip, version, platform, release, type, arch, node, timestamp) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TIMESTAMP 'now')`,
       values: [
         user.id, user.ip, user.version, user.os.platform, user.os.release, user.os.type, user.os.arch, user.node
