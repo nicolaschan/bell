@@ -139,6 +139,9 @@ app.get('/extension', (req, res) => {
 app.get('/gh', (req, res) => {
   res.redirect('https://github.com/nicolaschan/bell')
 })
+app.get('/about', (req, res) => {
+  res.redirect('https://github.com/nicolaschan/bell/blob/master/README.md')
+})
 
 app.get('/api/stats', async (req, res) => {
   res.json({

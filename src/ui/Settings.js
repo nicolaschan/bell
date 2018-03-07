@@ -44,7 +44,7 @@ const Settings = {
           }
         }, m('i.done-icon.icon.material-icons', 'done'))),
         m('.footer-left', m('a', {
-          href: 'https://countdown.zone/gh'
+          href: 'https://countdown.zone/about'
         }, 'About'))
       ])
     ]

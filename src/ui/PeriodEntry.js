@@ -6,7 +6,7 @@ const PeriodEntry = {
     vnode.attrs.uiModel.requestManager.get(`/api/data/${source}/meta`).then(meta => {
       vnode.state.meta = meta
       vnode.state.enabled = {}
-      for (let period in vnode.attrs.uiModel.cookieManager.get('periods', {})) {
+      for (let period of meta.periods) {
         vnode.state.enabled[period] = vnode.attrs.uiModel.cookieManager.get('periods', {})[period] !== 'Free'
       }
     })
