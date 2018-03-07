@@ -174,7 +174,7 @@ app.get('/api/data/:source/meta', async (req, res) => {
     var meta = await getMeta(req.params.source)
     return res.json(meta)
   } catch (e) {
-    next()
+    res.status(404).send('Not found')
   }
 })
 app.get('/api/data/:source/correction', async (req, res) => {
@@ -183,7 +183,7 @@ app.get('/api/data/:source/correction', async (req, res) => {
     var correction = await getCorrection(req.params.source)
     return res.send(correction ? correction.toString() : '0')
   } catch (e) {
-    next()
+    res.status(404).send('Not found')
   }
 })
 app.get('/api/data/:source/calendar', async (req, res) => {
@@ -192,7 +192,7 @@ app.get('/api/data/:source/calendar', async (req, res) => {
     var calendar = await getCalendar(req.params.source)
     return res.send(calendar)
   } catch (e) {
-    next()
+    res.status(404).send('Not found')
   }
 })
 app.get('/api/data/:source/schedules', async (req, res) => {
@@ -201,7 +201,7 @@ app.get('/api/data/:source/schedules', async (req, res) => {
     var schedules = await getSchedules(req.params.source)
     return res.send(schedules)
   } catch (e) {
-    next()
+    res.status(404).send('Not found')
   }
 })
 app.get('/api/version', (req, res) => {
