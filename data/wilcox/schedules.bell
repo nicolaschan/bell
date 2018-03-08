@@ -1,0 +1,116 @@
+* normal # Schedule on Normal M, Tu, and F
+7:25 Passing to {Period 1}
+7:30 {Period 1}
+8:20 Passing to {Period 2}
+8:25 {Period 2}
+9:15 Brunch
+9:20 Brunch/Passing to {Period 3}
+9:25 {Period 3}
+10:15 Passing to SSR
+10:20 SSR
+10:50 Passing to {Period 4}
+10:55 {Period 4}
+11:45 Lunch
+12:15 Passing to {Period 5}
+12:20 {Period 5}
+13:10 Passing to {Period 6}
+13:15 {Period 6}
+14:05 Passing to {Period 7}
+14:10 {Period 7}
+15:00 Free
+
+
+* even # Schedule on Normal Wed
+9:00 Passing to {Period 2}
+9:05 {Period 2}
+10:35 Brunch
+10:40 Brunch/Passing to {Period 4}
+10:45 {Period 4}
+12:20 Lunch
+12:50 Passing to {Period 6}
+12:55 {Period 6}
+14:25 Free
+
+* odd # Schedule on Thurs
+7:25 Passing to {Period 1}
+7:30 {Period 1}
+9:00 Passing to {Period 3}
+9:05 {Period 3}
+10:35 Brunch
+10:40 Brunch/Passing to {Period 5}
+10:45 {Period 5}
+12:20 Lunch
+12:50 Passing to {Period 7}
+12:55 {Period 7}
+14:25 Free
+
+* weekend # Weekend
+
+* holiday # Holiday
+
+* finals-wed # Wednesday Finals
+7:55 Passing to {Period 1}
+8:00 {Period 1}
+10:00 Brunch
+10:15 Brunch/Passing to {Period 6}
+10:20 {Period 6}
+12:20 Lunch
+12:55 Passing to {Period 7}
+13:00 {Period 7}
+15:00 Free
+
+* finals-thu # Thursday Finals
+7:55 Passing to {Period 2}
+8:00 {Period 2}
+10:00 Brunch
+10:15 Brunch/Passing to {Period 3}
+10:20 {Period 3}
+12:20 Free
+
+* finals-fri # Friday Finals
+7:55 Passing to {Period 4}
+8:00 {Period 4}
+10:00 Brunch
+10:15 Brunch/Passing to {Period 5}
+10:20 {Period 5}
+12:20 Free
+
+* double-assembly # Assembly
+7:25 Passing to {Period 1}
+7:30 {Period 1}
+8:20 Passing to {Period 2}
+8:25 {Period 2}
+9:10 Passing to {Period 3}
+9:15 {Period 3}/Assembly A
+10:15 {Period 3}/Assembly B
+11:05 Passing to {Period 4}
+11:10 {Period 4}
+12:00 Lunch
+12:30 Passing to {Period 5}
+12:35 {Period 5}
+13:20 Passing to {Period 6}
+13:25 {Period 6}
+14:10 Passing to {Period 7}
+14:15 {Period 7}
+15:00 Free
+
+* extended-lunch # Extended Lunch
+7:25 Passing to {Period 1}
+7:30 {Period 1}
+8:20 Passing to {Period 2}
+8:25 {Period 2}
+9:15 Brunch
+9:20 Brunch/Passing to {Period 3}
+9:25 {Period 3}
+10:15 Passing to SSR
+10:20 SSR
+10:40 Passing to {Period 4}
+10:45 {Period 4}
+11:35 Lunch
+12:15 Passing to {Period 5}
+12:20 {Period 5}
+13:10 Passing to {Period 6}
+13:15 {Period 6}
+14:05 Passing to {Period 7}
+14:10 {Period 7}
+15:00 Free
