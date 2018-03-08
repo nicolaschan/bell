@@ -33,10 +33,10 @@ const Settings = {
         m('.desc', 'Theme'),
         m('select#theme[placeholder=Theme]'),
         m('.add-link', (vnode.state.editClasses) ? m('a.add#edit-classes-button[href=/classes]', {
-            oncreate: m.route.link
-          }, 'Edit Classes') : m('a.add#edit-classes-button[href=/periods]', {
-            oncreate: m.route.link
-          }, 'Edit Periods')),
+          oncreate: m.route.link
+        }, 'Edit Classes') : m('a.add#edit-classes-button[href=/periods]', {
+          oncreate: m.route.link
+        }, 'Edit Periods')),
         m('.add-link', m('a.add#edit-classes-button[href=https://goo.gl/forms/LQumv10P4NY3jRf92]', 'Request school')),
         m('.add-link', m('a.add#edit-classes-button[href=https://goo.gl/forms/HgyL96yycOKKT0w22]', 'Report problem')),
         m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
