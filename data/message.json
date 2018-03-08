@@ -1,17 +1,18 @@
 [{
+  "message": {
+    "enabled": true,
+    "text": "Select your school's schedule",
+    "href": "/settings"
+  }
+}, {
   "agent": {
     "browser": {
       "name": "Chrome"
     }
   },
   "message": {
-    "enabled": true,
+    "enabled": false,
     "text": "Install the Chrome Extension",
     "href": "https://countdown.zone/xt"
-  }
-}, {
-  "message": {
-    "enabled": false,
-    "text": "You are not on Chrome! Good for you"
   }
 }]

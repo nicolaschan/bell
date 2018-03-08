@@ -338,8 +338,8 @@ a.course-link {
 }
 .footer-left {
     position: absolute;
-    left: 20px;
-    bottom: 20px;
+    left: 1em;
+    bottom: 1em;
 }
 .footer-left a:link,
 .footer-left a:visited {

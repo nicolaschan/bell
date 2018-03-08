@@ -37,17 +37,20 @@ const Settings = {
         }, 'Edit Classes') : m('a.add#edit-classes-button[href=/periods]', {
           oncreate: m.route.link
         }, 'Edit Periods')),
-        m('.add-link', m('a.add#edit-classes-button[href=https://goo.gl/forms/LQumv10P4NY3jRf92]', 'Request school')),
-        m('.add-link', m('a.add#edit-classes-button[href=https://goo.gl/forms/HgyL96yycOKKT0w22]', 'Report problem')),
+        m('.add-link', m('a.add#edit-classes-button[href=https://goo.gl/forms/LQumv10P4NY3jRf92]', 'Request School')),
+        m('.add-link', m('a.add#edit-classes-button[href=https://goo.gl/forms/HgyL96yycOKKT0w22]', 'Report Problem')),
         m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
           onclick: () => {
             vnode.attrs.uiModel.bellTimer.reloadData()
             m.route.set('/')
           }
         }, m('i.done-icon.icon.material-icons', 'done'))),
-        m('.footer-left', m('a', {
+        m('.footer-left[style=position: fixed;]', [m('a[style=margin-right: 2em;]', {
           href: 'https://countdown.zone/about'
-        }, 'About'))
+        }, 'About'),
+        m('a', {
+          href: '/xt'
+        }, 'Chrome Extension')])
       ])
     ]
   },
