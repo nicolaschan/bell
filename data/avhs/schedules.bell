@@ -1,0 +1,35 @@
+* weekend # Weekend
+
+* holiday # Holiday
+
+* normal # Normal Schedule
+8:55 Passing to {Period 1}
+9:00 {Period 1}
+9:50 Brunch
+10:05 Passing to {Period 2}
+10:10 {Period 2}
+11:00 Passing to {Period 3}
+11:05 {Period 3}
+11:55 Lunch
+12:40 Passing to {Period 4}
+12:45 {Period 4}
+13:35 Passing to {Period 5}
+13:40 {Period 5}
+14:30 Passing to Study
+14:35 Study
+15:25 Free
+
+* short # Monday
+8:55 Passing to {Period 1}
+9:00 {Period 1}
+9:50 Brunch
+10:05 Passing to {Period 2}
+10:10 {Period 2}
+11:00 Passing to {Period 3}
+11:05 {Period 3}
+11:55 Lunch
+12:40 Passing to {Period 4}
+12:45 {Period 4}
+13:35 Passing to {Period 5}
+13:40 {Period 5}
+14:30 Free
