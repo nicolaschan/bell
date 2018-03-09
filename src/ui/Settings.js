@@ -68,7 +68,7 @@ const Settings = {
       //   }
       // },
       load: (query, callback) => {
-        vnode.attrs.uiModel.requestManager.get(`/api/sources?query=${query}`).then(callback)
+        vnode.attrs.uiModel.requestManager.get(`/api/sources`).then(callback)
       },
       preload: true,
       render: {
