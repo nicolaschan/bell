@@ -18,14 +18,15 @@ var main = async function () {
   await db.query(`CREATE TABLE IF NOT EXISTS locations(id INTEGER, userid TEXT, city TEXT,
       region TEXT, country TEXT, lat REAL, long REAL, ip TEXT)`)
 
-  var locationsCount = await db.query('SELECT COUNT(*) FROM locations')
+  var locationsCount = parseInt((await db.query('SELECT COUNT(*) FROM locations')).rows[0].count)
+  logger.info(`${locationsCount} locations already exist in table`)
   var hits
   logger.log('Querying for hits')
   if (locationsCount > 0) {
     hits = await db.query(`WITH existing AS (SELECT MAX(id) AS n FROM locations)
       SELECT ip, userid, id FROM hits WHERE id > (SELECT n FROM existing) ORDER BY id`)
   } else {
-    hits = await db.query('SELECT * FROM hits')
+    hits = await db.query('SELECT ip, userid, id FROM hits')
   }
   logger.info(`Found ${hits.rowCount} hits`)
 
