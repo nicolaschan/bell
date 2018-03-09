@@ -1,0 +1,142 @@
+* weekend # Weekend
+
+* holiday # Holiday
+
+* normal # Normal Scheule
+7:05 Passing to {Early Bird}
+7:10 {Early Bird}
+7:50 Passing to {AM Support}
+8:00 {AM Support}
+8:27 Passing to {Period 1}
+8:32 {Period 1}
+9:14 Passing to {Period 2}
+9:19 {Period 2}
+10:01 Passing to {Period 3}
+10:06 {Period 3}
+10:53 Passing to {Period 4}
+10:58 {Period 4}
+11:40 Passing to {Period 5}
+11:45 {Period 5}
+12:27 Passing to {Period 6}
+12:32 {Period 6}
+13:14 Passing to {Period 7}
+13:19 {Period 7}
+14:01 Passing to {Period 8}
+14:06 {Period 8}
+14:48 Passing to {Period 9}
+14:53 {Period 9}
+15:35 Free
+
+* pd-monday # PD Monday
+7:05 Passing to {Early Bird}
+7:10 {Early Bird}
+7:50 Passing to {AM Support}
+8:00 {AM Support}
+8:27 Passing to {Period 1}
+8:32 {Period 1}
+9:05 Passing to {Period 2}
+9:10 {Period 2}
+9:43 Passing to {Period 3}
+9:48 {Period 3}
+10:21 Passing to {Period 4}
+10:26 {Period 4}
+10:59 Passing to {Period 5}
+11:04 {Period 5}
+11:37 Passing to {Period 6}
+11:42 {Period 6}
+12:15 Passing to {Period 7}
+12:20 {Period 7}
+12:53 Passing to {Period 8}
+12:58 {Period 8}
+13:31 Passing to {Period 9}
+13:36 {Period 9}
+14:09 Free
+
+* early-dismissal # Early Dismissal
+7:05 Passing to {Early Bird}
+7:10 {Early Bird}
+7:50 Passing to {AM Support}
+8:00 {AM Support}
+8:27 Passing to {Period 1}
+8:32 {Period 1}
+9:08 Passing to {Period 2}
+9:13 {Period 2}
+9:49 Passing to {Period 3}
+9:54 {Period 3}
+10:30 Passing to {Period 4}
+10:35 {Period 4}
+11:11 Passing to {Period 5}
+11:16 {Period 5}
+11:52 Passing to {Period 6}
+11:57 {Period 6}
+12:33 Passing to {Period 7}
+12:38 {Period 7}
+13:14 Passing to {Period 8}
+13:19 {Period 8}
+13:55 Passing to {Period 9}
+14:00 {Period 9}
+14:36 Free
+
+* half-day # Half Day
+7:05 Passing to {Early Bird}
+7:10 {Early Bird}
+7:50 Passing to {AM Support}
+8:00 {AM Support}
+8:27 Passing to {Period 1}
+8:32 {Period 1}
+9:02 Passing to {Period 2}
+9:07 {Period 2}
+9:37 Passing to {Period 3}
+9:42 {Period 3}
+10:15 Passing to {Period 7}
+10:20 {Period 7}
+10:50 Passing to {Period 8}
+10:55 {Period 8}
+11:25 Passing to {Period 9}
+11:30 {Period 9}
+12:00 Free
+
+* late-start # Late Start
+9:40 {Period 1}
+10:15 Passing to {Period 2}
+10:20 {Period 2}
+10:55 Passing to {Period 3}
+11:00 {Period 3}
+11:35 Passing to {Period 4}
+11:40 {Period 4}
+12:15 Passing to {Period 5}
+12:20 {Period 5}
+12:55 Passing to {Period 6}
+13:00 {Period 6}
+13:35 Passing to {Period 7}
+13:40 {Period 7}
+14:15 Passing to {Period 8}
+14:20 {Period 8}
+14:55 Passing to {Period 9}
+15:00 {Period 9}
+15:35 Free
+
+* c-day # C-Day
+7:05 Passing to {Early Bird}
+7:10 {Early Bird}
+7:50 Passing to {AM Support}
+8:00 {AM Support}
+8:27 Passing to {Period 1}
+8:32 {Period 1}
+9:12 Passing to {Period 2}
+9:17 {Period 2}
+9:57 Passing to {Period 3}
+10:02 {Period 3}
+11:05 Passing to {Period 4}
+11:10 {Period 4}
+11:50 Passing to {Period 5}
+11:55 {Period 5}
+12:35 Passing to {Period 6}
+12:40 {Period 6}
+13:20 Passing to {Period 7}
+13:25 {Period 7}
+14:05 Passing to {Period 8}
+14:10 {Period 8}
+14:50 Passing to {Period 9}
+14:55 {Period 9}
+15:35 Free
