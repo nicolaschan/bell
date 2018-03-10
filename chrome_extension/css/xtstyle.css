@@ -13,6 +13,11 @@ body {
     overflow-x: hidden;
 }
 
+#iframe-visible {
+  width: 100%;
+  height: 100%;
+}
+
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;

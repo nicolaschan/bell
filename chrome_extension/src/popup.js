@@ -2,7 +2,7 @@
 const ChromeCookieManagerFactory = require('./ChromeCookieManager2.js')
 const BellTimer = require('../../src/BellTimer.js')
 const ThemeManager = require('../../src/ThemeManager.js')
-const RequestManager = require('../../src/RequestManager.js')
+const RequestManager = require('./ChromeExtensionRequestManager')
 const ExtUI = require('./ExtUI.js')
 const ExtUIModel = require('./ExtUIModel.js')
 

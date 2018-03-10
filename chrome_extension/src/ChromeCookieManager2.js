@@ -8,8 +8,9 @@ const cookieSerializer = new CookieSerializer()
 class CookieManager {
   constructor (cookies) {
     this.cookies = cookies
-    chrome.storage.local.clear(() =>
-      chrome.storage.local.set(cookies))
+    chrome.storage.local.clear(() => {
+      chrome.storage.local.set(cookies)
+    })
   }
 
   get (key, defaultValue) {
@@ -20,6 +21,11 @@ class CookieManager {
 
   set (key, value) {
     this.cookies[key] = cookieSerializer.serialize(value)
+    if (key == 'requestCache') {
+      chrome.storage.local.set({
+        requestCache: cookieSerializer.serialize(value)
+      })
+    }
   }
 
   remove (key) {
@@ -48,9 +54,16 @@ var CookieManagerFactory = async function () {
       port.onMessage.addListener(msg => resolve(msg.value))
     })
     cookies = cookieSerializer.serializeAll(cookies)
-    cookieManager.cookies = cookies
-    chrome.storage.local.clear(() =>
-      chrome.storage.local.set(cookies))
+    chrome.storage.local.get('requestCache', cache => {
+      cache = cache.requestCache
+      if (!cache) {
+        cache = cookieSerializer.serialize({})
+      }
+      console.log(cache)
+      cookies['requestCache'] = cache
+      cookieManager.cookies = cookies
+      chrome.storage.local.set(cookies)
+    })    
   })()
 
   return cookieManager
