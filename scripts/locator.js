@@ -2,8 +2,8 @@
 
 const config = require('../config.json')
 const logger = require('loggy')
-const { Client } = require('pg')
-const db = new Client(config.postgres)
+const { Pool } = require('pg')
+const db = new Pool(config.postgres)
 
 const geoip = require('geoip-database')
 const maxmind = require('maxmind')
@@ -13,7 +13,6 @@ const ProgressBar = require('progress')
 
 var main = async function () {
   logger.log(`Connecting to postgres ${config.postgres.host}`)
-  await db.connect()
   logger.log(`Ensuring table 'locations'`)
   await db.query(`CREATE TABLE IF NOT EXISTS locations(id INTEGER, userid TEXT, city TEXT,
       region TEXT, country TEXT, lat REAL, long REAL, ip TEXT)`)

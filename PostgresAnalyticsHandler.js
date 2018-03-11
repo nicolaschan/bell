@@ -1,10 +1,11 @@
 const UAParser = require('useragent')
 const config = require('./config.json')
+const logger = require('loggy')
 
 const {
-  Client
+  Pool
 } = require('pg')
-const db = new Client(config.postgres)
+const db = new Pool(config.postgres)
 
 var getDevice = function (result) {
   return (result.device.family || (result.device.vendor && result.device.model))
@@ -12,9 +13,12 @@ var getDevice = function (result) {
     : 'Other'
 }
 
+db.on('error', (err, client) => {
+  logger.error(err)
+})
+
 const PostgresAnalyticsHandler = {
   initialize: async () => {
-    await db.connect()
     await db.query(`CREATE TABLE IF NOT EXISTS hits (
         id SERIAL,
         userId TEXT, 
