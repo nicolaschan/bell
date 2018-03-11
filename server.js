@@ -272,17 +272,22 @@ app.post('/api/analytics/server', async (req, res) => {
   }
 })
 app.post('/api/errors', async (req, res) => {
-  await analyticsHandler.recordError({
-    id: req.body.id,
-    userAgent: req.body.userAgent,
-    theme: req.body.theme,
-    source: req.body.source,
-    error: JSON.stringify(req.body.error),
-    version: req.body.version,
-    // https://stackoverflow.com/a/10849772/
-    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
-  })
-  return res.json({ success: true })
+  try {
+    await analyticsHandler.recordError({
+      id: req.body.id,
+      userAgent: req.body.userAgent,
+      theme: req.body.theme,
+      source: req.body.source,
+      error: JSON.stringify(req.body.error),
+      version: req.body.version,
+      // https://stackoverflow.com/a/10849772/
+      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+    })
+    return res.json({ success: true })
+  } catch (e) {
+    logger.error(e)
+    return res.json({ success: false })
+  }
 })
 app.get('/api/themes', (req, res) => {
   res.set('Content-Type', 'text/json')
@@ -395,3 +400,7 @@ Promise.resolve()
   .then(reportUsage)
   .then(checkForNewVersion)
   .then(() => logger.success('Ready'))
+
+process.on('uncaughtException', err => {
+  logger.error('uncaughtException', err)
+})
