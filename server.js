@@ -400,7 +400,3 @@ Promise.resolve()
   .then(reportUsage)
   .then(checkForNewVersion)
   .then(() => logger.success('Ready'))
-
-process.on('uncaughtException', err => {
-  logger.error('uncaughtException', err)
-})
