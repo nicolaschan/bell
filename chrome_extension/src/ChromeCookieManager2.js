@@ -21,7 +21,7 @@ class CookieManager {
 
   set (key, value) {
     this.cookies[key] = cookieSerializer.serialize(value)
-    if (key == 'requestCache') {
+    if (key === 'requestCache') {
       chrome.storage.local.set({
         requestCache: cookieSerializer.serialize(value)
       })
@@ -63,7 +63,7 @@ var CookieManagerFactory = async function () {
       cookies['requestCache'] = cache
       cookieManager.cookies = cookies
       chrome.storage.local.set(cookies)
-    })    
+    })
   })()
 
   return cookieManager
