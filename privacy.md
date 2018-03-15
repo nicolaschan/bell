@@ -1,7 +1,9 @@
 # Countdown.zone Privacy Statement
-_Draft: Not yet effective_
+_Effective: March 15, 2018_
 
-We are committed to protecting user privacy, and even though the information we collect on [countdown.zone](https://countdown.zone) does not on its own allow us to identify specific individuals, we provide this privacy statement in order to be as transparent as possible about the information we do collect.
+We are committed to protecting user privacy. For this reason, we have developed our own analytics mechanism to provide us with enough information to continue to improve the service while proudly keeping third party trackers off of the website. 
+
+Even though the information we collect on [countdown.zone](https://countdown.zone) does not on its own allow us to identify specific individuals, we provide this privacy statement in order to be as transparent as possible about the information we do collect.
 
 This privacy statement only applies to the website [countdown.zone](https://countdown.zone) and not to any other sites or software.
 
@@ -16,9 +18,9 @@ In this document, our definition of "personal information" refers to "personally
  (7) Information concerning a user that the Web site or online service collects online from the user and maintains in personally identifiable form in combination with an identifier described in this subdivision.
 
 ## Summary
-- We **do not** collect personal information as defined above
-- If your browser allows it, we store some data on your computer to improve service and functionality (such as theme preferences)
-- We may report data we collect publicly
+- We **do not** collect personal information as defined above.
+- If your browser allows it, we store some data on your computer to improve service and functionality (such as theme preferences). This may be in cookies, local storage, indexed database, or similar.
+- We may report any data we collect publicly.
 
 ## Data We Collect
 Some examples of data we might collect (what we collect may not be limited to these):
@@ -31,7 +33,7 @@ Some examples of data we might collect (what we collect may not be limited to th
 - Version of the website code you are using
 
 ## Data We Do NOT Collect
-We do NOT collect:
+We **do not** collect:
 - Your class names
 - Your custom course schedule
 
@@ -53,4 +55,4 @@ Since we do not collect personal information, it is impossible for us to know fo
 If you believe you have sent us personal information and we have recorded it and you would like it removed, please email support@nc99.co.
 
 ## Changes to this Policy
-We may change this privacy policy without notice, so please check back regularly. This privacy policy was last updated on 14 March 2018.
+We may change this privacy policy without notice, so please check back regularly. This privacy policy was last updated on 15 March 2018.
