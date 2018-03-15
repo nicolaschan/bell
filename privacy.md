@@ -19,7 +19,7 @@ In this document, our definition of "personal information" refers to "personally
 
 ## Summary
 - We **do not** collect personal information as defined above.
-- If your browser allows it, we store some data on your computer to improve service and functionality (such as theme preferences). This may be in cookies, local storage, indexed database, or similar.
+- If your browser allows it, we store some data on your computer to improve service and functionality (such as, but not limited to, theme preferences). This may be in cookies, local storage, indexed database, or similar.
 - We may report any data we collect publicly.
 
 ## Data We Collect
