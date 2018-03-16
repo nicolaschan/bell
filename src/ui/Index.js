@@ -22,6 +22,9 @@ const Index = {
           model: uiModel
         })
       ]),
+      m('.footer-left', [
+        m('a[href=https://github.com/nicolaschan/bell/blob/master/README.md]', 'About'),
+        m('a[href=https://github.com/nicolaschan/bell/blob/master/privacy.md][style=margin-left:1em;]', 'Privacy')]),
       m('.footer-right', m('a[href=/settings]', {
         oncreate: m.route.link
       }, m('i.settings-icon.icon.material-icons', 'settings')))
