@@ -20,7 +20,7 @@ In this document, our definition of "personal information" refers to "personally
 ## Summary
 - We **do not** collect personal information as defined above.
 - If your browser allows it, we store some data on your computer to improve service and functionality (such as, but not limited to, theme preferences). This may be in cookies, local storage, indexed database, or similar.
-- We may report any data we collect publicly.
+- We may report any data we collect to the public.
 
 ## Data We Collect
 Below is a list of data we may collect when you visit the site. None of this data allows us to learn the identity of or contact particular individuals. The list also includes some example use cases that justify the data collection, but we may also use the data for other purposes.
@@ -45,7 +45,7 @@ We **do not** collect:
 - Your custom course schedule
 
 ## Sharing the Data
-Since we do not collect personal information, we may share data we collect publicly. For example, we may report aggregate statistics on [countdown.zone/stats](https://countdown.zone/stats).
+Since we do not collect personal information, we may share data we collect to the public. For example, we may report aggregate statistics on [countdown.zone/stats](https://countdown.zone/stats).
 
 ## Responding to Do Not Track
 Since we do not collect personal information, we do not respond to Do Not Track requests. The data we collect is not used to track users across multiple sites.
