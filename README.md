@@ -1,6 +1,6 @@
 # Bell Schedule Countdown
 [![Build Status](https://img.shields.io/travis/nicolaschan/bell.svg)](https://travis-ci.org/nicolaschan/bell)
-[![codecov.io](https://img.shields.io/codecov/c/github/nicolaschan/bell/master.svg)](http://codecov.io/github/nicolaschan/bell?branch=master)
+[![codecov.io](https://img.shields.io/codecov/c/github/nicolaschan/bell/master.svg)](https://codecov.io/github/nicolaschan/bell?branch=master)
 [![codebeat badge](https://codebeat.co/badges/aaca5932-6582-4334-a487-91680d43a994)](https://codebeat.co/projects/github-com-nicolaschan-bell-master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![dependencies Status](https://david-dm.org/nicolaschan/bell/status.svg)](https://david-dm.org/nicolaschan/bell)
@@ -37,5 +37,5 @@ Bell is a **synchronized timer that counts down to the next time the bell rings 
 Usage instructions are provided on [our wiki](https://github.com/nicolaschan/bell/wiki).
 
 ## Screenshots
-![screenshot](http://i.imgur.com/tgIC22s.png "Screenshot")
-![customizable](http://i.imgur.com/5wQH81b.png "Customizable")
+![screenshot](https://i.imgur.com/tgIC22s.png "Screenshot")
+![customizable](https://i.imgur.com/5wQH81b.png "Customizable")
