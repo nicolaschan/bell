@@ -50,7 +50,7 @@ const Settings = {
             }),
             m('.control__indicator'),
             m('span', 'Show period name in page title')
-        ])), 
+          ])),
 
         m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
           onclick: () => {
