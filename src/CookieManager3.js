@@ -24,7 +24,10 @@ class CookieManager {
 
   get (key, defaultValue) {
     if (!key) { return this.getAll() }
-    return this.cache[key] || defaultValue
+    if (this.cache[key] === undefined) {
+      return defaultValue
+    }
+    return this.cache[key]
   }
 
   async set (key, value) {

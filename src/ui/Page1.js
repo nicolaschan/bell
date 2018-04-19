@@ -17,7 +17,7 @@ var Timer = {
     var period = bellTimer.getCurrentPeriod().name
 
     // This should be moved out to somewhere that makes sense
-    document.title = `${time} | ${period}`
+    document.title = (vnode.attrs.model.cookieManager.get('title_period', true)) ? `${time} | ${period}` : time
 
     var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60)
     if (time.split(':').length > 2) { min = 60 }

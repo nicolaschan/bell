@@ -22,6 +22,7 @@ const Settings = {
     vnode.state.previousSource = source
   },
   view: function (vnode) {
+    document.title = 'Settings'
     return [
       m('.header', m('h1', 'Settings')),
       m('div[style=margin:1em auto;width:24em;]', [
@@ -39,6 +40,18 @@ const Settings = {
         }, 'Edit Periods')),
         m('.add-link', m('a.add#edit-classes-button[href=https://goo.gl/forms/LQumv10P4NY3jRf92]', 'Request School')),
         m('.add-link', m('a.add#edit-classes-button[href=https://goo.gl/forms/HgyL96yycOKKT0w22]', 'Report Problem')),
+        m('span',
+          m('label.control.control--checkbox', [
+            m('input.checkbox[type=checkbox]', {
+              onclick: m.withAttr('checked', checked => {
+                vnode.attrs.uiModel.cookieManager.set('title_period', checked)
+              }),
+              checked: vnode.attrs.uiModel.cookieManager.get('title_period', true)
+            }),
+            m('.control__indicator'),
+            m('span', 'Show period name in page title')
+        ])), 
+
         m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
           onclick: () => {
             vnode.attrs.uiModel.bellTimer.reloadData()
