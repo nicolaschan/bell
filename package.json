@@ -1,6 +1,6 @@
 {
     "name": "bell-countdown",
-    "version": "3.2.8",
+    "version": "3.2.9",
     "description": "Countdown to the next time the bell rings at school.",
     "main": "index.js",
     "scripts": {
