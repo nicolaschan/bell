@@ -14,9 +14,10 @@ var Timer = {
   view: function (vnode) {
     var bellTimer = vnode.attrs.model.bellTimer
     var time = bellTimer.getTimeRemainingString()
+    var period = bellTimer.getCurrentPeriod().name
 
     // This should be moved out to somewhere that makes sense
-    document.title = time
+    document.title = `${time} | ${period}`
 
     var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60)
     if (time.split(':').length > 2) { min = 60 }
