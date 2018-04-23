@@ -32,6 +32,7 @@ var initializePopup = async function () {
   extUIModel = new ExtUIModel(bellTimer, cookman, thememan, reqman)
   extUI = new ExtUI(extUIModel)
   global.cookman = cookman
+  global.reqman = reqman
   global.bellTimer = bellTimer
 
   extUIModel.setLoadingMessage('Synchronizing')

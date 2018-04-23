@@ -59,7 +59,7 @@ var CookieManagerFactory = async function () {
       if (!cache) {
         cache = cookieSerializer.serialize({})
       }
-      console.log(cache)
+      // console.log(cache)
       cookies['requestCache'] = cache
       cookieManager.cookies = cookies
       chrome.storage.local.set(cookies)
