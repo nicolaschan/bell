@@ -17,9 +17,13 @@ var padNumber = function (number, padding) {
 }
 
 var deleteClass = function (id, cookieManager) {
-  var classes = cookieManager.get('courses', {})
-  delete classes[id]
-  cookieManager.set('classes', classes)
+  var courses = cookieManager.get('courses', {})
+  delete courses[id]
+
+  // Bug fixed in >= 3.2.11, we were accidentially setting 'classes' cookie
+  cookieManager.remove('classes')
+
+  cookieManager.set('courses', courses)
 }
 
 const Classes = {

@@ -20,6 +20,11 @@ class Schedule {
       i++
     }
 
+    // If a period at the beginning is free, remove it
+    if (this.periods[0] && this.periods[0].display(this.bindings) === 'Free') {
+      this.periods.splice(0, 1)
+    }
+
     // Calculate number of periods
     var count = 0
     var previous

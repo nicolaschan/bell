@@ -230,6 +230,11 @@ class BellTimer {
     var displayTimeNumber = function (time) {
       time = Math.ceil(time / 1000) * 1000
       var hours = Math.floor(time / 1000 / 60 / 60)
+
+      if (hours >= (10 * 365 * 24)) {
+        return 'Infinity'
+      }
+
       var seconds = Math.floor(time / 1000 % 60).toString()
       if (seconds.length < 2) { seconds = '0' + seconds }
       var minutes = Math.floor(time / 1000 / 60 % 60).toString()
@@ -256,6 +261,13 @@ class BellTimer {
     var period
     while (!period || skip > 0) {
       date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + increment, 0, 0, 0, 0)
+      if (Math.abs(date.getTime() - Date.now()) > (10 * 365 * 24 * 60 * 60 * 1000)) {
+        return {
+          time: {hour: 0, min: 0},
+          name: 'No periods',
+          timestamp: date
+        }
+      }
       var schedule = this.calendar.getSchedule(date)
       period = (increment < 0) ? schedule.getLastPeriod(date) : schedule.getFirstPeriod(date)
       if (period) { skip-- }
