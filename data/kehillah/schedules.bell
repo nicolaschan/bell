@@ -205,3 +205,28 @@
 14:39 Passing to {Block 9}
 14:43 {Block 9}
 15:45 Free
+
+* finals-1 # Finals Day 1
+8:56 Passing to Science 
+9:00 Science 
+11:00 Free
+
+* finals-2 # Finals Day 2
+8:56 Passing to English
+9:00 English
+11:00 Lunch
+12:56 Passing to Computer Science
+13:00 Computer Science
+15:00 Free
+
+* finals-3 # Finals Day 3
+8:56 Passing to Math
+9:00 Math
+11:00 Free
+
+* finals-4 # Finals Day 4
+8:56 Passing to History
+9:00 History
+11:00 Free
+
+
