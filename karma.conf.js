@@ -1,3 +1,5 @@
+process.env.CHROME_BIN = require('puppeteer').executablePath()
+
 const path = require('path')
 
 module.exports = function (config) {
@@ -58,7 +60,12 @@ module.exports = function (config) {
         ]
       }
     },
-
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    },
     plugins: [
       require('karma-webpack'),
       require('istanbul-instrumenter-loader'),

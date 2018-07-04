@@ -15,7 +15,7 @@ pipeline {
             steps {
                 sh 'apt-get update'
                 sh 'apt-get install chromium -y'
-                sh 'CHROME_BIN=/usr/bin/chromium-browser yarn test'
+                sh 'CHROME_BIN=/usr/bin/chromium yarn test'
             }
         }
     }
