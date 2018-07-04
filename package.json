@@ -40,6 +40,7 @@
         "shortid": "^2.2.6",
         "standard": "^11.0.0",
         "timesync": "^1.0.1",
+        "ua-parser-js": "^0.7.18",
         "useragent": "^2.3.0"
     },
     "devDependencies": {
