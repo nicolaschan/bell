@@ -13,7 +13,9 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'yarn test'
+                sh 'apk update'
+                sh 'apk add chromium'
+                sh 'CHROME_BIN=/usr/bin/chromium-browser yarn test'
             }
         }
     }

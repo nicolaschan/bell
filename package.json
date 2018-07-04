@@ -10,7 +10,7 @@
         "watch": "yarn run build:dev --watch",
         "build:chrome": "cd chrome_extension; webpack",
         "build:chrome:watch": "yarn run build:chrome -- --watch",
-        "test": "karma start --single-run --browsers Firefox && standard",
+        "test": "karma start --single-run --browsers ChromeHeadless && standard",
         "test:manual": "karma start"
     },
     "author": "Nicolas Chan",
