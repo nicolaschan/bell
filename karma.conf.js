@@ -22,7 +22,6 @@ module.exports = function (config) {
     reporters: ['spec', 'coverage'],
 
     coverageReporter: {
-
       dir: 'coverage/',
       reporters: [{
         type: 'html'
@@ -32,6 +31,8 @@ module.exports = function (config) {
         type: 'lcov'
       }, {
         type: 'text-summary'
+      }, {
+        type: 'cobertura'
       }]
     },
 
