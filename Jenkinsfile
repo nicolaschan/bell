@@ -14,7 +14,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'apt-get update'
-                sh 'apt-get install libxss1 libnss3-dev libatk-bridge2.0-0 libgtk-3-0 -y'
+                sh 'apt-get install libasound2 libxss1 libnss3-dev libatk-bridge2.0-0 libgtk-3-0 -y'
                 sh 'CHROME_BIN=/usr/bin/chromium yarn test'
             }
         }
