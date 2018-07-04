@@ -7,6 +7,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                sh 'apk update'
+                sh 'apk add build-base'
                 sh 'yarn'
                 sh 'yarn build'
             }
