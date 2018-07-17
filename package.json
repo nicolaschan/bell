@@ -36,7 +36,7 @@
         "query-string": "^6.1.0",
         "request": "^2.83.0",
         "roboto-fontface": "^0.9.0",
-        "selectize": "^0.12.4",
+        "selectize": "=0.12.4",
         "shortid": "^2.2.6",
         "standard": "^11.0.0",
         "timesync": "^1.0.1",
