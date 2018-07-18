@@ -1,6 +1,7 @@
+require('dotenv-safe').config()
+
 const Promise = require('bluebird')
 
-const config = require('./config.json')
 const logger = require('loggy')
 const http = require('http')
 const express = require('express')
@@ -13,9 +14,13 @@ const uuid = require('uuid/v4')
 const request = Promise.promisifyAll(require('request'))
 const os = require('os')
 const timesyncServer = require('timesync/server')
+const compareVersions = require('compare-versions')
 
-const cacheTime = 60
-const analyticsHandler = config.postgres.enabled ? require('./PostgresAnalyticsHandler') : require('./SqliteAnalyticsHandler')
+const cacheTime = 60 // seconds
+const analyticsHandler = (process.env.POSTGRES_ENABLED === 'true') ? require('./PostgresAnalyticsHandler') : require('./SqliteAnalyticsHandler')
+
+const baseDir = path.join(__dirname, '..')
+const dataDir = path.join(baseDir, 'data')
 
 var previousCheck = 0
 var cache = function (time, f) {
@@ -48,7 +53,7 @@ var getVersion = cache(cacheTime, function () {
 })
 var getMessage = cache(cacheTime, function () {
   try {
-    return JSON.parse(fs.readFileSync(`./data/message.json`).toString())
+    return JSON.parse(fs.readFileSync(path.join(dataDir, 'message.json')).toString())
   } catch (e) {
     logger.error(e)
   }
@@ -59,7 +64,7 @@ var fetch = async function (source, file) {
   var res
   switch (sourceData.location) {
     case 'local':
-      res = await fs.readFileAsync(`data/${source}/${file}`)
+      res = await fs.readFileAsync(path.join(dataDir, source, file))
       return res.toString()
     case 'web':
       res = await request.getAsync(`${sourceData.url}/api/data/${source}/${file.split('.')[0]}`)
@@ -67,8 +72,8 @@ var fetch = async function (source, file) {
     case 'github':
       var pieces = sourceData.repo.split('/')
       var usernameRepo = pieces.slice(0, 2).join('/')
-      var path = pieces.slice(2).join('/')
-      res = await request.getAsync(`https://raw.githubusercontent.com/${usernameRepo}/master/${path}/${file}`)
+      var dirs = pieces.slice(2).join('/')
+      res = await request.getAsync(`https://raw.githubusercontent.com/${usernameRepo}/master/${dirs}/${file}`)
       return res.body
   }
 }
@@ -86,49 +91,43 @@ var getMeta = cache(cacheTime, async function (source) {
   return JSON.parse(meta)
 })
 var getSource = cache(cacheTime, async function (source) {
-  // if (source.substring(0, 3) == 'gh:') {
-  //     return {
-  //         location: 'github',
-  //         repo: source.substring(3).split(':').join('/')
-  //     };
-  // }
-  source = await fs.readFileAsync(`data/${source}/source.json`)
+  source = await fs.readFileAsync(path.join(dataDir, source, 'source.json'))
   return JSON.parse(source.toString())
 })
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'html', 'index.html'))
+  res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 app.get('/offline', (req, res) => {
-  res.sendFile(path.join(__dirname, 'html', 'offline.html'))
+  res.sendFile(path.join(baseDir, 'html', 'offline.html'))
 })
 app.get('/periods', (req, res) => {
-  res.sendFile(path.join(__dirname, 'html', 'index.html'))
+  res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 app.get('/classes', (req, res) => {
-  res.sendFile(path.join(__dirname, 'html', 'index.html'))
+  res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 app.get('/enter', (req, res) => {
-  res.sendFile(path.join(__dirname, 'html', 'index.html'))
+  res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 app.get('/settings', (req, res) => {
-  res.sendFile(path.join(__dirname, 'html', 'index.html'))
+  res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 app.get('/blog', (req, res) => {
-  res.sendFile(path.join(__dirname, 'html', 'index.html'))
+  res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 app.get('/stats', (req, res) => {
-  res.sendFile(path.join(__dirname, 'html', 'stats.html'))
+  res.sendFile(path.join(baseDir, 'html', 'stats.html'))
 })
 
 app.get('/manifest.json', (req, res) => {
-  res.sendFile(path.join(__dirname, 'manifest.json'))
+  res.sendFile(path.join(baseDir, 'manifest.json'))
 })
 
 app.get('/bin/service-worker.js', (req, res) => {
   res.set('Service-Worker-Allowed', '/')
   res.set('Cache-Control', 'no-cache, public')
-  res.sendFile(path.join(__dirname, 'bin', 'service-worker.js'))
+  res.sendFile(path.join(baseDir, 'bin', 'service-worker.js'))
 })
 app.get('/xt', (req, res) => {
   res.redirect('https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc')
@@ -155,8 +154,12 @@ app.get('/api/stats', async (req, res) => {
   })
 })
 
+const dataDirectories = () => {
+  return fs.readdirSync(dataDir).filter(name => fs.lstatSync(path.join(dataDir, name)).isDirectory())
+}
+
 app.get('/api/sources', async (req, res) => {
-  var directories = fs.readdirSync('data').filter(name => fs.lstatSync(path.join('data', name)).isDirectory())
+  var directories = dataDirectories()
 
   var sources = []
   for (let directory of directories) {
@@ -168,7 +171,7 @@ app.get('/api/sources', async (req, res) => {
   res.json(sources)
 })
 app.get('/api/sources/names', async (req, res) => {
-  var directories = fs.readdirSync('data').filter(name => fs.lstatSync(path.join('data', name)).isDirectory())
+  var directories = dataDirectories()
   res.json(directories)
 })
 
@@ -291,16 +294,16 @@ app.post('/api/errors', async (req, res) => {
 })
 app.get('/api/themes', (req, res) => {
   res.set('Content-Type', 'text/json')
-  res.sendFile(path.join(__dirname, 'data', 'themes.json'))
+  res.sendFile(path.join(baseDir, 'data', 'themes.json'))
 })
 app.get('/css/selectize.css', (req, res) => {
-  res.sendFile(path.join(__dirname, 'node_modules', 'selectize', 'dist', 'css', 'selectize.default.css'))
+  res.sendFile(path.join(baseDir, 'node_modules', 'selectize', 'dist', 'css', 'selectize.default.css'))
 })
 app.get('/css/bootstrap.min.css', (req, res) => {
-  res.sendFile(path.join(__dirname, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css'))
+  res.sendFile(path.join(baseDir, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css'))
 })
 app.get('/css/bootstrap.min.css.map', (req, res) => {
-  res.sendFile(path.join(__dirname, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css.map'))
+  res.sendFile(path.join(baseDir, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css.map'))
 })
 
 app.use('/favicons', express.static('favicons'))
@@ -316,16 +319,16 @@ app.use('/fonts', express.static('node_modules/roboto-fontface/fonts', {
 
 var startWebServer = function () {
   return new Promise((resolve, reject) => {
-    server.listen(config.port, err => {
+    server.listen(process.env.WEBSERVER_PORT, err => {
       if (err) { return reject(err) }
-      logger.success('Web server listening on *:' + config.port)
+      logger.success(`Web server listening on *:${process.env.WEBSERVER_PORT}`)
       return resolve()
     })
   })
 }
 
 var getServerID = async function () {
-  var idFile = path.join(__dirname, 'data', 'id.txt')
+  var idFile = path.join(dataDir, 'id.txt')
   try {
     var id = await fs.readFileAsync(idFile)
     return id
@@ -367,15 +370,20 @@ var getNewestVersion = async function () {
     throw new Error('Failed to get newest version')
   }
 }
-var alertAboutVersionChange = function (currentVersion, newVersion) {
-  if (currentVersion !== newVersion) {
+var alertAboutVersionChange = function (localVersion, remoteVersion) {
+  const comparison = compareVersions(localVersion, remoteVersion)
+
+  if (comparison > 0) {
+    // Local version is greater than the remote version
+    logger.info(`This is future version bell-countdown@${localVersion} (countdown.zone is ${remoteVersion})`)
+  } else if (comparison < 0) {
+    // Local version is less than the remote version
     logger.warn('There is a new version of bell-countdown available')
-    logger.warn(`You are using ${currentVersion} while the newest version available is ${newVersion}`)
+    logger.warn(`You are using ${localVersion} while the newest version available is ${remoteVersion}`)
     logger.warn('Please update by visiting https://countdown.zone/gh')
-    return false
   } else {
-    logger.log(`bell-countdown@${currentVersion} is up to date`)
-    return true
+    // Local version matches remote version
+    logger.info(`bell-countdown@${localVersion} is up to date`)
   }
 }
 
@@ -387,16 +395,16 @@ var checkForNewVersion = async function () {
       alertAboutVersionChange(getVersion(), newestVersion)
     }
   } catch (e) {
-    logger.warn('You may not be online — check your internet connection')
+    logger.warn('Check for new version failed — check your internet connection')
   }
 }
 setInterval(checkForNewVersion, 24 * cacheTime * cacheTime * 1000)
 
 Promise.resolve()
-  .then(() => logger.info('Initializing analytics handler'))
+  .then(() => logger.log('Initializing analytics handler'))
   .then(analyticsHandler.initialize)
-  .then(() => logger.info('Starting web server'))
+  .then(() => logger.log('Starting web server'))
   .then(startWebServer)
   .then(reportUsage)
   .then(checkForNewVersion)
-  .then(() => logger.success('Ready'))
+  .then(() => logger.success('Ready to accept connections'))

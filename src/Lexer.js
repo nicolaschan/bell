@@ -1,6 +1,6 @@
 const separators = ['*', ' ', '{', '}', '#']
 
-var splitAndPreserve = function (str, chars) {
+function splitAndPreserve (str, chars) {
   var pieces = ['']
   for (let c of str) {
     if (chars.indexOf(c) > -1) {
@@ -13,38 +13,30 @@ var splitAndPreserve = function (str, chars) {
   return pieces.filter(str => str.length > 0)
 }
 
-var lex = function (line) {
+function lex (line) {
   return splitAndPreserve(line, separators)
 }
 
-var drop = function (char, arr) {
+function drop (char, arr) {
   while (arr[0] === char) { arr = arr.slice(1) }
   return arr
 }
 
-var dropEnd = function (char, arr) {
+function dropEnd (char, arr) {
   while (arr[arr.length - 1] === char) { arr = arr.slice(0, -1) }
   return arr
 }
 
-var trim = function (char, arr) {
+function trim (char, arr) {
   return drop(char, dropEnd(char, arr))
 }
 
-var concat = function (arr) {
+function concat (arr) {
   return arr.reduce((a, b) => a.concat(b), '')
 }
 
-var remove = function (char, str) {
+function remove (char, str) {
   return concat(str.split(char))
 }
 
-module.exports = {
-  lex: lex,
-  drop: drop,
-  dropEnd: dropEnd,
-  trim: trim,
-  splitAndPreserve: splitAndPreserve,
-  concat: concat,
-  remove
-}
+module.exports = { splitAndPreserve, lex, drop, dropEnd, trim, concat, remove }

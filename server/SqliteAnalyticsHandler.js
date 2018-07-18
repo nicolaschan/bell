@@ -1,6 +1,7 @@
 const UAParser = require('useragent')
 const Database = require('better-sqlite3')
 const db = new Database('analytics.sqlite')
+const logger = require('loggy')
 
 var getDevice = function (result) {
   return (result.device.family || (result.device.vendor && result.device.model))
@@ -24,6 +25,7 @@ const ServerAnalyticsHandler = {
 
     // Add version column if there isn't one (for legacy support)
     ServerAnalyticsHandler.addVersionColumnIfNotExists()
+    logger.success('SQLite analytics handler initialized')
   },
   addVersionColumnIfNotExists: async () => {
     runSafe('hits', 'ALTER TABLE hits ADD COLUMN version')

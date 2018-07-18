@@ -1,11 +1,16 @@
 const UAParser = require('useragent')
-const config = require('./config.json')
 const logger = require('loggy')
 
 const {
   Pool
 } = require('pg')
-const db = new Pool(config.postgres)
+const db = new Pool({
+  user: process.env.POSTGRES_USER,
+  host: process.env.POSTGRES_HOST,
+  database: process.env.POSTGRES_DATABASE,
+  password: process.env.POSTGRES_PASSWORD,
+  port: process.env.POSTGRES_PORT
+})
 
 var getDevice = function (result) {
   return (result.device.family || (result.device.vendor && result.device.model))
@@ -46,7 +51,7 @@ const PostgresAnalyticsHandler = {
         version TEXT,
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
-    return db.query(`CREATE TABLE IF NOT EXISTS servers (
+    await db.query(`CREATE TABLE IF NOT EXISTS servers (
         id SERIAL,
         userId TEXT,
         ip TEXT,
@@ -58,6 +63,7 @@ const PostgresAnalyticsHandler = {
         node TEXT,
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
+    logger.success('Postgres analytics handler initialized')
   },
   disconnect: async () => {
     return db.end()
