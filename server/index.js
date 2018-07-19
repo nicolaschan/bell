@@ -22,6 +22,15 @@ const analyticsHandler = (process.env.POSTGRES_ENABLED === 'true') ? require('./
 const baseDir = path.join(__dirname, '..')
 const dataDir = path.join(baseDir, 'data')
 
+const initializeAnalyticsHandler = async () => {
+  try {
+    await analyticsHandler.initialize()
+  } catch (e) {
+    logger.error(e)
+    process.exit(1)
+  }
+}
+
 var previousCheck = 0
 var cache = function (time, f) {
   // takes a function and caches its result
@@ -400,9 +409,18 @@ var checkForNewVersion = async function () {
 }
 setInterval(checkForNewVersion, 24 * cacheTime * cacheTime * 1000)
 
+const { Pool } = require('pg')
+const db = new Pool({
+  user: process.env.POSTGRES_USER,
+  host: process.env.POSTGRES_HOST,
+  database: process.env.POSTGRES_DATABASE,
+  password: process.env.POSTGRES_PASSWORD,
+  port: process.env.POSTGRES_PORT
+})
+
 Promise.resolve()
   .then(() => logger.log('Initializing analytics handler'))
-  .then(analyticsHandler.initialize)
+  .then(initializeAnalyticsHandler)
   .then(() => logger.log('Starting web server'))
   .then(startWebServer)
   .then(reportUsage)
