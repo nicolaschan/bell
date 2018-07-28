@@ -18,10 +18,10 @@ module.exports = {
     }],
     {
       weekend: {
-        'background': 'linear-gradient(to bottom right, magenta, cyan)'
+        'background': 'linear-gradient(to bottom right, #e5bcff, cyan)'
       },
       holiday: {
-        'background': 'linear-gradient(to bottom right, cyan, magenta)'
+        'background': 'linear-gradient(to bottom right, cyan, #e5bcff)'
       }
     }
   )
