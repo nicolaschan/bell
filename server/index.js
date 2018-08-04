@@ -68,22 +68,28 @@ var getMessage = cache(cacheTime, function () {
   }
 })
 
+const getLocalData = async function (source, file) {
+  const data = await fs.readFileAsync(path.join(dataDir, source, file))
+  return data.toString()
+}
+
+const getWebData = async function (source, file, url) {
+  const response = await request.getAsync(`${url}/api/data/${source}/${file.split('.')[0]}`)
+  return response.body
+}
+
 var fetch = async function (source, file) {
-  var sourceData = await getSource(source)
-  var res
+  const sourceData = await getSource(source)
   switch (sourceData.location) {
     case 'local':
-      res = await fs.readFileAsync(path.join(dataDir, source, file))
-      return res.toString()
+      return getLocalData(source, file)
     case 'web':
-      res = await request.getAsync(`${sourceData.url}/api/data/${source}/${file.split('.')[0]}`)
-      return res.body
-    case 'github':
-      var pieces = sourceData.repo.split('/')
-      var usernameRepo = pieces.slice(0, 2).join('/')
-      var dirs = pieces.slice(2).join('/')
-      res = await request.getAsync(`https://raw.githubusercontent.com/${usernameRepo}/master/${dirs}/${file}`)
-      return res.body
+      try {
+        return (await getWebData(source, file, sourceData.url))
+      } catch (e) {
+        logger.warn(`Connection to ${sourceData.url} failed`)
+        return getLocalData(source, file)
+      }
   }
 }
 var getCorrection = cache(cacheTime, async function (source) {
@@ -408,15 +414,6 @@ var checkForNewVersion = async function () {
   }
 }
 setInterval(checkForNewVersion, 24 * cacheTime * cacheTime * 1000)
-
-const { Pool } = require('pg')
-const db = new Pool({
-  user: process.env.POSTGRES_USER,
-  host: process.env.POSTGRES_HOST,
-  database: process.env.POSTGRES_DATABASE,
-  password: process.env.POSTGRES_PASSWORD,
-  port: process.env.POSTGRES_PORT
-})
 
 Promise.resolve()
   .then(() => logger.log('Initializing analytics handler'))
