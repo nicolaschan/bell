@@ -12,10 +12,10 @@ const uuid = require('uuid/v4')
 const request = Promise.promisifyAll(require('request'))
 const os = require('os')
 const timesyncServer = require('timesync/server')
-const compareVersions = require('compare-versions')
 
 const register = require('./register')
 const data = require('./data')
+const checkForNewVersion = require('./updates')
 const baseDir = path.join(__dirname, '..')
 
 app.get('/', (req, res) => {
@@ -104,45 +104,6 @@ app.get('/:source', (req, res) => {
   res.redirect(`/?source=${req.params.source}`)
 })
 
-var newestVersion
-var getNewestVersion = async function () {
-  try {
-    var version = await request.getAsync('https://countdown.zone/api/version')
-    return version.body
-  } catch (e) {
-    // Failed to check for a new version
-    throw new Error('Failed to check for a new version')
-  }
-}
-var alertAboutVersionChange = function (localVersion, remoteVersion) {
-  const comparison = compareVersions(localVersion, remoteVersion)
-
-  if (comparison > 0) {
-    // Local version is greater than the remote version
-    logger.info(`This is future version bell-countdown@${localVersion} (countdown.zone is ${remoteVersion})`)
-  } else if (comparison < 0) {
-    // Local version is less than the remote version
-    logger.warn('There is a new version of bell-countdown available')
-    logger.warn(`You are using ${localVersion} while the newest version available is ${remoteVersion}`)
-    logger.warn('Please update by visiting https://countdown.zone/gh')
-  } else {
-    // Local version matches remote version
-    logger.info(`bell-countdown@${localVersion} is up to date`)
-  }
-}
-
-var checkForNewVersion = async function () {
-  try {
-    var version = await getNewestVersion()
-    if (version !== newestVersion) {
-      newestVersion = version
-      alertAboutVersionChange(await data.getVersion(), newestVersion)
-    }
-  } catch (e) {
-    logger.warn('Check for new version failed — check your internet connection')
-    logger.warn(e)
-  }
-}
 setInterval(checkForNewVersion, 24 * 60 * 60 * 1000)
 
 Promise.resolve()
