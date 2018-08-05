@@ -24,7 +24,7 @@ class AnalyticsManager {
 
     var send
     try {
-      send = await this.requestManager.post('/api/analytics', {
+      send = await this.requestManager.post('/api/stats/hit', {
         id: this.cookieManager.get('id'),
         newPageLoad: this.newPageLoad,
         theme: this.themeManager.currentThemeName,

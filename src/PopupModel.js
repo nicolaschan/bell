@@ -1,10 +1,10 @@
 const UAParser = require('ua-parser-js')
 
 // Return true if obj1 contains all the keys of obj2 (deep)
-var deepCompare = function (obj1, obj2) {
+const deepCompare = function (obj1, obj2) {
   if (typeof obj1 !== 'object') { return obj1 === obj2 }
 
-  for (var key in obj2) {
+  for (let key in obj2) {
     if (!deepCompare(obj1[key], obj2[key])) { return false }
   }
   return true
@@ -28,10 +28,12 @@ class PopupModel {
   }
 
   async refresh () {
-    var messages = await this.requestManager.get('/api/message', [])
-    var ua = UAParser(navigator.userAgent)
-    for (var message of messages) {
-      var matches = !message.agent || deepCompare(ua, message.agent)
+    const dataSource = this.cookieManager.get('source', 'lahs')
+    const messages = await this.requestManager.get(`/api/data/${dataSource}/message`, [])
+    const ua = UAParser(navigator.userAgent)
+
+    for (let message of messages) {
+      const matches = !message.agent || deepCompare(ua, message.agent)
       if (matches) {
         this.enabled = message.message.enabled
         this.text = message.message.text.trim()

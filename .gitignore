@@ -3,6 +3,7 @@ analytics.sqlite
 
 # Ignore unique server ID
 data/id.txt
+id.txt
 
 # Because Jonathan uses a mac
 .DS_Store

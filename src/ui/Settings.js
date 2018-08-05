@@ -55,6 +55,7 @@ const Settings = {
         m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
           onclick: () => {
             vnode.attrs.uiModel.bellTimer.reloadData()
+            vnode.attrs.uiModel.popupModel.refresh()
             m.route.set('/')
           }
         }, m('i.done-icon.icon.material-icons', 'done'))),
