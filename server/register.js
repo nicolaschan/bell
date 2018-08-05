@@ -37,7 +37,6 @@ function register (url) {
         }
       })
     } catch (e) {
-      console.error(e)
       // do nothing
     }
   }

@@ -41,7 +41,6 @@ const checkForNewVersion = async function () {
     }
   } catch (e) {
     logger.warn('Check for new version failed — check your internet connection')
-    logger.warn(e)
   }
 }
 
