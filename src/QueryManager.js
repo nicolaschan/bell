@@ -1,4 +1,4 @@
-module.exports = function (url, cookieManager) {
+module.exports = async function (url, cookieManager) {
   // from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
   var getParameterByName = function (name, url) {
     name = name.replace(/[[\]]/g, '\\$&')
@@ -15,11 +15,15 @@ module.exports = function (url, cookieManager) {
   if (secretParameter && enabledSecrets.indexOf(secretParameter) < 0) { enabledSecrets.push(secretParameter) }
 
   var removeSecretParameter = getParameterByName('rmsecret', url)
-  if (removeSecretParameter && enabledSecrets.indexOf(removeSecretParameter) > -1) { enabledSecrets.splice(enabledSecrets.indexOf(removeSecretParameter), 1) }
-  cookieManager.set('secrets', enabledSecrets)
+  if (removeSecretParameter && enabledSecrets.indexOf(removeSecretParameter) > -1) {
+    enabledSecrets.splice(enabledSecrets.indexOf(removeSecretParameter), 1)
+  }
+  await cookieManager.set('secrets', enabledSecrets)
 
   var source = getParameterByName('source', url)
-  if (source) { cookieManager.set('source', source) }
+  if (source) {
+    await cookieManager.set('source', source)
+  }
 
-  if (secretParameter || removeSecretParameter || source) { window.location = '/' }
+  if (secretParameter || removeSecretParameter || source) { history.pushState(null, null, '/') }
 }

@@ -6,6 +6,21 @@ const analyticsHandler = require(
   (process.env.POSTGRES_ENABLED === 'true')
     ? './PostgresAnalyticsHandler' : './SqliteAnalyticsHandler')
 
+function getIp (req) {
+  // https://stackoverflow.com/a/10849772/
+  return req.headers['x-forwarded-for'] || req.connection.remoteAddress
+}
+
+function extractRegisterBody (req) {
+  return {
+    id: req.body.id,
+    version: req.body.version,
+    os: req.body.os,
+    node: req.body.node,
+    ip: getIp(req)
+  }
+}
+
 router.get('/', async (req, res) => {
   res.json({
     totalHits: (await analyticsHandler.getTotalDailyHits()).rows,
@@ -25,8 +40,7 @@ router.post('/hit', async (req, res) => {
       theme: req.body.theme,
       source: req.body.source,
       version: req.body.version,
-      // https://stackoverflow.com/a/10849772/
-      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+      ip: getIp(req)
     })
     return res.json({ success: true })
   } catch (e) {
@@ -36,14 +50,16 @@ router.post('/hit', async (req, res) => {
 })
 router.post('/server', async (req, res) => {
   try {
-    await analyticsHandler.recordServer({
-      id: req.body.id,
-      version: req.body.version,
-      os: req.body.os,
-      node: req.body.node,
-      // https://stackoverflow.com/a/10849772/
-      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
-    })
+    await analyticsHandler.recordServer(extractRegisterBody(req))
+    return res.json({ success: true })
+  } catch (e) {
+    logger.error(e)
+    return res.json({ success: false })
+  }
+})
+router.post('/api', async (req, res) => {
+  try {
+    await analyticsHandler.recordApi(extractRegisterBody(req))
     return res.json({ success: true })
   } catch (e) {
     logger.error(e)

@@ -63,7 +63,7 @@ $(window).on('load', async function () {
   logger.info(`bell-countdown version ${VERSION}`)
   uiModel.setLoadingMessage('Loading')
   await cookieManager.initialize()
-  processQuery(window.location.href, cookieManager)
+  await processQuery(window.location.href, cookieManager)
   // CHANGE THIS FOR LOCAL TESTING TO THE ID FOUND IN CHROME://EXTENSIONS
   chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc')
   uiModel.setLoadingMessage('Synchronizing')

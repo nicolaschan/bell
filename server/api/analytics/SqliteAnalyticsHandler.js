@@ -22,6 +22,7 @@ const ServerAnalyticsHandler = {
     db.prepare('CREATE TABLE IF NOT EXISTS hits (user, userAgent, browser, device, os, theme, source, ip, version, timestamp DATETIME)').run()
     db.prepare('CREATE TABLE IF NOT EXISTS errors (user, userAgent, browser, device, os, theme, source, ip, error, version, timestamp DATETIME)').run()
     db.prepare('CREATE TABLE IF NOT EXISTS servers (user, ip, version, platform, release, type, arch, node, timestamp DATETIME)').run()
+    db.prepare('CREATE TABLE IF NOT EXISTS api (user, ip, version, platform, release, type, arch, node, timestamp DATETIME)').run()
 
     // Add version column if there isn't one (for legacy support)
     ServerAnalyticsHandler.addVersionColumnIfNotExists()
@@ -41,6 +42,11 @@ const ServerAnalyticsHandler = {
   },
   recordServer: async (data) => {
     return db.prepare(`INSERT INTO servers (user, ip, version, platform, release, type, arch, node, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))`).run(
+      data.id, data.ip, data.version, data.os.platform, data.os.release, data.os.type, data.os.arch, data.node)
+  },
+  recordApi: async (data) => {
+    return db.prepare(`INSERT INTO api (user, ip, version, platform, release, type, arch, node, timestamp)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime("now"))`).run(
       data.id, data.ip, data.version, data.os.platform, data.os.release, data.os.type, data.os.arch, data.node)
   },

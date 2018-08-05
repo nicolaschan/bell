@@ -14,6 +14,7 @@ const os = require('os')
 const timesyncServer = require('timesync/server')
 const compareVersions = require('compare-versions')
 
+const register = require('./register')
 const data = require('./data')
 const baseDir = path.join(__dirname, '..')
 
@@ -99,38 +100,9 @@ var startWebServer = function () {
   })
 }
 
-var getServerID = async function () {
-  var idFile = path.join(__dirname, '..', 'id.txt')
-  try {
-    var id = await fs.readFileAsync(idFile)
-    return id
-  } catch (e) {
-    var newId = uuid()
-    await fs.writeFileAsync(idFile, newId)
-    return newId
-  }
-}
-
-var reportUsage = async function () {
-  var serverId = await getServerID()
-  try {
-    await request.postAsync('https://countdown.zone/api/analytics/server', {
-      form: {
-        id: serverId,
-        os: {
-          platform: os.platform(),
-          release: os.release(),
-          type: os.type(),
-          arch: os.arch()
-        },
-        node: process.version,
-        version: await data.getVersion()
-      }
-    })
-  } catch (e) {
-    // Failed to report this server instance
-  }
-}
+app.get('/:source', (req, res) => {
+  res.redirect(`/?source=${req.params.source}`)
+})
 
 var newestVersion
 var getNewestVersion = async function () {
@@ -179,7 +151,7 @@ Promise.resolve()
   .then(api => app.use('/api', api))
   .then(() => logger.log('Starting web server'))
   .then(startWebServer)
-  .then(reportUsage)
+  .then(register.registerServer)
   .then(checkForNewVersion)
   .then(() => logger.success('Ready to accept connections'))
   .catch(logger.error)

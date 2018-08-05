@@ -63,6 +63,18 @@ const PostgresAnalyticsHandler = {
         node TEXT,
         timestamp TIMESTAMP WITH TIME ZONE
     )`)
+    await db.query(`CREATE TABLE IF NOT EXISTS api (
+        id SERIAL,
+        userId TEXT,
+        ip TEXT,
+        version TEXT,
+        platform TEXT,
+        release TEXT,
+        type TEXT,
+        arch TEXT,
+        node TEXT,
+        timestamp TIMESTAMP WITH TIME ZONE
+    )`)
     logger.success('Postgres analytics handler initialized')
   },
   disconnect: async () => {
@@ -81,6 +93,14 @@ const PostgresAnalyticsHandler = {
   recordServer: async (user) => {
     return db.query({
       text: `INSERT INTO servers (userId, ip, version, platform, release, type, arch, node, timestamp) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TIMESTAMP 'now')`,
+      values: [
+        user.id, user.ip, user.version, user.os.platform, user.os.release, user.os.type, user.os.arch, user.node
+      ]})
+  },
+  recordApi: async (user) => {
+    return db.query({
+      text: `INSERT INTO api (userId, ip, version, platform, release, type, arch, node, timestamp) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TIMESTAMP 'now')`,
       values: [
         user.id, user.ip, user.version, user.os.platform, user.os.release, user.os.type, user.os.arch, user.node
