@@ -5,7 +5,7 @@ const fs = Promise.promisifyAll(require('fs'))
 const path = require('path')
 const data = require('../data')
 
-const schoolsDir = path.join(__dirname, '..', '..', 'schedules', 'schools')
+const schoolsDir = path.join(__dirname, '..', '..', 'schedules')
 
 /**
  * Get the names of the supported schools

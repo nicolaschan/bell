@@ -20,7 +20,7 @@ const validateSource = function (source) {
 
 const getLocalData = async function (source, file) {
   if (!validateSource(source)) { throw new Error('Source contains invalid characters') }
-  const data = await fs.readFileAsync(path.join(dataDir, 'schools', source, file))
+  const data = await fs.readFileAsync(path.join(dataDir, source, file))
   return data.toString()
 }
 
