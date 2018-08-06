@@ -13,12 +13,12 @@ const schoolsDir = path.join(__dirname, '..', '..', 'schedules')
  */
 const dataDirectories = async () => {
   const contents = await fs.readdirAsync(schoolsDir)
-  return Promise.all(contents.filter(async name =>
-    (await fs.lstatAsync(path.join(schoolsDir, name))).isDirectory()))
+  return contents.filter(name =>
+    fs.lstatSync(path.join(schoolsDir, name)).isDirectory())
 }
 
 router.get('/', async (req, res) => {
-  var directories = await dataDirectories()
+  const directories = await dataDirectories()
   const sources = await Promise.all(directories.map(async directory => {
     const source = await data.getMeta(directory)
     source.id = directory

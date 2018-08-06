@@ -54,8 +54,12 @@ const getCalendar = cache(async function (source) {
   return fetch(source, 'calendar.bell')
 })
 const getMeta = cache(async function (source) {
-  const meta = await fetch(source, 'meta.json')
-  return JSON.parse(meta)
+  try {
+    const meta = await fetch(source, 'meta.json')
+    return JSON.parse(meta)
+  } catch (e) {
+    return JSON.parse(await getLocalData(source, 'meta.json'))
+  }
 })
 const getSource = cache(async function (source) {
   source = await getLocalData(source, 'source.json')
