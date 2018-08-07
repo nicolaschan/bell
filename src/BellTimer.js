@@ -107,13 +107,10 @@ class BellTimer {
     this.calendar = calendar
   }
 
-  loadData (dataSource, sources, version, correction, schedules, calendar) {
-    if (sources.indexOf(dataSource) < 0) {
+  loadData (sources, version, correction, schedules, calendar) {
+    if (sources.indexOf(this.source) < 0) {
       this.cookieManager.remove('source')
-      return this.loadData(dataSource, sources, version, correction, schedules, calendar)
     }
-
-    this.source = dataSource
 
     if (this.version && this.version !== version) {
       // Give IndexedDB time to write (TODO: make more robust)
@@ -132,29 +129,39 @@ class BellTimer {
   }
 
   set source (value) {
+    const different = this.source !== value
     this.cookieManager.set('source', value)
+    if (different) {
+      return this.reloadData()
+    }
   }
 
   get source () {
-    return this.cookieManager.get('source')
+    return this.cookieManager.get('source', 'lahs')
+  }
+
+  async fetchData () {
+    return Promise.all([
+      this.requestManager.get('/api/sources/names', []),
+      this.requestManager.get('/api/version'),
+      this.requestManager.get(`/api/data/${this.source}/correction`, '0'),
+      this.requestManager.get(`/api/data/${this.source}/schedules`),
+      this.requestManager.get(`/api/data/${this.source}/calendar`)
+    ])
   }
 
   async reloadData () {
-    var dataSource = this.cookieManager.get('source', 'lahs')
-    if (dataSource === 'custom') {
-      this.source = dataSource
+    if (this.source === 'custom') {
       return this.loadCustomCourses()
     }
-
-    var [sources, version, correction, schedules, calendar] = await Promise.all([
-      this.requestManager.get('/api/sources/names', []),
-      this.requestManager.get('/api/version'),
-      this.requestManager.get(`/api/data/${dataSource}/correction`, '0'),
-      this.requestManager.get(`/api/data/${dataSource}/schedules`),
-      this.requestManager.get(`/api/data/${dataSource}/calendar`)
-    ])
-
-    return this.loadData(dataSource, sources, version, correction, schedules, calendar)
+    try {
+      const [sources, version, correction, schedules, calendar] = await this.fetchData()
+      return this.loadData(sources, version, correction, schedules, calendar)
+    } catch (e) {
+      // something went wrong fetching source data, so let's just reset it
+      this.cookieManager.remove('source')
+      return this.reloadData()
+    }
   }
 
   async initialize () {
@@ -175,7 +182,7 @@ class BellTimer {
       // Full URL is necessary for Chrome extension
       // If not building Chrome extension,
       // server can be changed to '/timesync'
-      server: 'https://countdown.zone/timesync',
+      server: '/timesync',
       interval: 4 * 60 * 1000
     })
 

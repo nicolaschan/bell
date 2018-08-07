@@ -24,7 +24,8 @@ const addUIModel = function (element, uiModel) {
           m('.loading-message', uiModel.state.errorMessage.value)
         ])
       }
-      return m(element, { uiModel })
+      vnode.attrs.uiModel = uiModel
+      return m(element, vnode.attrs)
     }
   }
 }
@@ -39,7 +40,8 @@ class MithrilUI {
       '/settings': addUIModel(Settings, uiModel),
       '/periods': addUIModel(PeriodEntry, uiModel),
       '/classes': addUIModel(Classes, uiModel),
-      '/enter': addUIModel(Enter, uiModel)
+      '/enter': addUIModel(Enter, uiModel),
+      '/:source': addUIModel(Index, uiModel)
     })
   }
 

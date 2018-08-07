@@ -7,6 +7,16 @@ const Popup = require('./Popup')
 const SchoolIndicator = require('./SchoolIndicator')
 
 const Index = {
+  oninit: function (vnode) {
+    if (vnode.attrs.source) {
+      vnode.attrs.uiModel.bellTimer.source = vnode.attrs.source
+    }
+  },
+  onupdate: function (vnode) {
+    if (m.route.get() !== `/${vnode.attrs.uiModel.bellTimer.source}`) {
+      m.route.set(vnode.attrs.uiModel.bellTimer.source)
+    }
+  },
   view: function (vnode) {
     var uiModel = vnode.attrs.uiModel
 
