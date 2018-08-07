@@ -9,6 +9,7 @@
         "build": "webpack --config webpack.production.js",
         "build:prod": "webpack --config webpack.production.js",
         "build:dev": "webpack --config webpack.dev.js",
+	"build:ts": "webpack --config webpack.config.js",
         "watch": "yarn run build:dev --watch",
         "build:chrome": "cd chrome_extension; webpack",
         "build:chrome:watch": "yarn run build:chrome -- --watch",
@@ -46,7 +47,7 @@
         "shortid": "^2.2.6",
         "standard": "^11.0.0",
         "timesync": "^1.0.1",
-        "typescript": "^2.9.2",
+        "typescript": "^3.0.1",
         "ua-parser-js": "^0.7.18",
         "useragent": "^2.3.0"
     },
