@@ -1,3 +1,6 @@
+# Environment variable config
+.env
+
 # Ignore database file
 analytics.sqlite
 
