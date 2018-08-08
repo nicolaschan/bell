@@ -175,7 +175,7 @@ class BellTimer {
       // Full URL is necessary for Chrome extension
       // If not building Chrome extension,
       // server can be changed to '/timesync'
-      server: 'https://countdown.zone/timesync',
+      server: '/timesync',
       interval: 4 * 60 * 1000
     })
 

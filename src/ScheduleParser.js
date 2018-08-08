@@ -7,7 +7,7 @@ const {
 } = require('./Lexer')
 
 const Schedule = require('./Schedule')
-const Period = require('./Period')
+const Period = require('./Period').default
 
 var parseLine = function (line) {
   var [head, ...tokens] = drop(' ', lex(line))
