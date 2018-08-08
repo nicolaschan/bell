@@ -10,10 +10,19 @@ module.exports = {
   },
   module: {
     rules: [{
-      test: /\.js$/,
-      exclude: /node_modules/,
-      loader: 'babel-loader'
+      test: /\.(js|ts)x?$/,
+      use: 'babel-loader',
+      exclude: /node_modules/
+    }, {
+      test: /\.tsx?$/,
+      use: {
+        loader: 'ts-loader'
+      },
+      exclude: /node_modules/
     }]
+  },
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ]
   },
   output: {
     path: path.join(__dirname, 'bin'),

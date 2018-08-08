@@ -1,5 +1,4 @@
 process.env.CHROME_BIN = require('puppeteer').executablePath()
-
 const path = require('path')
 
 module.exports = function (config) {
@@ -16,24 +15,14 @@ module.exports = function (config) {
     frameworks: ['mocha'],
     preprocessors: {
       // add webpack as preprocessor
-      'test/*.js': ['webpack']
+      'test/**/*': ['webpack', 'sourcemap']
     },
 
-    reporters: ['spec', 'coverage'],
+    reporters: ['spec', 'coverage-istanbul'],
 
-    coverageReporter: {
-      dir: 'coverage/',
-      reporters: [{
-        type: 'html'
-      }, {
-        type: 'text'
-      }, {
-        type: 'lcov'
-      }, {
-        type: 'text-summary'
-      }, {
-        type: 'cobertura'
-      }]
+    coverageIstanbulReporter: {
+      reports: ['text', 'json-summary', 'text-summary', 'cobertura', 'html'],
+      dir: path.join(__dirname, 'coverage')
     },
 
     webpack: {
@@ -42,23 +31,28 @@ module.exports = function (config) {
       // webpack watches dependencies
 
       // webpack configuration
-
-      node: {
-        fs: 'empty'
-      },
-
-      // Instrument code that isn't test or vendor code.
+      mode: 'development',
       module: {
-        rules: [
-          // instrument only testing sources with Istanbul
-          {
-            test: /\.js$/,
-            use: {
-              loader: 'istanbul-instrumenter-loader'
-            },
-            include: path.resolve('src/')
-          }
-        ]
+        rules: [{
+          test: /\.tsx?$/,
+          use: {
+            loader: 'ts-loader'
+          },
+          exclude: /node_modules/
+        }, {
+          test: /\.(js|ts)x?$/,
+          use: {
+            loader: 'istanbul-instrumenter-loader',
+            options: {
+              esModules: true
+            }
+          },
+          enforce: 'post',
+          include: path.resolve('src/')
+        }]
+      },
+      resolve: {
+        extensions: [ '.tsx', '.ts', '.js' ]
       }
     },
     customLaunchers: {
@@ -68,6 +62,7 @@ module.exports = function (config) {
       }
     },
     plugins: [
+      require('karma-sourcemap-loader'),
       require('karma-webpack'),
       require('istanbul-instrumenter-loader'),
       require('karma-mocha'),

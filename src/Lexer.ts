@@ -18,7 +18,9 @@ function lex (line: string): string[] {
 }
 
 function drop (char: string, arr: string[]): string[] {
-  while (arr[0] === char) { arr = arr.slice(1) }
+  while (arr[0] === char) {
+    arr = arr.slice(1)
+  }
   return arr
 }
 
