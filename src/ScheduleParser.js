@@ -6,7 +6,7 @@ const {
   remove
 } = require('./Lexer')
 
-const Schedule = require('./Schedule')
+const Schedule = require('./Schedule').default
 const Period = require('./Period').default
 
 var parseLine = function (line) {

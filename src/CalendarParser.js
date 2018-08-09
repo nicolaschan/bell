@@ -6,7 +6,7 @@ const {
   concat,
   remove
 } = require('./Lexer')
-const Calendar = require('./Calendar')
+const Calendar = require('./Calendar').default
 
 var parse = function (str, schedules) {
   str = remove('\r', str)

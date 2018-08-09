@@ -1,6 +1,6 @@
-import format from './FormatString'
+import { Bindings, default as format } from './FormatString'
 
-interface Time {
+export interface Time {
   hour: number,
   min: number
 }
@@ -14,7 +14,7 @@ export default class Period {
     this.formatString = formatString
   }
 
-  display (bindings: { [key: string]: string } = {}): string {
+  display (bindings: Bindings = {}): string {
     return format(this.formatString, bindings)
   }
 

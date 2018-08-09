@@ -1,5 +1,21 @@
-class Schedule {
-  constructor (name, display, periods, bindings = {}) {
+import { Bindings } from './FormatString'
+import { default as Period, Time } from './Period'
+
+interface PeriodObject {
+  time: Time,
+  name: string,
+  timestamp: Date
+}
+
+export default class Schedule {
+
+  name: string
+  display: string
+  periods: Period[]
+  bindings: Bindings
+  length: number
+
+  constructor (name: string, display: string, periods: Period[], bindings: Bindings = {}) {
     this.name = name
     this.display = display
     this.bindings = bindings
@@ -38,26 +54,26 @@ class Schedule {
     this.length = count
   }
 
-  overrideDisplay (display) {
+  overrideDisplay (display: string | null): Schedule {
     if (!display) { return this }
     return new Schedule(this.name, display, this.periods, this.bindings)
   }
 
-  getCurrentPeriodIndex (date) {
-    var time = {
+  getCurrentPeriodIndex (date: Date): number {
+    var time: Time = {
       hour: date.getHours(),
       min: date.getMinutes()
     }
 
     for (let i in this.periods) {
       let period = this.periods[i]
-      if (period.time.hour > time.hour) { return i - 1 }
-      if (period.time.hour >= time.hour && period.time.min > time.min) { return i - 1 }
+      if (period.time.hour > time.hour) { return Number(i) - 1 }
+      if (period.time.hour >= time.hour && period.time.min > time.min) { return Number(i) - 1 }
     }
     return this.periods.length - 1
   }
 
-  getPeriodByIndex (i, date) {
+  getPeriodByIndex (i: number, date: Date): PeriodObject {
     var period = this.periods[i]
 
     if (period) {
@@ -69,22 +85,20 @@ class Schedule {
     }
   }
 
-  getFirstPeriod (date) {
+  getFirstPeriod (date: Date): PeriodObject {
     return this.getPeriodByIndex(0, date)
   }
-  getLastPeriod (date) {
+  getLastPeriod (date: Date): PeriodObject {
     return this.getPeriodByIndex(this.length - 1, date)
   }
 
-  getCurrentPeriod (date) {
+  getCurrentPeriod (date: Date): PeriodObject {
     return this.getPeriodByIndex(this.getCurrentPeriodIndex(date), date)
   }
-  getNextPeriod (date) {
+  getNextPeriod (date: Date): PeriodObject {
     return this.getPeriodByIndex(this.getCurrentPeriodIndex(date) + 1, date)
   }
-  getPreviousPeriod (date) {
+  getPreviousPeriod (date: Date): PeriodObject {
     return this.getPeriodByIndex(this.getCurrentPeriodIndex(date) - 1, date)
   }
 }
-
-module.exports = Schedule

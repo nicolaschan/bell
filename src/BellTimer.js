@@ -300,7 +300,9 @@ class BellTimer {
     var date = this.getDate()
     var completedPeriods = []
     var schedule = this.getCurrentSchedule()
-    for (var i = 0; i < this.getCurrentPeriodNumber(); i++) { completedPeriods.push(schedule.getPeriodByIndex(i, date)) }
+    for (var i = 0; i < this.getCurrentPeriodNumber(); i++) {
+      completedPeriods.push(schedule.getPeriodByIndex(i, date))
+    }
     return completedPeriods
   }
 
@@ -308,7 +310,9 @@ class BellTimer {
     var date = this.getDate()
     var futurePeriods = []
     var schedule = this.getCurrentSchedule()
-    for (var i = this.getCurrentPeriodNumber() + 1; i < schedule.length; i++) { futurePeriods.push(schedule.getPeriodByIndex(i, date)) }
+    for (var i = this.getCurrentPeriodNumber() + 1; i < schedule.length; i++) {
+      futurePeriods.push(schedule.getPeriodByIndex(i, date))
+    }
     return futurePeriods
   }
 

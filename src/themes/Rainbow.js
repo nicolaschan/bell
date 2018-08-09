@@ -1,4 +1,4 @@
-const ConstantTiming = require('./timings/ConstantTiming')
+const ConstantTiming = require('./timings/ConstantTiming').default
 const BasicLightAndDarkTheme = require('./templates/BasicLightAndDarkTheme')
 
 module.exports = BasicLightAndDarkTheme(

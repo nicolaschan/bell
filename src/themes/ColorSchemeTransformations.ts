@@ -1,7 +1,7 @@
-type ShorthandColor = string | object
-type Color = { [property: string]: string } // a CSS properties object
+export type ShorthandColor = string | object
+export type Color = { [property: string]: string } // a CSS properties object
 
-interface ColorScheme<T> {
+export interface ColorScheme<T> {
   background: T, 
   text: T,
   subtext: T,
