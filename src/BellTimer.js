@@ -3,9 +3,9 @@
 const _ = require('lodash')
 const $ = require('jquery')
 
-const Period = require('./Period')
-const Schedule = require('./Schedule')
-const Calendar = require('./Calendar')
+const Period = require('./Period').default
+const Schedule = require('./Schedule').default
+const Calendar = require('./Calendar').default
 
 class BellTimer {
   constructor (cookieManager, requestManager) {
