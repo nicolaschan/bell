@@ -1,6 +1,5 @@
 /* global timesync */
 
-const _ = require('lodash')
 const $ = require('jquery')
 
 const BellCalculator = require('./BellCalculator').default
@@ -113,7 +112,7 @@ class BellTimer {
     this.ts = ts
 
     return new Promise((resolve, reject) =>
-      ts.on('sync', _.once(() => resolve(ts))))
+      ts.on('sync', () => resolve(ts)))
   }
 
   setCorrection (correction) {
