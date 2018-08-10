@@ -6,6 +6,15 @@
     "module": "es6",
     "target": "es6",
     "jsx": "react",
-    "allowJs": true
-  }
+    "allowJs": true,
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
+  "exclude": [
+    "node_modules",
+    "**/bin"
+  ]
 }

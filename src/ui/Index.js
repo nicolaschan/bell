@@ -7,6 +7,12 @@ const Popup = require('./Popup')
 const SchoolIndicator = require('./SchoolIndicator')
 
 const Index = {
+  oninit: async function (vnode) {
+    const BellTimer = require('../BellTimer2').default
+    const SynchronizedDate = require('../SynchronizedDate').default
+    const CorrectedDate = require('../CorrectedDate').default
+    vnode.state.bellTimer = new BellTimer(vnode.attrs.source, new CorrectedDate(new SynchronizedDate()))
+  },
   view: function (vnode) {
     var uiModel = vnode.attrs.uiModel
 

@@ -3,8 +3,8 @@ const path = require('path')
 
 module.exports = {
   entry: {
-    stats: ['babel-polyfill', './src/stats.js'],
-    online: ['babel-polyfill', './src/online.js'],
+    'stats': ['babel-polyfill', './src/stats.js'],
+    'online': ['babel-polyfill', './src/online.js'],
     'client-mithril': ['babel-polyfill', './src/client-mithril.js'],
     'service-worker': ['babel-polyfill', './src/service-worker.js']
   },

@@ -1,46 +1,46 @@
 export type ShorthandColor = string | object
-export type Color = { [property: string]: string } // a CSS properties object
+export interface IColor { [property: string]: string } // a CSS properties object
 
-export interface ColorScheme<T> {
-  background: T, 
-  text: T,
-  subtext: T,
-  contrast: T 
+export interface IColorScheme<T> {
+  background: T
+  text: T
+  subtext: T
+  contrast: T
 }
 
-function shorthandToColor(shorthand: ShorthandColor, property: string): Color {
+function shorthandToColor (shorthand: ShorthandColor, property: string): IColor {
   if (typeof shorthand === 'string') {
-    const color: Color = {}
-    color[property] = <string> shorthand
+    const color: IColor = {}
+    color[property] = shorthand
     return color
   }
-  return <Color> shorthand
+  return shorthand as IColor
 }
 
 // Translate simplified color strings to full color object
-export function fromObjectStrings (color: ColorScheme<ShorthandColor>): ColorScheme<Color> {
+export function fromObjectStrings (color: IColorScheme<ShorthandColor>): IColorScheme<IColor> {
   return {
     background: shorthandToColor(color.background, 'background-color'),
-    text: shorthandToColor(color.text, 'color'),
+    contrast: shorthandToColor(color.contrast, 'background-color'),
     subtext: shorthandToColor(color.subtext, 'color'),
-    contrast: shorthandToColor(color.contrast, 'background-color')
+    text: shorthandToColor(color.text, 'color')
   }
 }
 
-export function fromColorLight (color: Color): ColorScheme<Color> {
+export function fromColorLight (color: IColor): IColorScheme<IColor> {
   return fromObjectStrings({
     background: color,
-    text: 'black',
+    contrast: 'white',
     subtext: 'black',
-    contrast: 'white'
+    text: 'black'
   })
 }
 
-export function fromColorDark (color: Color): ColorScheme<Color> {
+export function fromColorDark (color: IColor): IColorScheme<IColor> {
   return fromObjectStrings({
     background: 'black',
-    text: color,
+    contrast: '#444',
     subtext: 'white',
-    contrast: '#444'
+    text: color
   })
 }

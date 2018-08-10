@@ -1,21 +1,23 @@
-import { Bindings } from './FormatString'
-import { default as Period, Time } from './Period'
+import { IBindings } from './FormatString'
+import { default as Period, ITime } from './Period'
 
-interface PeriodObject {
-  time: Time,
-  name: string,
+export interface IPeriodObject {
+  name: string
+  time: ITime
   timestamp: Date
 }
 
 export default class Schedule {
+  public bindings: IBindings
+  public display: string
+  public length: number
+  public name: string
+  public periods: Period[]
 
-  name: string
-  display: string
-  periods: Period[]
-  bindings: Bindings
-  length: number
-
-  constructor (name: string, display: string, periods: Period[], bindings: Bindings = {}) {
+  constructor (name: string,
+               display: string,
+               periods: Period[],
+               bindings: IBindings = {}) {
     this.name = name
     this.display = display
     this.bindings = bindings
@@ -23,9 +25,9 @@ export default class Schedule {
     this.periods = periods.sort((a, b) => (a.time.hour * 60 + a.time.min) - (b.time.hour * 60 + b.time.min))
 
     // Remove consecutive free periods
-    var i = 0
-    while (i < this.periods.length) {
-      if (this.periods[i].display(this.bindings) === 'Free' || this.periods[i].display(this.bindings) === 'Passing to Free') {
+    for (let i = 0; i < this.periods.length; i++) {
+      const displayName = this.periods[i].display(this.bindings)
+      if (displayName === 'Free' || displayName === 'Passing to Free') {
         if (this.periods[i - 1] && (this.periods[i - 1].display(this.bindings) === 'Free' ||
                         this.periods[i - 1].display(this.bindings) === 'Passing to Free')) {
           this.periods[i - 1].formatString = 'Free'
@@ -33,7 +35,6 @@ export default class Schedule {
           i--
         }
       }
-      i++
     }
 
     // If a period at the beginning is free, remove it
@@ -42,10 +43,10 @@ export default class Schedule {
     }
 
     // Calculate number of periods
-    var count = 0
-    var previous
+    let count = 0
+    let previous
     for (let i = 0; i < this.periods.length; i++) {
-      var period = this.getPeriodByIndex(i, new Date())
+      const period = this.getPeriodByIndex(i, new Date())
       if (period !== previous) {
         count++
         previous = period
@@ -54,51 +55,73 @@ export default class Schedule {
     this.length = count
   }
 
-  overrideDisplay (display: string | null): Schedule {
+  public overrideDisplay (display: string | null): Schedule {
     if (!display) { return this }
     return new Schedule(this.name, display, this.periods, this.bindings)
   }
 
-  getCurrentPeriodIndex (date: Date): number {
-    var time: Time = {
+  public getCurrentPeriodIndex (date: Date): number {
+    const time: ITime = {
       hour: date.getHours(),
       min: date.getMinutes()
     }
 
-    for (let i in this.periods) {
-      let period = this.periods[i]
+    for (let i = 0; i < this.periods.length; i++) {
+      const period = this.periods[i]
       if (period.time.hour > time.hour) { return Number(i) - 1 }
       if (period.time.hour >= time.hour && period.time.min > time.min) { return Number(i) - 1 }
     }
     return this.periods.length - 1
   }
 
-  getPeriodByIndex (i: number, date: Date): PeriodObject {
-    var period = this.periods[i]
-
-    if (period) {
-      return {
-        time: period.time,
-        name: period.display(this.bindings),
-        timestamp: period.getTimestamp(date)
-      }
-    }
-  }
-
-  getFirstPeriod (date: Date): PeriodObject {
+  public getFirstPeriod (date: Date): IPeriodObject | null {
     return this.getPeriodByIndex(0, date)
   }
-  getLastPeriod (date: Date): PeriodObject {
+  public getLastPeriod (date: Date): IPeriodObject | null {
     return this.getPeriodByIndex(this.length - 1, date)
   }
 
-  getCurrentPeriod (date: Date): PeriodObject {
+  public getCurrentPeriod (date: Date): IPeriodObject | null {
     return this.getPeriodByIndex(this.getCurrentPeriodIndex(date), date)
   }
-  getNextPeriod (date: Date): PeriodObject {
+  public getNextPeriod (date: Date): IPeriodObject | null {
     return this.getPeriodByIndex(this.getCurrentPeriodIndex(date) + 1, date)
   }
-  getPreviousPeriod (date: Date): PeriodObject {
+  public getPreviousPeriod (date: Date): IPeriodObject | null {
     return this.getPeriodByIndex(this.getCurrentPeriodIndex(date) - 1, date)
+  }
+
+  public getCompletedPeriods (date: Date): IPeriodObject[] {
+    // If the index is (-1) or 0, return empty array
+    return this.periods
+      .slice(0, Math.max(this.getCurrentPeriodIndex(date), 0))
+      .map((period) => this.periodToObject(period, date))
+  }
+
+  public getFuturePeriods (date: Date): IPeriodObject[] {
+    return this.periods
+      .slice(this.getCurrentPeriodIndex(date) + 1)
+      .map((period) => this.periodToObject(period, date))
+  }
+
+  private getPeriodByIndex (i: number, date: Date): IPeriodObject | null {
+    const period = this.periods[i]
+    if (period) {
+      return {
+        name: period.display(this.bindings),
+        time: period.time,
+        timestamp: period.getTimestamp(date)
+      }
+    } else {
+      return null
+    }
+  }
+
+  private periodToObject (period: Period, date: Date): IPeriodObject {
+    return {
+      name: period.display(this.bindings),
+      time: period.time,
+      timestamp: period.getTimestamp(date)
+    }
   }
 }

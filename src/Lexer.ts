@@ -1,8 +1,8 @@
 const separators: string[] = ['*', ' ', '{', '}', '#']
 
 function splitAndPreserve (str: string, chars: string[]): string[] {
-  var pieces = ['']
-  for (let c of str) {
+  const pieces = ['']
+  for (const c of str) {
     if (chars.indexOf(c) > -1) {
       pieces.push(c)
       pieces.push('')
@@ -10,7 +10,7 @@ function splitAndPreserve (str: string, chars: string[]): string[] {
       pieces[pieces.length - 1] += c
     }
   }
-  return pieces.filter(str => str.length > 0)
+  return pieces.filter((piece) => piece.length > 0)
 }
 
 function lex (line: string): string[] {

@@ -1,24 +1,24 @@
-import { Bindings, default as format } from './FormatString'
+import { default as format, IBindings } from './FormatString'
 
-export interface Time {
-  hour: number,
+export interface ITime {
+  hour: number
   min: number
 }
 
 export default class Period {
-  time: Time
-  formatString: string
+  public time: ITime
+  public formatString: string
 
-  constructor (time: Time, formatString: string) {
+  constructor (time: ITime, formatString: string) {
     this.time = time
     this.formatString = formatString
   }
 
-  display (bindings: Bindings = {}): string {
+  public display (bindings: IBindings = {}): string {
     return format(this.formatString, bindings)
   }
 
-  getTimestamp (date: Date): Date {
+  public getTimestamp (date: Date): Date {
     return new Date(
       date.getFullYear(),
       date.getMonth(),
@@ -28,4 +28,3 @@ export default class Period {
       0, 0)
   }
 }
-
