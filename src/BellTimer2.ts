@@ -1,11 +1,12 @@
 import BellCalculator from './BellCalculator'
 import Calendar from './Calendar'
-import * as parseCalendar from './CalendarParser'
+import parseCalendar from './CalendarParser'
 import CorrectedDate from './CorrectedDate'
 import { getCustomCalendar, ICourses } from './CustomSchedule'
 import { IBindings } from './FormatString'
+import requestManager from './RequestManager2'
 import { default as Schedule, IPeriodObject } from './Schedule'
-import * as parseSchedules from './ScheduleParser'
+import parseSchedules from './ScheduleParser'
 
 export default class BellTimer {
   public source: string
@@ -14,18 +15,16 @@ export default class BellTimer {
   public initialized: boolean
   public refreshing: boolean
   public currentTimeout: any
-  public calculator: BellCalculator
+  public calculator!: BellCalculator
   public bindings: IBindings | null
   public courses: ICourses | null
 
   constructor (source: string,
                correctedDate: CorrectedDate,
-               requestManager: any,
                bindings: IBindings | null,
                courses: ICourses | null) {
     this.source = source
     this.correctedDate = correctedDate
-    this.requestManager = requestManager
     this.initialized = false
     this.refreshing = false
     this.currentTimeout = null
@@ -62,13 +61,11 @@ export default class BellTimer {
     if (this.source === 'custom') {
       return this.loadCustomCourses()
     }
-    const [sources, correction, schedules, calendar] = await Promise.all([
-      this.requestManager.get('/api/sources/names', []),
-      this.requestManager.get(`/api/data/${this.source}/correction`, '0'),
-      this.requestManager.get(`/api/data/${this.source}/schedules`),
-      this.requestManager.get(`/api/data/${this.source}/calendar`)
+    const [sources, data] = await Promise.all([
+      requestManager.get('/api/sources/names', []),
+      requestManager.get(`/api/data/${this.source}`)
     ])
-    return this.loadData(sources, correction, schedules, calendar)
+    return this.loadData(sources, Number(data.correction), data.schedules, data.calendar)
   }
 
   public refresh (refreshInterval: number) {

@@ -44,5 +44,22 @@ router.get('/:source/message', async (req, res) => {
     res.status(404).send('Not found')
   }
 })
+router.get('/:source', async (req, res) => {
+  try {
+    const [meta, correction, calendar, schedules, message] = await Promise.all([
+      data.getMeta(req.params.source),
+      data.getCorrection(req.params.source),
+      data.getCalendar(req.params.source),
+      data.getSchedules(req.params.source),
+      data.getMessage(req.params.source)
+    ])
+
+    res.json({
+      meta, correction, calendar, schedules, message
+    })
+  } catch (e) {
+    res.status(404).send('Not found')
+  }
+})
 
 module.exports = router

@@ -5,6 +5,8 @@ const logger = require('loggy')
 const http = require('http')
 const express = require('express')
 const app = express()
+const compression = require('compression')
+app.use(compression())
 const server = http.createServer(app)
 const path = require('path')
 const timesyncServer = require('timesync/server')
@@ -96,7 +98,7 @@ var startWebServer = function () {
 }
 
 app.get('/:source', (req, res) => {
-  res.redirect(`/?source=${req.params.source}`)
+  res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 
 setInterval(checkForNewVersion, 24 * 60 * 60 * 1000)

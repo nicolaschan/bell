@@ -104,7 +104,7 @@ const Enter = {
     var query = querystring.parse(window.location.search.substring(1))
     var id = query.course
     vnode.state.id = id
-    Model.data = vnode.attrs.uiModel.cookieManager.get('courses', {})[id] || {
+    Model.data = vnode.attrs.cookieManager.get('courses', {})[id] || {
       name: '',
       sections: [
         ['Monday', null, null]
@@ -165,8 +165,7 @@ const Enter = {
       }, '+ Add Section')),
       m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
         onclick: () => {
-          Model.save(vnode.state.id, vnode.attrs.uiModel.cookieManager)
-          vnode.attrs.uiModel.bellTimer.reloadData()
+          Model.save(vnode.state.id, vnode.attrs.cookieManager)
           m.route.set('/classes')
         }
       }, m('i.done-icon.icon.material-icons', 'done')))

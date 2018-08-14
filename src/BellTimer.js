@@ -41,8 +41,8 @@ class BellTimer {
 
     this.setCorrection(parseInt(correction))
 
-    var parseSchedules = require('./ScheduleParser')
-    var parseCalendar = require('./CalendarParser')
+    var parseSchedules = require('./ScheduleParser').default
+    var parseCalendar = require('./CalendarParser').default
 
     schedules = parseSchedules(schedules, this.cookieManager.get('periods'))
     calendar = parseCalendar(calendar, schedules)

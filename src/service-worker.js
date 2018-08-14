@@ -3,7 +3,7 @@
 
 const VERSION = require('../package.json').version
 var CACHE = `cache-${VERSION}`
-const SimpleLogger = require('./SimpleLogger')
+const SimpleLogger = require('./SimpleLogger').default
 const logger = new SimpleLogger()
 
 const cachedResources = [

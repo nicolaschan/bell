@@ -2,7 +2,7 @@ const m = require('mithril')
 
 var ScheduleDisplay = {
   view: function (vnode) {
-    var bellTimer = vnode.attrs.model.bellTimer
+    var bellTimer = vnode.attrs.bellTimer
 
     var completed = bellTimer.getCompletedPeriods()
     var current = bellTimer.getCurrentPeriod()
@@ -34,20 +34,20 @@ var ScheduleDisplay = {
     future = future.slice(0, numberOfFuturePeriods)
 
     if (!completed.length && !future.length && current.name === 'Free') {
-      return m('.no-classes', 'No classes today')
+      return m('.centered', m('.no-classes', 'No classes today'))
     }
 
     var rows = []
     for (let period of completed) { rows.push(m('tr.completed', [m('td.time', displayTimeArray(period.time)), m('td', period.name)])) }
     if (current) {
       rows.push(m('tr.current', [m('td.time', displayTimeArray({
-        hour: bellTimer.getDate().getHours(),
-        min: bellTimer.getDate().getMinutes()
+        hour: bellTimer.date.getHours(),
+        min: bellTimer.date.getMinutes()
       })), m('td', current.name)]))
     }
     for (let period of future) { rows.push(m('tr.future', [m('td.time', displayTimeArray(period.time)), m('td', period.name)])) }
 
-    return m('table', rows)
+    return m('.centered', m('table', rows))
   }
 }
 

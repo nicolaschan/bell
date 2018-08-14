@@ -1,11 +1,16 @@
 const m = require('mithril')
 
+const cookieManager = require('../LocalForageCookieManager').default
+const requestManager = require('../RequestManager2').default
+const sourceManager = require('../SourceManager').default
+const themeManager = require('../ThemeManager')
+
 const $ = require('jquery')
 require('selectize')
 
 const Settings = {
   onupdate: function (vnode) {
-    var source = vnode.attrs.uiModel.bellTimer.source
+    var source = sourceManager.source
     if (source === vnode.state.previousSource) {
       return
     }
@@ -14,7 +19,7 @@ const Settings = {
       m.redraw()
     } else {
       vnode.state.editClasses = true
-      vnode.attrs.uiModel.requestManager.get(`/api/data/${source}/meta`).then(meta => {
+      requestManager.get(`/api/data/${source}/meta`).then(meta => {
         vnode.state.editClasses = !meta.periods
         m.redraw()
       })
@@ -44,9 +49,9 @@ const Settings = {
           m('label.control.control--checkbox', [
             m('input.checkbox[type=checkbox]', {
               onclick: m.withAttr('checked', checked => {
-                vnode.attrs.uiModel.cookieManager.set('title_period', checked)
+                cookieManager.set('title_period', checked)
               }),
-              checked: vnode.attrs.uiModel.cookieManager.get('title_period', true)
+              checked: cookieManager.get('title_period', true)
             }),
             m('.control__indicator'),
             m('span', 'Show period name in page title')
@@ -54,8 +59,6 @@ const Settings = {
 
         m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
           onclick: () => {
-            vnode.attrs.uiModel.bellTimer.reloadData()
-            vnode.attrs.uiModel.popupModel.refresh()
             m.route.set('/')
           }
         }, m('i.done-icon.icon.material-icons', 'done'))),
@@ -82,7 +85,7 @@ const Settings = {
       //   }
       // },
       load: (query, callback) => {
-        vnode.attrs.uiModel.requestManager.get(`/api/sources`).then(callback)
+        requestManager.get(`/api/sources`).then(callback)
       },
       preload: true,
       render: {
@@ -90,12 +93,12 @@ const Settings = {
         option: (item, escape) => `<div><b>${escape(item.name)}</b> (${escape(item.id)})</div>`
       },
       onChange: (value) => {
-        vnode.attrs.uiModel.bellTimer.source = value
+        sourceManager.source = value
         m.redraw()
       },
       onLoad: data => {
         if (!hasLoaded) {
-          sourceSelector[0].selectize.setValue(vnode.attrs.uiModel.cookieManager.get('source', 'lahs'))
+          sourceSelector[0].selectize.setValue(cookieManager.get('source', 'lahs'))
           hasLoaded = true
         }
       }
@@ -104,18 +107,18 @@ const Settings = {
     var themeSelector = $('select#theme').selectize({
       valueField: 'name',
       searchField: ['name'],
-      value: vnode.attrs.uiModel.themeManager.currentThemeName,
-      options: (Object.keys(vnode.attrs.uiModel.themeManager.availableThemes))
+      value: themeManager.currentThemeName,
+      options: (Object.keys(themeManager.availableThemes))
         .map(x => { return {name: x} }),
       render: {
         item: (item, escape) => `<div><b>${escape(item.name)}</b></div>`,
         option: (item, escape) => `<div><b>${escape(item.name)}</b></div>`
       },
       onChange: (value) => {
-        vnode.attrs.uiModel.themeManager.currentThemeName = value
+        themeManager.currentThemeName = value
       }
     })
-    themeSelector[0].selectize.setValue(vnode.attrs.uiModel.themeManager.currentThemeName)
+    themeSelector[0].selectize.setValue(themeManager.currentThemeName)
   }
 }
 

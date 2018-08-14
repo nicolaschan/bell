@@ -6,40 +6,41 @@ const Settings = require('./ui/Settings')
 const PeriodEntry = require('./ui/PeriodEntry')
 const Classes = require('./ui/Classes')
 const Enter = require('./ui/Enter')
+const Loading = require('./ui/Loading').default
 
-const addUIModel = function (element, uiModel) {
+const withCookies = function (element) {
   return {
+    oninit: function (vnode) {
+      vnode.attrs.cookieManager = require('./LocalForageCookieManager').default
+      vnode.attrs.cookieManager.initialize()
+    },
     view: function (vnode) {
-      if (!uiModel.state.ready) {
-        if (!uiModel.state.errorMessage.visible) {
-          return m('.centered.loading', [
-            m('i.material-icons.loading-icon.spin', 'sync'),
-            m('br'),
-            m('.loading-message', uiModel.state.loadingMessage.value)
-          ])
-        }
-        return m('.centered.loading', [
-          m('i.material-icons.loading-icon', 'error_outline'),
-          m('br'),
-          m('.loading-message', uiModel.state.errorMessage.value)
-        ])
+      if (!vnode.attrs.cookieManager.initialized) {
+        return m(Loading, 'Loading')
       }
-      return m(element, { uiModel })
+      return m(element, vnode.attrs)
     }
   }
 }
 
 class MithrilUI {
-  constructor (uiModel) {
-    this.uiModel = uiModel
-
+  constructor () {
     m.route.prefix('')
     m.route(root, '/', {
-      '/': addUIModel(Index, uiModel),
-      '/settings': addUIModel(Settings, uiModel),
-      '/periods': addUIModel(PeriodEntry, uiModel),
-      '/classes': addUIModel(Classes, uiModel),
-      '/enter': addUIModel(Enter, uiModel)
+      '/': withCookies({
+        oninit: function (vnode) {
+          const sourceManager = require('./SourceManager').default
+          m.route.set(`/${sourceManager.source}`)
+        },
+        view: function (vnode) {
+          return m('')
+        }
+      }),
+      '/settings': withCookies(Settings),
+      '/periods': withCookies(PeriodEntry),
+      '/classes': withCookies(Classes),
+      '/enter': withCookies(Enter),
+      '/:source': withCookies(Index)
     })
   }
 

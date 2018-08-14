@@ -15,8 +15,8 @@ const themes = [
 ]
 
 class ThemeManager {
-  constructor (cookieManager) {
-    this.cookieManager = cookieManager
+  constructor () {
+    this.cookieManager = require('./LocalForageCookieManager').default
     this.themes = {}
     for (var theme of themes) {
       this.themes[theme.name] = theme
@@ -62,4 +62,4 @@ class ThemeManager {
   }
 }
 
-module.exports = ThemeManager
+module.exports = new ThemeManager()

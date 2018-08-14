@@ -1,5 +1,5 @@
 export default class SynchronizedDate {
-  public ts: any // Date doesn't support .now()
+  private ts: any // Date doesn't support .now()
 
   constructor (timesync: any) {
     this.ts = Date
@@ -14,7 +14,7 @@ export default class SynchronizedDate {
     }
   }
 
-  get date (): any {
-    return new Date(this.ts.now())
+  public now (): number {
+    return this.ts.now()
   }
 }

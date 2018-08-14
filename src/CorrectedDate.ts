@@ -10,6 +10,6 @@ export default class CorrectedDate {
   }
 
   get date () {
-    return new Date(this.synchronizedDate.date.now() + this.correction)
+    return new Date(this.synchronizedDate.now() + this.correction)
   }
 }

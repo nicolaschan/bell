@@ -1,13 +1,15 @@
 const m = require('mithril')
 
+const requestManager = require('../RequestManager2').default
+
 const PeriodEntry = {
   oninit: function (vnode) {
-    var source = vnode.attrs.uiModel.cookieManager.get('source')
-    vnode.attrs.uiModel.requestManager.get(`/api/data/${source}/meta`).then(meta => {
+    var source = vnode.attrs.cookieManager.get('source')
+    requestManager.get(`/api/data/${source}/meta`).then(meta => {
       vnode.state.meta = meta
       vnode.state.enabled = {}
       for (let period of meta.periods) {
-        vnode.state.enabled[period] = vnode.attrs.uiModel.cookieManager.get('periods', {})[period] !== 'Free'
+        vnode.state.enabled[period] = vnode.attrs.cookieManager.get('periods', {})[period] !== 'Free'
       }
     })
   },
@@ -21,11 +23,11 @@ const PeriodEntry = {
             m('td.tableInput', m('input.inputBox[type=text]', {
               placeholder: period,
               maxlength: '20',
-              value: vnode.attrs.uiModel.cookieManager.get('periods', {})[period],
+              value: vnode.attrs.cookieManager.get('periods', {})[period],
               oninput: m.withAttr('value', input => {
-                var periods = vnode.attrs.uiModel.cookieManager.get('periods', {})
+                var periods = vnode.attrs.cookieManager.get('periods', {})
                 periods[period] = input
-                vnode.attrs.uiModel.cookieManager.set('periods', periods)
+                vnode.attrs.cookieManager.set('periods', periods)
               }),
               disabled: !((vnode.state.enabled) ? vnode.state.enabled[period] : false)
             })),
@@ -33,9 +35,9 @@ const PeriodEntry = {
               m('label.control.control--checkbox', [
                 m('input.checkbox[type=checkbox]', {
                   onclick: m.withAttr('checked', checked => {
-                    var periods = vnode.attrs.uiModel.cookieManager.get('periods', {})
+                    var periods = vnode.attrs.cookieManager.get('periods', {})
                     periods[period] = checked ? period : 'Free'
-                    vnode.attrs.uiModel.cookieManager.set('periods', periods)
+                    vnode.attrs.cookieManager.set('periods', periods)
                     vnode.state.enabled[period] = checked
                   }),
                   checked: (vnode.state.enabled) ? vnode.state.enabled[period] : false

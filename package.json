@@ -1,6 +1,6 @@
 {
     "name": "bell-countdown",
-    "version": "3.4.0-rc3",
+    "version": "4.0.0-rc1",
     "description": "Countdown to the next time the bell rings at school.",
     "main": "index.js",
     "scripts": {
@@ -20,12 +20,18 @@
     "author": "Nicolas Chan",
     "license": "MIT",
     "dependencies": {
+        "@types/jquery": "^3.3.5",
+        "@types/localforage": "^0.0.34",
+        "@types/mithril": "^1.1.12",
+        "@types/react": "^16.4.9",
+        "@types/ua-parser-js": "^0.7.32",
         "better-sqlite3": "^4.1.0",
         "bluebird": "^3.5.1",
         "body-parser": "^1.18.2",
         "bootstrap": "^4.1.3",
         "chart.js": "^2.7.0",
         "compare-versions": "^3.3.0",
+        "compression": "^1.7.3",
         "dotenv-safe": "^6.0.0",
         "express": "^4.16.2",
         "geoip-database": "^1.0.14",

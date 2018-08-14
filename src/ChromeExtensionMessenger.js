@@ -1,6 +1,7 @@
 /* global chrome */
 
-const logger = new (require('./SimpleLogger.js'))()
+const SimpleLogger = require('./SimpleLogger').default
+const logger = new SimpleLogger()
 
 class ChromeExtensionMessenger {
   constructor (cookieManager) {

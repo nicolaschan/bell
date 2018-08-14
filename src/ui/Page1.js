@@ -12,18 +12,18 @@ var getIconImage = function (min) {
 
 var Timer = {
   view: function (vnode) {
-    var bellTimer = vnode.attrs.model.bellTimer
+    var bellTimer = vnode.attrs.bellTimer
     var time = bellTimer.getTimeRemainingString()
     var period = bellTimer.getCurrentPeriod().name
 
     // This should be moved out to somewhere that makes sense
-    document.title = (vnode.attrs.model.cookieManager.get('title_period', true)) ? `${time} | ${period}` : time
+    document.title = vnode.attrs.periodInTitle ? `${time} | ${period}` : time
 
     var min = parseInt(time.split(':')[time.split(':').length - 2]) + (parseInt(time.split(':')[time.split(':').length - 1]) / 60)
     if (time.split(':').length > 2) { min = 60 }
     document.getElementById('favicon').href = getIconImage(min)
 
-    var theme = vnode.attrs.model.themeManager.currentTheme.theme(bellTimer)
+    var theme = vnode.attrs.themeManager.currentTheme.theme(bellTimer)
     return m('.time', {
       style: theme.text
     }, time)
@@ -31,27 +31,27 @@ var Timer = {
 }
 var Period = {
   view: function (vnode) {
-    var bellTimer = vnode.attrs.model.bellTimer
-    var theme = vnode.attrs.model.themeManager.currentTheme.theme(bellTimer)
+    var bellTimer = vnode.attrs.bellTimer
+    var theme = vnode.attrs.themeManager.currentTheme.theme(bellTimer)
     return m('.period', {
       style: theme.subtext
-    }, vnode.attrs.model.bellTimer.getCurrentPeriod().name)
+    }, vnode.attrs.bellTimer.getCurrentPeriod().name)
   }
 }
 var ScheduleName = {
   view: function (vnode) {
-    var bellTimer = vnode.attrs.model.bellTimer
-    var theme = vnode.attrs.model.themeManager.currentTheme.theme(bellTimer)
+    var bellTimer = vnode.attrs.bellTimer
+    var theme = vnode.attrs.themeManager.currentTheme.theme(bellTimer)
     return m('.schedule', {
       style: theme.subtext
-    }, vnode.attrs.model.bellTimer.getCurrentSchedule().display)
+    }, vnode.attrs.bellTimer.getCurrentSchedule().display)
   }
 }
 var updateGraphics = function (vnode) {
   // return;
   var c = vnode.dom
-  var bellTimer = vnode.attrs.model.bellTimer
-  var themeManager = vnode.attrs.model.themeManager
+  var bellTimer = vnode.attrs.bellTimer
+  var themeManager = vnode.attrs.themeManager
 
   var ctx = c.getContext('2d')
 
@@ -82,8 +82,8 @@ var updateGraphics = function (vnode) {
 
 var Background = {
   onbeforeupdate: function (vnode) {
-    var bellTimer = vnode.attrs.model.bellTimer
-    var theme = vnode.attrs.model.themeManager.currentTheme.theme(bellTimer).background
+    var bellTimer = vnode.attrs.bellTimer
+    var theme = vnode.attrs.themeManager.currentTheme.theme(bellTimer).background
     if (vnode.state.currentStyle !== theme && theme) {
       if (vnode.state.topVisible) {
         vnode.state.topStyle = vnode.state.currentStyle
@@ -121,6 +121,9 @@ var Background = {
 }
 
 module.exports = {
+  oninit: function (vnode) {
+    vnode.attrs.themeManager = require('../ThemeManager')
+  },
   view: function (vnode) {
     return m('.container#page1', {
       style: vnode.state.bottomStyle
@@ -133,7 +136,8 @@ module.exports = {
       ]),
       m('canvas.centered', {
         onupdate: updateGraphics,
-        model: vnode.attrs.model
+        bellTimer: vnode.attrs.bellTimer,
+        themeManager: vnode.attrs.themeManager
       })
     ])
   }

@@ -6,15 +6,15 @@ var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
 describe('ThemeManager', function () {
-  const ThemeManager = require('../src/ThemeManager')
+  const themeManager = require('../src/ThemeManager')
   const BellTimer = require('../src/BellTimer')
   const RequestManager = require('../src/RequestManager')
-  const CookieManager = require('../src/CookieManager3')
+  const cookieManager = require('../src/LocalForageCookieManager').default
 
   beforeEach(async function () {
-    var cookieManager = new CookieManager()
+    // var cookieManager = new CookieManager()
     await cookieManager.initialize()
-    var themeManager = new ThemeManager(cookieManager)
+    // var themeManager = new ThemeManager(cookieManager)
     var requestManager = new RequestManager({
       get: async url => {
         url = url.split('?')[0]

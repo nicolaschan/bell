@@ -34,19 +34,19 @@ const Classes = {
         oncreate: m.route.link
       }, '+ Add Class')),
       m('ul.class-list#class-list', Object.keys(
-        vnode.attrs.uiModel.cookieManager.get('courses', {})).map(id => m('li', [
+        vnode.attrs.cookieManager.get('courses', {})).map(id => m('li', [
         m('a.course-link', {
           href: `/enter?course=${id}`,
           oncreate: m.route.link
-        }, vnode.attrs.uiModel.cookieManager.get('courses', {})[id].name),
+        }, vnode.attrs.cookieManager.get('courses', {})[id].name),
         m('table.sections', m('tbody', [
-          ...vnode.attrs.uiModel.cookieManager.get('courses', {})[id].sections.map(section => m('tr', [
+          ...vnode.attrs.cookieManager.get('courses', {})[id].sections.map(section => m('tr', [
             m('td.day', section[0]),
             m('td', `${displayTimeArray(section[1])} - ${displayTimeArray(section[2])}`)
           ])),
           m('tr', [
             m('a.delete-link[href=javascript:void(0);]', {
-              onclick: () => deleteClass(id, vnode.attrs.uiModel.cookieManager)
+              onclick: () => deleteClass(id, vnode.attrs.cookieManager)
             }, 'Delete')
           ])
         ]))

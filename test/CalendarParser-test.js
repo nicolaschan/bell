@@ -6,8 +6,8 @@ var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
 describe('CalendarParser', function () {
-  const parse = require('../src/CalendarParser')
-  const scheduleParse = require('../src/ScheduleParser')
+  const parse = require('../src/CalendarParser').default
+  const scheduleParse = require('../src/ScheduleParser').default
 
   describe('#parse', function () {
     it('should parse a single entry schedule names properly', function () {
