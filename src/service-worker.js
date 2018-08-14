@@ -23,7 +23,8 @@ async function fromCache (request) {
   var cache = await caches.open(CACHE)
   var matching = await cache.match(request)
   if (!matching) {
-    throw new Error(`No cached data for ${request.method}: ${request.url}`)
+    return fromCache('/') // Match routes such as "/lahs" or generally "/:source"
+    // throw new Error(`No cached data for ${request.method}: ${request.url}`)
   }
   return matching
 }

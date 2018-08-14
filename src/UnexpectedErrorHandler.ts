@@ -36,6 +36,8 @@ export default class UnexpectedErrorHandler {
         }
       } catch (requestError) {
         console.error(requestError)
+      } finally {
+        cookieManager.clear()
       }
     }
   }

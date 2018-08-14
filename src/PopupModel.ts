@@ -1,5 +1,6 @@
 import * as UAParser from 'ua-parser-js'
 
+import Refresher from './Refresher'
 import cookieManager from './LocalForageCookieManager'
 import requestManager from './RequestManager2'
 
@@ -12,7 +13,7 @@ const deepCompare = (obj1: any, obj2: any) => {
   return true
 }
 
-export default class PopupModel {
+export default class PopupModel extends Refresher {
 
   get visible () {
     return this.enabled && this.text && this.text !== cookieManager.get('popup')
@@ -31,12 +32,13 @@ export default class PopupModel {
   private enabled: boolean
 
   constructor (source: string) {
+    super(1 * 60 * 1000)
     this.source = source
     this.enabled = false
     this.text = ''
   }
 
-  public async refresh () {
+  public async reloadData () {
     const messages = await requestManager.get(`/api/data/${this.source}/message`, [])
     const ua = new UAParser(navigator.userAgent)
 

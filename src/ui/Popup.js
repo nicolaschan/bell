@@ -5,7 +5,7 @@ const PopupModel = require('../PopupModel').default
 var Popup = {
   oninit: function (vnode) {
     vnode.attrs.popupModel = new PopupModel(vnode.attrs.source)
-    vnode.attrs.popupModel.refresh()
+    vnode.attrs.popupModel.initialize()
   },
   view: function (vnode) {
     if (!vnode.attrs.popupModel.visible) { return }
@@ -28,6 +28,9 @@ var Popup = {
         }
       }, m('i.dismiss-icon.material-icons', 'cancel')))
     ]))))
+  },
+  onremove: function (vnode) {
+    vnode.attrs.popupModel.stopRefreshing()
   }
 }
 
