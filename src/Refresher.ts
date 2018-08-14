@@ -1,6 +1,6 @@
 export default abstract class Refresher {
-  private refreshing: boolean
   public initialized: boolean
+  private refreshing: boolean
   private currentTimeout: any
   private refreshInterval: number
 
@@ -9,8 +9,6 @@ export default abstract class Refresher {
     this.refreshing = false
     this.initialized = false
   }
-
-  protected abstract reloadData (): Promise<void>
 
   public async initialize () {
     if (!this.initialized) {
@@ -27,6 +25,8 @@ export default abstract class Refresher {
       clearTimeout(this.currentTimeout)
     }
   }
+
+  protected abstract reloadData (): Promise<void>
 
   private refresh (refreshInterval: number) {
     if (!this.refreshing) { return }

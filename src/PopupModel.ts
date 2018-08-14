@@ -1,7 +1,7 @@
 import * as UAParser from 'ua-parser-js'
 
-import Refresher from './Refresher'
 import cookieManager from './LocalForageCookieManager'
+import Refresher from './Refresher'
 import requestManager from './RequestManager2'
 
 // Return true if obj1 contains all the keys of obj2 (deep)
