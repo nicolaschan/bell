@@ -35,6 +35,10 @@ const Index = {
     vnode.attrs.bellTimer = bellTimer
     vnode.attrs.cookieManager = cookieManager
     vnode.attrs.periodInTitle = cookieManager.get('title_period', true)
+    const ChromeExtensionMessenger = require('../ChromeExtensionMessenger')
+    const chromeExtensionMessenger = new ChromeExtensionMessenger()
+    // CHANGE THIS FOR LOCAL TESTING TO THE ID FOUND IN CHROME://EXTENSIONS
+    chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc')
     try {
       await bellTimer.initialize()
     } catch (e) {
@@ -59,7 +63,7 @@ const Index = {
         ])
       ]),
       m(Popup, vnode.attrs),
-      m(SchoolIndicator, vnode.attrs),
+      m(SchoolIndicator, vnode.attrs, (vnode.attrs.bellTimer.meta || {}).name || ''),
       m(ScrollArrow, { visible: vnode.attrs.cookieManager.get('has_scrolled') })
     ]
   },

@@ -70,8 +70,7 @@ describe('ThemeManager', function () {
 
   describe('#availableThemes', function () {
     it('should filter correctly if secret is not present', function () {
-      this.cookieManager.remove('secrets')
-      Object.keys(this.themeManager.availableThemes).should.not.contain('Secret: Jonathan')
+      this.themeManager.availableThemes.should.not.contain('Secret: Jonathan')
     })
     it('should include secrets', function () {
       this.themeManager.secrets = ['jonathan']

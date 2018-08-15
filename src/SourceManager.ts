@@ -12,7 +12,9 @@ class SourceManager {
   }
 
   set source (source) {
-    cookieManager.set('source', source).catch((e) => { /* not much we can do */ })
+    if (source) {
+      cookieManager.set('source', source).catch((e) => { /* not much we can do */ })
+    }
   }
 
   public async clearSource () {

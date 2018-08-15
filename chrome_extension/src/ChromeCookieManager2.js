@@ -45,7 +45,7 @@ var CookieManagerFactory = async function () {
 
   (async () => {
     // Load data in the background (so it opens faster)
-    var frame = $('<iframe src="https://countdown.zone"></iframe>')
+    var frame = $(`<iframe src="${require('./Hostname').default}"></iframe>`)
     $('#iframe').append(frame)
 
     var port = await new Promise((resolve, reject) =>
@@ -63,6 +63,8 @@ var CookieManagerFactory = async function () {
       cookies['requestCache'] = cache
       cookieManager.cookies = cookies
       chrome.storage.local.set(cookies)
+
+      global.extUIModel.needsUpdate = true
     })
   })()
 

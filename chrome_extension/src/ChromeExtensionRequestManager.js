@@ -8,7 +8,7 @@ class RequestManager {
       var lastChar = host.substring(host.length - 1)
       this.host = (lastChar === '/') ? host.substring(0, host.length - 1) : host
     } else {
-      this.host = ''
+      this.host = require('./Hostname').default
     }
     this.cookieManager = cookieManager
 

@@ -1,12 +1,12 @@
 // Local dependencies
-const ChromeCookieManagerFactory = require('./ChromeCookieManager2.js')
-const BellTimer = require('../../src/BellTimer.js')
-const ThemeManager = require('../../src/ThemeManager.js')
+const ChromeCookieManagerFactory = require('./ChromeCookieManager2')
+const BellTimer = require('../../src/BellTimer2').default
+const ThemeManager = require('../../src/ThemeManager').default
 const RequestManager = require('./ChromeExtensionRequestManager')
+const CorrectedDate = require('../../src/CorrectedDate').default
+const SynchronizedDate = require('../../src/SynchronizedDate').default
 const ExtUI = require('./ExtUI.js')
-const ExtUIModel = require('./ExtUIModel.js')
-
-const hostname = 'https://countdown.zone'
+const ExtUIModel = require('./ExtUIModel')
 
 var cookman
 var thememan
@@ -25,18 +25,25 @@ var setup = function () {
   window.requestAnimationFrame(updateAll)
 }
 
-var initializePopup = async function () {
-  thememan = new ThemeManager(cookman)
-  reqman = new RequestManager(cookman, hostname)
-  bellTimer = new BellTimer(cookman, reqman)
+global.firstTime = true
+global.initializePopup = async function () {
+  thememan = new ThemeManager(cookman.get('theme'))
+  reqman = new RequestManager(cookman)
+  bellTimer = new BellTimer(
+    cookman.get('source', 'lahs'),
+    new CorrectedDate(new SynchronizedDate()),
+    cookman.get('periods', {}),
+    cookman.get('courses', {}),
+    reqman)
   extUIModel = new ExtUIModel(bellTimer, cookman, thememan, reqman)
-  extUI = new ExtUI(extUIModel)
+  global.extUIModel = extUIModel
   global.cookman = cookman
   global.reqman = reqman
   global.bellTimer = bellTimer
+  global.thememan = thememan
 
-  extUIModel.setLoadingMessage('Synchronizing')
-  await bellTimer.initialize()
+  extUI = new ExtUI(extUIModel)
+  await bellTimer.reloadData()
   extUIModel.initialize()
   setup()
 }
@@ -54,7 +61,7 @@ var somethingWentWrong = function (err) {
 document.addEventListener('DOMContentLoaded', async function () {
   try {
     cookman = await ChromeCookieManagerFactory()
-    initializePopup()
+    global.initializePopup()
   } catch (e) {
     somethingWentWrong()
     console.log(e.stack)

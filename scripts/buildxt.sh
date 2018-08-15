@@ -14,7 +14,7 @@ cd ..
 mkdir $DEST
 log "Building extension"
 cd "chrome_extension"
-../node_modules/.bin/webpack
+../node_modules/.bin/webpack --config "webpack.dev.js"
 cd ..
 
 log "Copying manifest"

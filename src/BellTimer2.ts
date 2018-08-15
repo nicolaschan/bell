@@ -4,7 +4,7 @@ import parseCalendar from './CalendarParser'
 import CorrectedDate from './CorrectedDate'
 import { getCustomCalendar, ICourses } from './CustomSchedule'
 import { IBindings } from './FormatString'
-import requestManager from './RequestManager2'
+import { default as defaultRequestManager, RequestManager } from './RequestManager2'
 import { default as Schedule, IPeriodObject } from './Schedule'
 import parseSchedules from './ScheduleParser'
 
@@ -18,11 +18,13 @@ export default class BellTimer {
   public calculator!: BellCalculator
   public bindings: IBindings | null
   public courses: ICourses | null
+  public meta?: object
 
   constructor (source: string,
                correctedDate: CorrectedDate,
                bindings: IBindings | null,
-               courses: ICourses | null) {
+               courses: ICourses | null,
+               requestManager: RequestManager = defaultRequestManager) {
     this.source = source
     this.correctedDate = correctedDate
     this.initialized = false
@@ -30,6 +32,7 @@ export default class BellTimer {
     this.currentTimeout = null
     this.bindings = bindings
     this.courses = courses
+    this.requestManager = requestManager
   }
 
   get date () {
@@ -62,9 +65,10 @@ export default class BellTimer {
       return this.loadCustomCourses()
     }
     const [sources, data] = await Promise.all([
-      requestManager.get('/api/sources/names', []),
-      requestManager.get(`/api/data/${this.source}`)
+      this.requestManager.get('/api/sources/names', []),
+      this.requestManager.get(`/api/data/${this.source}`)
     ])
+    this.meta = data.meta
     return this.loadData(sources, Number(data.correction), data.schedules, data.calendar)
   }
 

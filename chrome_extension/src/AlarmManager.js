@@ -2,7 +2,8 @@
 
 const alarms = chrome.alarms
 const browserAction = chrome.browserAction
-const logger = new (require('../../src/SimpleLogger.js'))()
+const SimpleLogger = require('../../src/SimpleLogger')
+const logger = new SimpleLogger()
 
 logger.setLevel('trace')
 

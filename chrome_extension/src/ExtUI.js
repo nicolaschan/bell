@@ -3,7 +3,7 @@
 const m = require('mithril')
 const root = document.getElementById('root')
 
-const hostname = 'https://countdown.zone'
+const hostname = require('./Hostname').default
 
 var openSettingsTab = function () {
   chrome.tabs.create({
@@ -14,18 +14,14 @@ var openSettingsTab = function () {
 // Below code is almost all from MithrilUI.js, with some modification
 var SchoolIndicator = {
   view: function (vnode) {
-    var model = vnode.attrs.model
-    var source = model.bellTimer.source
-    var theme = model.themeManager.currentTheme.theme(model.bellTimer)
-    var meta = model.requestManager.getSync(`/api/data/${source}/meta`)
-    if (!meta) { return }
+    var theme = vnode.attrs.themeManager.currentTheme.theme(vnode.attrs.bellTimer)
 
     return m('.top.left.popup.school-indicator', m('table', m('tr', [
       m('td', m('a.no-decoration.center-vertical', {
         href: `${hostname}/settings`,
         style: theme.subtext,
         onclick: openSettingsTab
-      }, meta.name))
+      }, vnode.children))
     ])))
   }
 }
@@ -36,6 +32,30 @@ class ExtUI {
     this.uiModel = uiModel
 
     m.mount(root, {
+      onupdate: async function () {
+        if (uiModel.needsUpdate) {
+          uiModel.needsUpdate = false
+          // Necessary for when cookies are loaded from the website
+          const BellTimer = require('../../src/BellTimer2').default
+          const ThemeManager = require('../../src/ThemeManager').default
+          const RequestManager = require('./ChromeExtensionRequestManager')
+          const CorrectedDate = require('../../src/CorrectedDate').default
+          const SynchronizedDate = require('../../src/SynchronizedDate').default
+          const cookman = uiModel.cookieManager
+          var thememan = new ThemeManager(cookman.get('theme'))
+          var reqman = new RequestManager(cookman)
+          var bellTimer = new BellTimer(
+            cookman.get('source', 'lahs'),
+            new CorrectedDate(new SynchronizedDate()),
+            cookman.get('periods', {}),
+            cookman.get('courses', {}),
+            reqman)
+          await bellTimer.reloadData()
+          uiModel.themeManager = thememan
+          uiModel.requestManager = reqman
+          uiModel.bellTimer = bellTimer
+        }
+      },
       view: function () {
         if (!uiModel.state.ready) {
           return m('.centered.loading', [
@@ -49,15 +69,18 @@ class ExtUI {
             'font-size': (Math.min(window.innerHeight * 0.3, window.innerWidth * 0.2) * 0.1) + 'px'
           }
         }, [m(Page1, {
-          model: uiModel
+          model: uiModel,
+          bellTimer: uiModel.bellTimer,
+          themeManager: uiModel.themeManager
         }), m('.centered'),
         m('.footer-right', m(`a[href=${hostname}/settings]`,
           m('i.settings-icon.material-icons', {
             onclick: openSettingsTab
           }, 'settings')))
         ]), m(SchoolIndicator, {
-          model: uiModel
-        })]
+          bellTimer: uiModel.bellTimer,
+          themeManager: uiModel.themeManager
+        }, (uiModel.bellTimer.meta || {}).name || '')]
       }
     })
   }

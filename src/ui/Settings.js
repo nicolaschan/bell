@@ -99,7 +99,7 @@ const Settings = {
       },
       onLoad: data => {
         if (!hasLoaded) {
-          sourceSelector[0].selectize.setValue(cookieManager.get('source', 'lahs'))
+          sourceSelector[0].selectize.setValue(sourceManager.source)
           hasLoaded = true
         }
       }
@@ -108,7 +108,7 @@ const Settings = {
     var themeSelector = $('select#theme').selectize({
       valueField: 'name',
       searchField: ['name'],
-      value: themeManager.currentThemeName,
+      value: cookieManager.get('theme', 'Default - Light'),
       options: (themeManager.availableThemes)
         .map(x => { return {name: x} }),
       render: {
@@ -119,7 +119,7 @@ const Settings = {
         cookieManager.set('theme', value)
       }
     })
-    themeSelector[0].selectize.setValue(themeManager.currentThemeName)
+    themeSelector[0].selectize.setValue(cookieManager.get('theme', 'Default - Light'))
   }
 }
 

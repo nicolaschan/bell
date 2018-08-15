@@ -5,7 +5,7 @@ interface IRequest {
   post: (url: string, data: any) => Promise<any>
 }
 
-class RequestManager {
+export class RequestManager {
 
   private request: IRequest
   private logged: { [url: string]: number }
