@@ -15,7 +15,7 @@ const withCookies = function (element) {
       vnode.attrs.cookieManager.initialize()
     },
     view: function (vnode) {
-      if (!vnode.attrs.cookieManager.initialized) {
+      if (!vnode.attrs.cookieManager || !vnode.attrs.cookieManager.initialized) {
         return m(Loading, 'Loading')
       }
       return m(element, vnode.attrs)
