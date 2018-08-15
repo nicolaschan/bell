@@ -43,6 +43,6 @@ function register (url) {
 }
 
 module.exports = {
-  registerServer: register('https://countdown.zone/api/stats/server'),
-  registerApi: register('https://countdown.zone/api/stats/api')
+  registerServer: register('https://bell.plus/api/stats/server'),
+  registerApi: register('https://bell.plus/api/stats/api')
 }

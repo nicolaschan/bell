@@ -8,7 +8,7 @@ const data = require('./data')
 let newestVersion
 const getNewestVersion = async function () {
   try {
-    const version = await request.getAsync('https://countdown.zone/api/version')
+    const version = await request.getAsync('https://bell.plus/api/version')
     return version.body
   } catch (e) {
     // Failed to check for a new version
