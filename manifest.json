@@ -1,6 +1,6 @@
 {
-  "name": "Countdown",
-  "shortname": "Countdown",
+  "name": "Bell",
+  "shortname": "Bell",
   "start_url": ".",
   "display": "standalone",
   "background-color": "#fff",
