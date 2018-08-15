@@ -21,7 +21,7 @@ var Popup = {
         href: vnode.attrs.popupModel.href,
         style: theme.subtext
       }, vnode.attrs.popupModel.text)),
-      m('td', m('a.dismiss.center-vertical[href="#"]', {
+      m('td', m('a.dismiss.center-vertical[href=javascript:void(0)]', {
         onclick: function () {
           vnode.attrs.popupModel.visible = false
         }

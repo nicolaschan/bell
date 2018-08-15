@@ -191,11 +191,29 @@ select:focus {
 .no-decoration {
     text-decoration: none;
 }
+
 .popup {
     margin: 1em;
     font-size: 0.8em;
     padding: 0.2em;
+    width: auto;
 }
+@media (pointer: coarse) {
+    .popup {
+        width: 100%;
+        margin: 0;
+        font-size: 1em;
+    }
+    .popup table {
+        margin: auto auto;
+    }
+}
+@media (pointer: coarse) and (-webkit-min-device-pixel-ratio: 3) {
+    .popup {
+        font-size: 1.5em;
+    }
+}
+
 .link:link, .link:visited {
     text-decoration: none;
 }
@@ -365,6 +383,12 @@ a.course-link {
     transform: rotate(2rad);
 }
 
+@media (pointer: coarse) and (-webkit-min-device-pixel-ratio: 3) {
+    .icon {
+        font-size: 6em;
+    }
+}
+
 .inputBox {
     font-family: 'Roboto', sans-serif;
     border: 1px solid #dddddd;
@@ -466,6 +490,10 @@ canvas {
     opacity: 0.1;
 }
 
+.settings-section {
+    margin: 1em auto;
+    width: 24em;
+}
 
 /*
 checkbox css is modified from https://kyusuf.com/post/completely-css-custom-checkbox-radio-buttons-and-select-boxes

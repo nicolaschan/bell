@@ -62,8 +62,8 @@ const Index = {
           m(SettingsIcon)
         ])
       ]),
-      m(Popup, vnode.attrs),
       m(SchoolIndicator, vnode.attrs, (vnode.attrs.bellTimer.meta || {}).name || ''),
+      m(Popup, vnode.attrs),
       m(ScrollArrow, { visible: vnode.attrs.cookieManager.get('has_scrolled') })
     ]
   },

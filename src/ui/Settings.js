@@ -31,7 +31,7 @@ const Settings = {
     document.title = 'Settings'
     return [
       m('.header', m('h1', 'Settings')),
-      m('div[style=margin:1em auto;width:24em;]', [
+      m('.settings-section', [
         m('.desc', [
           'Schedule source or Custom',
           m('br'),
