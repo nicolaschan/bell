@@ -1,6 +1,5 @@
 import cookieManager from './LocalForageCookieManager'
 import requestManager from './RequestManager2'
-import * as themeManager from './ThemeManager'
 
 import Logger from './SimpleLogger'
 import * as version from './Version'
@@ -40,7 +39,7 @@ export default class AnalyticsManager {
         id: cookieManager.get('id'),
         newPageLoad: this.newPageLoad,
         source: cookieManager.get('source'),
-        theme: themeManager.currentThemeName,
+        theme: cookieManager.get('theme', 'Default - Light'),
         userAgent: window.navigator.userAgent,
         version
       })

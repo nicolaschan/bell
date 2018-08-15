@@ -6,7 +6,7 @@ var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
 describe('ThemeManager', function () {
-  const themeManager = require('../src/ThemeManager')
+  const ThemeManager = require('../src/ThemeManager').default
   const BellTimer = require('../src/BellTimer')
   const RequestManager = require('../src/RequestManager')
   const cookieManager = require('../src/LocalForageCookieManager').default
@@ -14,7 +14,7 @@ describe('ThemeManager', function () {
   beforeEach(async function () {
     // var cookieManager = new CookieManager()
     await cookieManager.initialize()
-    // var themeManager = new ThemeManager(cookieManager)
+    var themeManager = new ThemeManager()
     var requestManager = new RequestManager({
       get: async url => {
         url = url.split('?')[0]
@@ -74,8 +74,8 @@ describe('ThemeManager', function () {
       Object.keys(this.themeManager.availableThemes).should.not.contain('Secret: Jonathan')
     })
     it('should include secrets', function () {
-      this.cookieManager.set('secrets', ['jonathan'])
-      Object.keys(this.themeManager.availableThemes).should.contain('Secret: Jonathan')
+      this.themeManager.secrets = ['jonathan']
+      this.themeManager.availableThemes.should.contain('Secret: Jonathan')
     })
   })
   describe('Themes', function () {

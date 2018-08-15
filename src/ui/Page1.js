@@ -121,9 +121,6 @@ var Background = {
 }
 
 module.exports = {
-  oninit: function (vnode) {
-    vnode.attrs.themeManager = require('../ThemeManager')
-  },
   view: function (vnode) {
     return m('.container#page1', {
       style: vnode.state.bottomStyle

@@ -1,13 +1,12 @@
 const m = require('mithril')
 
-const themeManager = require('../ThemeManager')
 const requestManager = require('../RequestManager2').default
 
 var SchoolIndicator = {
   view: function (vnode) {
     var bellTimer = vnode.attrs.bellTimer
     var source = bellTimer.source
-    var theme = themeManager.currentTheme.theme(bellTimer)
+    var theme = vnode.attrs.themeManager.currentTheme.theme(bellTimer)
     var meta = requestManager.getSync(`/api/data/${source}/meta`)
     if (!meta) { return }
 

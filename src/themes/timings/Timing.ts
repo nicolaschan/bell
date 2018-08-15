@@ -7,3 +7,9 @@ export type ThemeFunction = (bellTimer: IBellTimer) => IColorScheme<IColor>
 export interface IBellTimer {
   getTimeRemainingMs: () => number
 }
+
+export interface ITheme {
+  name: string,
+  locked?: string,
+  theme: ThemeFunction
+}

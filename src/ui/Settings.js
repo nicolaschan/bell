@@ -3,7 +3,8 @@ const m = require('mithril')
 const cookieManager = require('../LocalForageCookieManager').default
 const requestManager = require('../RequestManager2').default
 const sourceManager = require('../SourceManager').default
-const themeManager = require('../ThemeManager')
+const ThemeManager = require('../ThemeManager').default
+const themeManager = new ThemeManager()
 
 const $ = require('jquery')
 require('selectize')
@@ -108,14 +109,14 @@ const Settings = {
       valueField: 'name',
       searchField: ['name'],
       value: themeManager.currentThemeName,
-      options: (Object.keys(themeManager.availableThemes))
+      options: (themeManager.availableThemes)
         .map(x => { return {name: x} }),
       render: {
         item: (item, escape) => `<div><b>${escape(item.name)}</b></div>`,
         option: (item, escape) => `<div><b>${escape(item.name)}</b></div>`
       },
       onChange: (value) => {
-        themeManager.currentThemeName = value
+        cookieManager.set('theme', value)
       }
     })
     themeSelector[0].selectize.setValue(themeManager.currentThemeName)

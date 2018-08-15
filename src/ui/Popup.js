@@ -1,5 +1,4 @@
 const m = require('mithril')
-const themeManager = require('../ThemeManager')
 const PopupModel = require('../PopupModel').default
 
 var Popup = {
@@ -10,7 +9,7 @@ var Popup = {
   view: function (vnode) {
     if (!vnode.attrs.popupModel.visible) { return }
     var bellTimer = vnode.attrs.bellTimer
-    var theme = themeManager.currentTheme.theme(bellTimer)
+    var theme = vnode.attrs.themeManager.currentTheme.theme(bellTimer)
 
     return m('span', {
       style: {

@@ -20,6 +20,8 @@ const Index = {
         }
       })
     }
+    const ThemeManager = require('../ThemeManager').default
+    vnode.attrs.themeManager = new ThemeManager(vnode.attrs.cookieManager.get('theme'))
     const sourceManager = require('../SourceManager').default
     sourceManager.source = vnode.attrs.source
     const BellTimer = require('../BellTimer2').default
