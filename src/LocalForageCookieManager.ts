@@ -28,6 +28,9 @@ class LocalForageCookieManager implements ICookieManager {
   }
 
   public async initialize () {
+    if (this.initialized) {
+      return
+    }
     if (this.storage) {
       const keys = await this.storage.keys()
       await Promise.all(keys.map(async (key: string) => {
