@@ -1,6 +1,6 @@
 FROM node:10
 
-RUN git clone --recursive https://github.com/nicolaschan/bell.git bell
+ADD . /bell
 WORKDIR /bell
 RUN git config --global user.email "jenkins@nicolaschan.com"
 RUN git config --global user.name "Jenkins"

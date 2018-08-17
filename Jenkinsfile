@@ -12,7 +12,7 @@ pipeline {
           steps {
             sh 'yarn'
             sh 'yarn build'
-            archiveArtifacts artifacts: 'bin/*.js', fingerprint: true, name: 'bin'
+            archiveArtifacts artifacts: 'bin/*.js', fingerprint: true
           }
         }
         stage('Test') {
@@ -34,7 +34,7 @@ pipeline {
       agent any
       steps {
         script {
-          unstash 'bin'
+          checkout scm, recursiveSubmodules: true
           def image = docker.build("bell:${BRANCH_NAME}", "--no-cache")
         }
       }
