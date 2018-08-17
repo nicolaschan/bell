@@ -1,10 +1,5 @@
 pipeline {
   agent none
-  agent {
-    docker {
-      image 'node:10-stretch'
-    }
-  }
   stages {
     stage('Build and Test') {
       agent {
@@ -40,16 +35,5 @@ pipeline {
         def image = docker.build('bell:${env.BUILD_ID}')
       }
     }
-    stage('') {
-      steps {
-        script {
-          node {
-            checkout scm;
-
-            def image = docker.build("bell:${env.BUILD_ID}"); image.push(); }
-          }
-
-        }
-      }
-    }
   }
+}
