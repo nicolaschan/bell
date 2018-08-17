@@ -34,7 +34,7 @@ pipeline {
       steps {
         script {
           checkout scm
-          def image = docker.build('bell:dev')
+          def image = docker.build("bell:${BRANCH_NAME}")
         }
       }
     }
