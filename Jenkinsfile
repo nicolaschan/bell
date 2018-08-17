@@ -34,7 +34,7 @@ pipeline {
       agent any
       steps {
         script {
-          def image = docker.build("bell:${BRANCH_NAME}", "--no-cache")
+          def image = docker.build("bell:${BRANCH_NAME}", "--no-cache .")
         }
       }
     }
