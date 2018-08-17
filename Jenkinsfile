@@ -43,8 +43,7 @@ pipeline {
     stage('Deploy') {
       agent any
       steps {
-        sh 'docker rm -f bell-dev || true'
-        sh 'docker run -e WEBSERVER_PORT=8080 -e SERVER_NAME=bell-dev-ci -e POSTGRES_ENABLED=false -e POSTGRES_USER=false -e POSTGRES_HOST=false -e POSTGRES_DATABASE=false -e POSTGRES_PASSWORD=false -e POSTGRES_PORT=false -p 8102:8080 --name bell-dev -d bell:dev'
+        sh "./scripts/deploy-dev.sh ${BRANCH_NAME}""
       }
     }
   }
