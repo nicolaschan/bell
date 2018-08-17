@@ -43,7 +43,7 @@ pipeline {
     stage('Deploy') {
       agent any
       steps {
-        sh "./scripts/deploy-dev.sh ${BRANCH_NAME}""
+        sh "./scripts/deploy-dev.sh ${BRANCH_NAME}"
       }
     }
   }
