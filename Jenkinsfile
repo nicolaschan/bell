@@ -35,7 +35,7 @@ pipeline {
       steps {
         script {
           checkout scm
-          def image = docker.build("bell:${BRANCH_NAME}")
+          def image = docker.build("bell:${BRANCH_NAME}", "--no-cache")
         }
       }
     }
