@@ -34,7 +34,7 @@ pipeline {
       steps {
         script {
           checkout scm
-          def image = docker.build('bell:${env.BUILD_ID}')
+          def image = docker.build('bell:dev')
         }
       }
     }
