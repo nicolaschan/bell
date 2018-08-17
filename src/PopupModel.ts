@@ -15,40 +15,75 @@ const deepCompare = (obj1: any, obj2: any) => {
 
 export default class PopupModel extends Refresher {
 
-  get visible () {
-    return this.enabled && this.text && this.text !== cookieManager.get('popup')
-  }
-
-  set visible (visible) {
-    if (visible) {
-      cookieManager.remove('popup').catch((e) => { /* not much we can do */ })
-    } else {
-      cookieManager.set('popup', this.text).catch((e) => { /* not much we can do */ })
+  /**
+   * Returns a list of all messages that should be visible to the user, including both text
+   * and an optional href.
+   */
+  get messages () {
+    const content = cookieManager.get('popup', [])
+    const keys = Object.keys(this.msgs)
+    if (typeof content === 'string') {
+      // convert from legacy, where only one message was seen at a given time
+      cookieManager.set('popup', [content]).catch((e) => { /* not much we can do */ })
+      return keys.filter((text) => text !== content)
+        .map((text) => ({ text, href: this.msgs[text] }))
     }
+    if (Array.isArray(content)) {
+      // don't show messages that have already been hidden
+      return keys.filter((text) => content.indexOf(text) < 0)
+        .map((text) => ({ text, href: this.msgs[text] }))
+    }
+    return {}
   }
-  public text: string
-  public href?: string
+  private msgs: { [text: string]: string }
   private source: string
-  private enabled: boolean
 
   constructor (source: string) {
     super(1 * 60 * 1000)
     this.source = source
-    this.enabled = false
-    this.text = ''
+    this.msgs = {}
+  }
+
+  /**
+   * Specifies that the given popup message should be invisible.
+   * Note that the cookie only stores text, not the href.
+   */
+  public hide (text: string, visible: boolean) {
+    const invisibleMsgs = cookieManager.get('popup', [])
+    if (visible) {
+      if (typeof invisibleMsgs === 'string') {
+        if (invisibleMsgs === text) {
+          cookieManager.remove('popup').catch((e) => { /* not much we can do */ })
+        }
+      } else {
+        const ind = invisibleMsgs.indexOf(text)
+        if (ind > 0) {
+          invisibleMsgs.splice(ind, 1)
+        }
+        cookieManager.set('popup', invisibleMsgs).catch((e) => { /* not much we can do */ })
+      }
+    } else {
+      if (typeof invisibleMsgs === 'string') {
+        const arr = text === invisibleMsgs ? [invisibleMsgs] : [invisibleMsgs, text]
+        cookieManager.set('popup', arr).catch((e) => { /* not much we can do */ })
+      } else {
+        if (invisibleMsgs.indexOf(text) < 0) {
+          invisibleMsgs.push(text)
+          cookieManager.set('popup', invisibleMsgs).catch((e) => { /* not much we can do */ })
+        }
+      }
+    }
   }
 
   public async reloadData () {
     const messages = await requestManager.get(`/api/data/${this.source}/message`, [])
-    const ua = new UAParser(navigator.userAgent)
-
+    // using 'new' returns the wrong result -- be careful
+    // @ts-ignore:2348
+    const ua = UAParser(navigator.userAgent)
     for (const message of messages) {
-      const matches = !message.agent || deepCompare(ua, message.agent)
+      const matches = !message.agent || (deepCompare(ua, message.agent) && message.message.enabled)
       if (matches) {
-        this.enabled = message.message.enabled
-        this.text = message.message.text.trim()
-        this.href = message.message.href
-        break
+        this.msgs[message.message.text.trim()] = message.message.href
       }
     }
   }
