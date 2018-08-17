@@ -40,5 +40,16 @@ pipeline {
         def image = docker.build('bell:${env.BUILD_ID}')
       }
     }
+    stage('') {
+      steps {
+        script {
+          node {
+            checkout scm;
+
+            def image = docker.build("bell:${env.BUILD_ID}"); image.push(); }
+          }
+
+        }
+      }
+    }
   }
-}
