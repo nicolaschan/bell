@@ -48,28 +48,28 @@ export default class PopupModel extends Refresher {
    * Specifies that the given popup message should be invisible.
    * Note that the cookie only stores text, not the href.
    */
-  public hide (text: string, visible: boolean) {
-    const invisibleMsgs = cookieManager.get('popup', [])
-    if (visible) {
-      if (typeof invisibleMsgs === 'string') {
-        if (invisibleMsgs === text) {
+  public markAsRead (text: string, read: boolean) {
+    const readMsgs = cookieManager.get('popup', [])
+    if (read) {
+      if (typeof readMsgs === 'string') {
+        if (readMsgs === text) {
           cookieManager.remove('popup').catch((e) => { /* not much we can do */ })
         }
       } else {
-        const ind = invisibleMsgs.indexOf(text)
+        const ind = readMsgs.indexOf(text)
         if (ind > 0) {
-          invisibleMsgs.splice(ind, 1)
+          readMsgs.splice(ind, 1)
         }
-        cookieManager.set('popup', invisibleMsgs).catch((e) => { /* not much we can do */ })
+        cookieManager.set('popup', readMsgs).catch((e) => { /* not much we can do */ })
       }
     } else {
-      if (typeof invisibleMsgs === 'string') {
-        const arr = text === invisibleMsgs ? [invisibleMsgs] : [invisibleMsgs, text]
+      if (typeof readMsgs === 'string') {
+        const arr = text === readMsgs ? [readMsgs] : [readMsgs, text]
         cookieManager.set('popup', arr).catch((e) => { /* not much we can do */ })
       } else {
-        if (invisibleMsgs.indexOf(text) < 0) {
-          invisibleMsgs.push(text)
-          cookieManager.set('popup', invisibleMsgs).catch((e) => { /* not much we can do */ })
+        if (readMsgs.indexOf(text) < 0) {
+          readMsgs.push(text)
+          cookieManager.set('popup', readMsgs).catch((e) => { /* not much we can do */ })
         }
       }
     }
