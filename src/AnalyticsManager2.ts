@@ -20,6 +20,7 @@ export default class AnalyticsManager {
 
   public async initialize () {
     if (this.initialized) { return }
+    await cookieManager.initialize()
 
     let uuid = cookieManager.get('id')
     if (!uuid) {
