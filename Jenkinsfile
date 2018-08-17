@@ -19,17 +19,10 @@ pipeline {
         sh 'CHROME_BIN=/usr/bin/chromium yarn test'
       }
     }
-    stage('') {
+    stage('Report Test Results') {
       steps {
         cobertura(autoUpdateHealth: true, autoUpdateStability: true, coberturaReportFile: 'coverage/**/cobertura-coverage.xml', failUnhealthy: true, failUnstable: true)
       }
     }
-  }
-  post {
-    always {
-      step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage/**/cobertura-coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
-
-    }
-
   }
 }
