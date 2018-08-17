@@ -24,5 +24,16 @@ pipeline {
         cobertura(autoUpdateHealth: true, autoUpdateStability: true, coberturaReportFile: 'coverage/**/cobertura-coverage.xml', failUnhealthy: true, failUnstable: true)
       }
     }
+    stage('') {
+      steps {
+        script {
+          node {
+            checkout scm;
+
+            def image = docker.build("bell:${env.BUILD_ID}"); image.push(); }
+          }
+
+        }
+      }
+    }
   }
-}
