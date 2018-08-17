@@ -30,8 +30,9 @@ pipeline {
     }
 
     stage('Build Docker') {
+      agent any
       steps {
-        node {
+        script {
           checkout scm
           def image = docker.build('bell:${env.BUILD_ID}')
         }
