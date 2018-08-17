@@ -34,7 +34,6 @@ pipeline {
       agent any
       steps {
         script {
-          checkout scm, recursiveSubmodules: true
           def image = docker.build("bell:${BRANCH_NAME}", "--no-cache")
         }
       }
