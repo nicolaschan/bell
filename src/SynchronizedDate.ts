@@ -1,4 +1,4 @@
-declare const timesync: any;
+declare const timesync: any
 
 let ts = Date
 if (typeof timesync !== 'undefined') {
@@ -7,7 +7,7 @@ if (typeof timesync !== 'undefined') {
     // Full URL is necessary for Chrome extension
     // If not building Chrome extension,
     // server can be changed to '/timesync'
-    server: '/timesync'
+    server: 'https://bell.plus/timesync'
   })
 }
 
@@ -15,7 +15,7 @@ export default class SynchronizedDate {
   private ts: any // Date doesn't support .now()
 
   constructor () {
-    this.ts = ts 
+    this.ts = ts
   }
 
   public now (): number {
