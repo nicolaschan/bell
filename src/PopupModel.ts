@@ -50,7 +50,7 @@ export default class PopupModel extends Refresher {
    */
   public markAsRead (text: string, read: boolean) {
     const readMsgs = cookieManager.get('popup', [])
-    if (read) {
+    if (!read) {
       if (typeof readMsgs === 'string') {
         if (readMsgs === text) {
           cookieManager.remove('popup').catch((e) => { /* not much we can do */ })

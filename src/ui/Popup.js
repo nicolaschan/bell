@@ -2,18 +2,19 @@ const m = require('mithril')
 const PopupModel = require('../PopupModel').default
 
 var dismiss = (pm, text) => m('td', m('a.dismiss.center-vertical[href=javascript:void(0)]', {
+  title: 'Dismiss',
   onclick: function () {
-    pm.hide(text, false)
+    pm.markAsRead(text, true)
   }
 }, m('i.dismiss-icon.material-icons', 'cancel')))
 
-var collapseStr = () => expanded ? 'collapse' : 'expand'
-var collapseOrShow = (visible) => m('td', m(`a.${collapseStr()}.center-vertical[href=javascript:void(0)]`, {
+var collapseOrShow = (visible) => m('td', m(`a.collapse.center-vertical[href=javascript:void(0)]`, {
+  title: expanded ? 'Show less' : 'Show more',
   style: { visibility: visible ? 'visible' : 'hidden' },
   onclick: function () {
     expanded = !expanded
   }
-}, m(`i.${collapseStr()}-icon.material-icons`, expanded ? 'expand_less' : 'expand_more')))
+}, m(`i.collapse-icon.material-icons`, expanded ? 'expand_less' : 'expand_more')))
 
 var expanded = false
 
@@ -37,7 +38,8 @@ var Popup = {
     ])]
     var makeRows = () => (
       // not sure if iteration order is guaranteed, but oh well
-      expanded ? messages.slice(1).map((msg) => m('tr', [
+      // take up to 5 notifications to avoid clutter
+      expanded ? messages.slice(1, 5).map((msg) => m('tr', [
         m('td', m(`${msg.href ? 'a.link' : 'span'}.center-vertical[target=_blank]`, {
           href: messages.href,
           style: theme.subtext
