@@ -1,6 +1,6 @@
 {
     "name": "bell-countdown",
-    "version": "4.0.0",
+    "version": "4.1.0",
     "description": "Countdown to the next time the bell rings at school.",
     "main": "index.js",
     "scripts": {
@@ -49,8 +49,8 @@
         "pg": "^7.4.0",
         "query-string": "^6.1.0",
         "request": "^2.88.0",
-        "roboto-fontface": "^0.9.0",
-        "selectize": "=0.12.4",
+        "roboto-fontface": "^0.10.0",
+        "selectize": "^0.12.6",
         "shortid": "^2.2.6",
         "standard": "^11.0.0",
         "timesync": "^1.0.1",

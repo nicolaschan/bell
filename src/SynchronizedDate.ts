@@ -1,17 +1,21 @@
+declare const timesync: any
+
+let ts = Date
+if (typeof timesync !== 'undefined') {
+  ts = timesync.create({
+    interval: 4 * 60 * 1000,
+    // Full URL is necessary for Chrome extension
+    // If not building Chrome extension,
+    // server can be changed to '/timesync'
+    server: '/timesync'
+  })
+}
+
 export default class SynchronizedDate {
   private ts: any // Date doesn't support .now()
 
-  constructor (timesync: any) {
-    this.ts = Date
-    if (timesync) {
-      this.ts = timesync.create({
-        interval: 4 * 60 * 1000, // 4 minutes
-        // Full URL is necessary for Chrome extension
-        // If not building Chrome extension,
-        // server can be changed to '/timesync'
-        server: '/timesync'
-      })
-    }
+  constructor () {
+    this.ts = ts
   }
 
   public now (): number {
