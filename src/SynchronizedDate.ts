@@ -7,7 +7,7 @@ if (typeof timesync !== 'undefined') {
     // Full URL is necessary for Chrome extension
     // If not building Chrome extension,
     // server can be changed to '/timesync'
-    server: 'https://bell.plus/timesync'
+    server: '/timesync'
   })
 }
 
