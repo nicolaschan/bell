@@ -30,7 +30,9 @@ class MithrilUI {
       '/': withCookies({
         oninit: function (vnode) {
           const sourceManager = require('./SourceManager').default
-          m.route.set(`/${sourceManager.source}`)
+          m.route.set(`/${sourceManager.source}`, null, {
+            replace: true
+          })
         },
         view: function (vnode) {
           return m('')
