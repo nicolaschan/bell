@@ -8,13 +8,14 @@ var dismiss = (pm, text) => m('td', m('a.dismiss.center-vertical[href=javascript
   }
 }, m('i.dismiss-icon.material-icons', 'cancel')))
 
-var collapseOrShow = (visible) => m('td', m(`a.collapse.center-vertical[href=javascript:void(0)]`, {
-  title: expanded ? 'Show less' : 'Show more',
-  style: { visibility: visible ? 'visible' : 'hidden' },
-  onclick: function () {
-    expanded = !expanded
-  }
-}, m(`i.collapse-icon.material-icons`, expanded ? 'expand_less' : 'expand_more')))
+var collapseOrShow = (visible) => visible
+  ? m('td', m(`a.collapse.center-vertical[href=javascript:void(0)]`, {
+    title: expanded ? 'Show less' : 'Show more',
+    onclick: function () {
+      expanded = !expanded
+    }
+  }, m(`i.collapse-icon.material-icons`, expanded ? 'expand_less' : 'expand_more')))
+  : m('span')
 
 var expanded = false
 
