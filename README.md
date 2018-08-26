@@ -7,14 +7,14 @@
 [![devDependencies Status](https://david-dm.org/nicolaschan/bell/dev-status.svg)](https://david-dm.org/nicolaschan/bell?type=dev)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/users/pkeeekfbjjpdkbijkjfljamglegfaikc.svg)](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc)
 
-> It doesn't matter what time it is if you don't know when you have to do it
+> Saved by the bell.plus!
 
 - **Get your school added** by entering the school name in [this form](https://goo.gl/forms/LQumv10P4NY3jRf92).
 - **Report an error or request features** by [opening an issue](https://github.com/nicolaschan/bell/issues) (recommended) or with [this form](https://goo.gl/forms/HgyL96yycOKKT0w22) if you prefer. 
 
 ## About 
 
-Bell is a **synchronized timer that counts down to the next time the bell rings at school**. A live instance of this program is currently running at [countdown.zone](https://countdown.zone) (formerly [bell.lahs.club](https://bell.lahs.club)). This software continues to be developed by Los Altos High School alumni, [nicolaschan](https://github.com/nicolaschan) and [noloerino](https://github.com/noloerino), who began working on it during their senior year of high school. The [LAHS Hack Club](https://lahs.club) helps to maintain the schedules for LAHS.
+Bell is a **synchronized timer that counts down to the next time the bell rings at school**. A live instance of this program is currently running at [bell.plus](https://bell.plus) (formerly [countdown.zone](https://countdown.zone) and [bell.lahs.club](https://bell.lahs.club)). This software continues to be developed by Los Altos High School alumni, [nicolaschan](https://github.com/nicolaschan) and [noloerino](https://github.com/noloerino), who began working on it during their senior year of high school. The [LAHS Hack Club](https://lahs.club) helps to maintain the schedules for LAHS.
 - [Chrome extension](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc) originally developed by [noloerino](https://github.com/noloerino/bell).
 - Periodic announcements about the status of the website are posted to [blog.countdown.zone](https://blog.countdown.zone). 
 - Usage statistics are available at [countdown.zone/stats](https://countdown.zone/stats).
