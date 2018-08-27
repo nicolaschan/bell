@@ -20,12 +20,12 @@ const alertAboutVersionChange = function (localVersion, remoteVersion) {
 
   if (comparison > 0) {
     // Local version is greater than the remote version
-    logger.info(`This is future version bell-countdown@${localVersion} (countdown.zone is ${remoteVersion})`)
+    logger.info(`This is future version bell-countdown@${localVersion} (bell.plus is ${remoteVersion})`)
   } else if (comparison < 0) {
     // Local version is less than the remote version
     logger.warn('There is a new version of bell-countdown available')
     logger.warn(`You are using ${localVersion} while the newest version available is ${remoteVersion}`)
-    logger.warn('Please update by visiting https://countdown.zone/gh')
+    logger.warn('Please update by visiting https://bell.plus/gh')
   } else {
     // Local version matches remote version
     logger.info(`bell-countdown@${localVersion} is up to date`)
