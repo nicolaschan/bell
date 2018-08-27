@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="76.199997mm"
+   height="38.099998mm"
+   viewBox="0 0 76.199997 38.099998"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.3 (d244b95, 2018-08-02)"
+   sodipodi:docname="sticker-draft.svg"
+   inkscape:export-filename="/home/nicolas/sticker-draft.png"
+   inkscape:export-xdpi="1365.33"
+   inkscape:export-ydpi="1365.33">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.6"
+     inkscape:cx="158.85047"
+     inkscape:cy="59.46182"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:pagecheckerboard="true"
+     inkscape:window-width="3200"
+     inkscape:window-height="1685"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid819"
+       originx="-81.249936"
+       originy="-150.73999" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-81.249939,-108.16)">
+    <rect
+       style="opacity:1;fill:#00ff00;fill-opacity:1;stroke-width:0.09178235"
+       id="rect815"
+       width="76.199997"
+       height="38.099998"
+       x="81.249939"
+       y="108.16"
+       rx="5"
+       ry="5" />
+    <g
+       id="g4543"
+       transform="matrix(1.1931465,0,0,1.1931465,-4.2235806,-24.457416)">
+      <g
+         id="g4547">
+        <circle
+           style="opacity:1;fill:#00ff00;fill-opacity:1;stroke-width:0.44700655"
+           id="path4524"
+           cx="103.56944"
+           cy="127.1155"
+           r="15.166294" />
+        <path
+           style="opacity:0.1;fill:#000000;fill-opacity:1;stroke-width:0.44700655"
+           id="path4524-3"
+           sodipodi:type="arc"
+           sodipodi:cx="103.56944"
+           sodipodi:cy="127.1155"
+           sodipodi:rx="15.166294"
+           sodipodi:ry="15.166294"
+           sodipodi:start="1.0471976"
+           sodipodi:end="4.712389"
+           d="m 111.15259,140.2499 a 15.166294,15.166294 0 0 1 -17.331854,-1.51634 15.166294,15.166294 0 0 1 -4.502948,-16.80524 15.166294,15.166294 0 0 1 14.251652,-9.97911 l 0,15.16629 z" />
+      </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:8.76530075px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:0.5;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.21913251"
+       x="93.090416"
+       y="137.59621"
+       id="text855"><tspan
+         sodipodi:role="line"
+         x="93.090416"
+         y="137.59621"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:roboto;-inkscape-font-specification:roboto;stroke-width:0.21913251"
+         id="tspan861">bell.plus/lahs</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:18.58265877px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.46456647"
+       x="104.7914"
+       y="128.98035"
+       id="text855-3"><tspan
+         sodipodi:role="line"
+         x="104.7914"
+         y="128.98035"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:roboto;-inkscape-font-specification:roboto;stroke-width:0.46456647"
+         id="tspan861-6">bell</tspan></text>
+  </g>
+</svg>
