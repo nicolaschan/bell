@@ -17,11 +17,6 @@ router.get('/uuid', (req, res) => {
     id: shortid.generate()
   })
 })
-router.get('/time', (req, res) => {
-  res.json({
-    time: Date.now()
-  })
-})
 router.get('/error', (req, res) => {
   res.status(400).send('Bad request')
 })
