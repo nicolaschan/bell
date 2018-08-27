@@ -50,6 +50,7 @@ export default class PopupModel extends Refresher {
    */
   public markAsRead (text: string, read: boolean) {
     const readMsgs = cookieManager.get('popup', [])
+    // mark as unread, not sure if we'd ever need this though
     if (!read) {
       if (typeof readMsgs === 'string') {
         if (readMsgs === text) {
@@ -69,7 +70,8 @@ export default class PopupModel extends Refresher {
       } else {
         if (readMsgs.indexOf(text) < 0) {
           readMsgs.push(text)
-          cookieManager.set('popup', readMsgs).catch((e) => { /* not much we can do */ })
+          // limit storage to 10 messages
+          cookieManager.set('popup', readMsgs.slice(-10)).catch((e) => { /* not much we can do */ })
         }
       }
     }
