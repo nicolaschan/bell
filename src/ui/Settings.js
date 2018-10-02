@@ -64,7 +64,7 @@ const Settings = {
           }
         }, m('i.done-icon.icon.material-icons', 'done'))),
         m('.footer-left[style=position: fixed;]', [m('a[style=margin-right: 2em;]', {
-          href: 'https://countdown.zone/about'
+          href: 'https://bell.plus/about'
         }, 'About'),
         m('a', {
           href: '/xt'
