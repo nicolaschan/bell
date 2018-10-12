@@ -9,8 +9,8 @@ export default {
     return m('i.down-arrow.pulse.material-icons', {
       onclick () {
         document.getElementById('page2')!.scrollIntoView({
-          block: 'start',
-          behavior: 'smooth'
+          behavior: 'smooth',
+          block: 'start'
         })
       },
       style: {

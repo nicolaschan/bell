@@ -76,7 +76,7 @@ export default new RequestManager({
   },
   post: async (url: string, data: any) => {
     return m.request({
-      method: 'POST', url, data
+      data, method: 'POST', url
     })
   }
 })
