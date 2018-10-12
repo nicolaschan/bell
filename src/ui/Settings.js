@@ -44,7 +44,7 @@ const Settings = {
         m(Select, {
           value: (vnode.state.sources) ? sourceManager.source : '',
           options: vnode.state.sources || [''],
-          onselect: source => sourceManager.source = source
+          onselect: source => { sourceManager.source = source }
         }),
         m('.desc', 'Theme'),
         m(Select, {
