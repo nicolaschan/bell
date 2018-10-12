@@ -42,6 +42,18 @@ const Index = {
     chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc')
     try {
       await bellTimer.initialize()
+
+      // Will only get to here if the source is valid
+      // Report analytics here since we have a valid source
+      // If there is an invalid source, it will be reset
+      // in the following catch block and we'll run again in
+      // the next load.
+      // TODO: Move this somewhere that makes more sense
+      const SimpleLogger = require('../SimpleLogger').default
+      const logger = new SimpleLogger()
+      const AnalyticsManager = require('../AnalyticsManager2').default
+      const analyticsManager = new AnalyticsManager(logger)
+      await analyticsManager.reportAnalytics()
     } catch (e) {
       await sourceManager.clearSource()
       m.route.set('/') // School data not available

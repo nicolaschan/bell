@@ -3,15 +3,13 @@ const handler = new UnexpectedErrorHandler()
 handler.initialize()
 
 const SimpleLogger = require('./SimpleLogger').default
-const AnalyticsManager = require('./AnalyticsManager2').default
 const MithrilUI = require('./MithrilUI')
 const VERSION = require('./Version')
 global.VERSION = VERSION
 
-var logger = new SimpleLogger()
+const logger = new SimpleLogger()
 
 const mithrilUI = new MithrilUI()
-const analyticsManager = new AnalyticsManager(logger)
 const greet = require('./Greeter').default
 
 setInterval(function () {
@@ -38,10 +36,8 @@ checkForNewVersion()
 
 window.addEventListener('load', async function () {
   logger.info(`bell-countdown version ${VERSION}`)
-
   logger.success('Ready!')
   greet()
-  await analyticsManager.reportAnalytics()
 })
 
 if (navigator.serviceWorker) {
