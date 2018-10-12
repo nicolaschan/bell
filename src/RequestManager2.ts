@@ -1,4 +1,4 @@
-import * as $ from 'jquery'
+import * as m from 'mithril'
 
 interface IRequest {
   get: (url: string) => Promise<any>,
@@ -70,9 +70,13 @@ export class RequestManager {
 
 export default new RequestManager({
   get: async (url: string) => {
-    return $.get(url)
+    return m.request({
+      method: 'GET', url
+    })
   },
   post: async (url: string, data: any) => {
-    return $.post(url, data)
+    return m.request({
+      method: 'POST', url, data
+    })
   }
 })

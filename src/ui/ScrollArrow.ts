@@ -1,4 +1,3 @@
-import * as $ from 'jquery'
 import * as m from 'mithril'
 
 interface IAttrs {
@@ -9,9 +8,10 @@ export default {
   view (vnode: m.Vnode<IAttrs>) {
     return m('i.down-arrow.pulse.material-icons', {
       onclick () {
-        $('body, html').animate({
-          scrollTop: $('#page2').offset()!.top
-        }, 1500)
+        document.getElementById('page2')!.scrollIntoView({
+          block: 'start',
+          behavior: 'smooth'
+        })
       },
       style: {
         visibility: vnode.attrs.visible ? 'hidden' : 'visible'

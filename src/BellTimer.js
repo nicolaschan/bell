@@ -1,7 +1,5 @@
 /* global timesync */
 
-const $ = require('jquery')
-
 const BellCalculator = require('./BellCalculator').default
 const getCustomCalendar = require('./CustomSchedule').getCustomCalendar
 
@@ -36,7 +34,7 @@ class BellTimer {
 
     if (this.version && this.version !== version) {
       // Give IndexedDB time to write (TODO: make more robust)
-      setTimeout(() => $(window)[0].location.reload(), 1000)
+      setTimeout(() => window.location.reload(), 1000)
     } else { this.version = version }
 
     this.setCorrection(parseInt(correction))

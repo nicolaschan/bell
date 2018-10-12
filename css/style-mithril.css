@@ -61,6 +61,12 @@ body {
   font-feature-settings: 'liga';
 }
 
+.selector input {
+    width: 100%;
+}
+.selector-dropdown {
+    max-height: 12em !important;
+}
 .centered {
     position: absolute;
     top: 50%;

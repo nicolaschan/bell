@@ -2,7 +2,6 @@ const UnexpectedErrorHandler = require('./UnexpectedErrorHandler').default
 const handler = new UnexpectedErrorHandler()
 handler.initialize()
 
-const $ = require('jquery')
 const SimpleLogger = require('./SimpleLogger').default
 const AnalyticsManager = require('./AnalyticsManager2').default
 const MithrilUI = require('./MithrilUI')
@@ -37,7 +36,7 @@ const checkForNewVersion = async () => {
 setInterval(checkForNewVersion, 4 * 60 * 1000)
 checkForNewVersion()
 
-$(window).on('load', async function () {
+window.addEventListener('load', async function () {
   logger.info(`bell-countdown version ${VERSION}`)
 
   logger.success('Ready!')
