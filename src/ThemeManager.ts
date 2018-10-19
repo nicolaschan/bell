@@ -71,7 +71,7 @@ export default class ThemeManager {
 
   public isAvailable (themeName: string): boolean {
     return !this.themes[themeName].enabled
-      || this.themes[themeName].enabled!()
+      || this.themes[themeName].enabled!(this.secrets)
   }
 
   get availableThemes () {
