@@ -4,11 +4,13 @@ import { dark as BluesDark, light as BluesLight } from './themes/Blues'
 import { dark as DefaultDark, light as DefaultLight } from './themes/Default'
 import * as GradientLight from './themes/GradientLight'
 import { dark as GraysDark, light as GraysLight } from './themes/Grays'
+import * as Halloween from './themes/Halloween'
 import * as Jonathan from './themes/Jonathan'
 import { dark as PastelDark, light as PastelLight } from './themes/Pastel'
 import { dark as RainbowDark, light as RainbowLight } from './themes/Rainbow'
 
 const themes: ITheme[] = [
+  Halloween,
   DefaultLight,
   DefaultDark,
   GradientLight,
@@ -41,7 +43,7 @@ export default class ThemeManager {
   }
 
   get defaultTheme (): ITheme {
-    return DefaultLight
+    return Halloween
   }
 
   set currentThemeName (themeName: string) {
