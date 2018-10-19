@@ -43,7 +43,7 @@ export default class ThemeManager {
   }
 
   get defaultTheme (): ITheme {
-    return DefaultLight
+    return Halloween
   }
 
   set currentThemeName (themeName: string) {
