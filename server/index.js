@@ -75,6 +75,9 @@ app.get('/css/bootstrap.min.css', (req, res) => {
 app.get('/css/bootstrap.min.css.map', (req, res) => {
   res.sendFile(path.join(baseDir, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css.map'))
 })
+app.get('/css/mithril-selector.min.css', (req, res) => {
+  res.sendFile(path.join(baseDir, 'node_modules', 'mithril-selector', 'style', 'dist', 'default.min.css'))
+})
 
 app.use('/favicons', express.static('favicons'))
 app.use('/bin', express.static('bin'))

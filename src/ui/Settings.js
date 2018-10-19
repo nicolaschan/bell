@@ -5,11 +5,16 @@ const requestManager = require('../RequestManager2').default
 const sourceManager = require('../SourceManager').default
 const ThemeManager = require('../ThemeManager').default
 const themeManager = new ThemeManager()
-
-const $ = require('jquery')
-require('selectize')
+const { Select } = require('mithril-selector')
 
 const Settings = {
+  oninit: async function (vnode) {
+    vnode.state.sources = (await requestManager.get('/api/sources'))
+      .map(source => ({
+        display: `${source.name} (${source.id})`,
+        value: source.id
+      }))
+  },
   onupdate: function (vnode) {
     var source = sourceManager.source
     if (source === vnode.state.previousSource) {
@@ -36,9 +41,17 @@ const Settings = {
           'Schedule source or Custom',
           m('br'),
           '(No guarantee of correctness. Check with school for official schedules.)']),
-        m('select#source[placeholder=Schedule source]'),
+        m(Select, {
+          value: (vnode.state.sources) ? sourceManager.source : '',
+          options: vnode.state.sources || [''],
+          onselect: source => { sourceManager.source = source }
+        }),
         m('.desc', 'Theme'),
-        m('select#theme[placeholder=Theme]'),
+        m(Select, {
+          value: new ThemeManager(cookieManager.get('theme')).currentTheme.name,
+          options: themeManager.availableThemes,
+          onselect: theme => cookieManager.set('theme', theme)
+        }),
         m('.add-link', (vnode.state.editClasses) ? m('a.add#edit-classes-button[href=/classes]', {
           oncreate: m.route.link
         }, 'Edit Classes') : m('a.add#edit-classes-button[href=/periods]', {
@@ -71,55 +84,6 @@ const Settings = {
         }, 'Chrome Extension')])
       ])
     ]
-  },
-  oncreate: function (vnode) {
-    var hasLoaded = false
-    var sourceSelector = $('select#source').selectize({
-      valueField: 'id',
-      searchField: ['name', 'id'],
-      options: [],
-      // create: (input) => {
-      //   var split = input.split(':')
-      //   return {
-      //     name: split[split.length - 1],
-      //     id: input
-      //   }
-      // },
-      load: (query, callback) => {
-        requestManager.get(`/api/sources`).then(callback)
-      },
-      preload: true,
-      render: {
-        item: (item, escape) => `<div><b>${escape(item.name)}</b> (${escape(item.id)})</div>`,
-        option: (item, escape) => `<div><b>${escape(item.name)}</b> (${escape(item.id)})</div>`
-      },
-      onChange: (value) => {
-        sourceManager.source = value
-        m.redraw()
-      },
-      onLoad: data => {
-        if (!hasLoaded) {
-          sourceSelector[0].selectize.setValue(sourceManager.source)
-          hasLoaded = true
-        }
-      }
-    })
-
-    var themeSelector = $('select#theme').selectize({
-      valueField: 'name',
-      searchField: ['name'],
-      value: cookieManager.get('theme', 'Default - Light'),
-      options: (themeManager.availableThemes)
-        .map(x => { return {name: x} }),
-      render: {
-        item: (item, escape) => `<div><b>${escape(item.name)}</b></div>`,
-        option: (item, escape) => `<div><b>${escape(item.name)}</b></div>`
-      },
-      onChange: (value) => {
-        cookieManager.set('theme', value)
-      }
-    })
-    themeSelector[0].selectize.setValue(cookieManager.get('theme', 'Default - Light'))
   }
 }
 

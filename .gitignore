@@ -11,6 +11,9 @@ id.txt
 # Because Jonathan uses a mac
 .DS_Store
 
+# for vim
+.swp
+
 # Chrome app zip
 bellxt.zip
 

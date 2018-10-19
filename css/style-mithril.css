@@ -61,6 +61,12 @@ body {
   font-feature-settings: 'liga';
 }
 
+.selector input {
+    width: 100%;
+}
+.selector-dropdown {
+    max-height: 12em !important;
+}
 .centered {
     position: absolute;
     top: 50%;
@@ -238,14 +244,19 @@ select:focus {
     margin-bottom: 0.3em;
     font-size: 1em;
 }
-.dismiss {
+.collapse-icon {
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+    font-size: 1.4em;
+}
+.dismiss, .collapse {
     font-size: 1em;
 }
-.dismiss:link, .dismiss:visited {
+.dismiss:link, .dismiss:visited, .collapse:link, .collapse:visited {
     color: #aaaaaa;
     transition: color 0.5s ease;
 }
-.dismiss:hover {
+.dismiss:hover, .collapse:hover {
     color: red;
 }
 

@@ -43,7 +43,13 @@ export default class ThemeManager {
   }
 
   get defaultTheme (): ITheme {
-    return Halloween
+    // The first available theme in the array is the default
+    for (const theme of themes) {
+      if (this.isAvailable(theme.name)) {
+        return theme
+      }
+    }
+    return DefaultLight
   }
 
   set currentThemeName (themeName: string) {
@@ -64,8 +70,8 @@ export default class ThemeManager {
   }
 
   public isAvailable (themeName: string): boolean {
-    return !this.themes[themeName].locked
-      || this.secrets.indexOf(this.themes[themeName].locked!) > (-1)
+    return !this.themes[themeName].enabled
+      || this.themes[themeName].enabled!(this.secrets)
   }
 
   get availableThemes () {

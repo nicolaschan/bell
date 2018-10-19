@@ -13,7 +13,9 @@ class SourceManager {
 
   set source (source) {
     if (source) {
-      cookieManager.set('source', source).catch((e) => { /* not much we can do */ })
+      cookieManager.set('source', source).catch((e) => {
+        // not much we can do
+      })
     }
   }
 

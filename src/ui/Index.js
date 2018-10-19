@@ -1,5 +1,4 @@
 const m = require('mithril')
-const $ = require('jquery')
 
 const ScheduleDisplay = require('./ScheduleDisplay')
 const Page1 = require('./Page1')
@@ -11,14 +10,16 @@ const ScrollArrow = require('./ScrollArrow').default
 
 const Index = {
   oninit: async function (vnode) {
+    const onScroll = function (e) {
+      if (window.pageYOffset > 250) {
+        window.removeEventListener('scroll', onScroll)
+        cookieManager.set('has_scrolled', true)
+      }
+    }
+
     const cookieManager = vnode.attrs.cookieManager
     if (!cookieManager.get('has_scrolled')) {
-      $(window).on('scroll', function (e) {
-        if ($(window).scrollTop() > 250) {
-          $(window).off('scroll')
-          cookieManager.set('has_scrolled', true)
-        }
-      })
+      window.addEventListener('scroll', onScroll)
     }
     const ThemeManager = require('../ThemeManager').default
     vnode.attrs.themeManager = new ThemeManager(vnode.attrs.cookieManager.get('theme'))
@@ -41,6 +42,18 @@ const Index = {
     chromeExtensionMessenger.connect('pkeeekfbjjpdkbijkjfljamglegfaikc')
     try {
       await bellTimer.initialize()
+
+      // Will only get to here if the source is valid
+      // Report analytics here since we have a valid source
+      // If there is an invalid source, it will be reset
+      // in the following catch block and we'll run again in
+      // the next load.
+      // TODO: Move this somewhere that makes more sense
+      const SimpleLogger = require('../SimpleLogger').default
+      const logger = new SimpleLogger()
+      const AnalyticsManager = require('../AnalyticsManager2').default
+      const analyticsManager = new AnalyticsManager(logger)
+      await analyticsManager.reportAnalytics()
     } catch (e) {
       await sourceManager.clearSource()
       m.route.set('/') // School data not available

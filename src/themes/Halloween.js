@@ -4,6 +4,10 @@ const BasicTiming = require('./timings/BasicTiming')
 
 module.exports = {
   name: 'Halloween',
+  enabled: (secrets) => {
+    const now = new Date()
+    return (now.getMonth() + 1) === 10 && (now.getDate() > 18)
+  },
   theme: BasicColorTheme(
     ColorSchemeTransformations.fromObjectStrings,
     BasicTiming,
