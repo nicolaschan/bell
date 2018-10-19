@@ -41,7 +41,7 @@ export default class AnalyticsManager {
         id: cookieManager.get('id'),
         newPageLoad: this.newPageLoad,
         source: cookieManager.get('source'),
-        theme: new ThemeManager(cookieManager.get('theme')).currentThemeName,
+        theme: new ThemeManager(cookieManager.get('theme')).currentTheme.name,
         userAgent: window.navigator.userAgent,
         version
       })

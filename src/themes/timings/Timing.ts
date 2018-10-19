@@ -10,6 +10,8 @@ export interface IBellTimer {
 
 export interface ITheme {
   name: string,
-  locked?: string,
+  // Eventually, .enabled() should be made a 
+  // pure function of bellTimer and cookieManager
+  enabled?: () => boolean,
   theme: ThemeFunction
 }

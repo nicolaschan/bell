@@ -4,7 +4,7 @@ const BasicTiming = require('./timings/BasicTiming')
 
 module.exports = {
   name: 'Secret: Jonathan',
-  locked: 'jonathan',
+  enabled: () => false,
   theme: BasicColorTheme(
     ColorSchemeTransformations.fromObjectStrings,
     BasicTiming,

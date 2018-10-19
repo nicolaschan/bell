@@ -48,7 +48,7 @@ const Settings = {
         }),
         m('.desc', 'Theme'),
         m(Select, {
-          value: new ThemeManager(cookieManager.get('theme')).currentThemeName,
+          value: new ThemeManager(cookieManager.get('theme')).currentTheme.name,
           options: themeManager.availableThemes,
           onselect: theme => cookieManager.set('theme', theme)
         }),
