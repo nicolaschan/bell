@@ -16,10 +16,10 @@
 
 Bell is a **synchronized timer that counts down to the next time the bell rings at school**. A live instance of this program is currently running at [bell.plus](https://bell.plus) (formerly [countdown.zone](https://countdown.zone) and [bell.lahs.club](https://bell.lahs.club)). This software continues to be developed by Los Altos High School alumni, [nicolaschan](https://github.com/nicolaschan) and [noloerino](https://github.com/noloerino), who began working on it during their senior year of high school. The [LAHS Hack Club](https://lahs.club) helps to maintain the schedules for LAHS.
 - [Chrome extension](https://chrome.google.com/webstore/detail/belllahsclub-extension/pkeeekfbjjpdkbijkjfljamglegfaikc) originally developed by [noloerino](https://github.com/noloerino/bell).
-- Periodic announcements about the status of the website are posted to [blog.countdown.zone](https://blog.countdown.zone). 
-- Usage statistics are available at [countdown.zone/stats](https://countdown.zone/stats).
+- Periodic announcements about the status of the website are posted to [blog.bell.plus](https://blog.bell.plus). 
+- Usage statistics are available at [bell.plus/stats](https://bell.plus/stats).
 
-**_As seen in [The Talon](https://lahstalon.org/38066/news/senior-creates-website-for-bell-schedule/), the Los Altos High School student newspaper_**
+**_As seen in [The Talon](http://archive.is/oGs6I), the Los Altos High School student newspaper_**
 
 ## Features
 - Support for weekly schedules
