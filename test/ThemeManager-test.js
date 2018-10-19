@@ -63,8 +63,8 @@ describe('ThemeManager', function () {
     })
     it('If current theme name is not a theme, use default', function () {
       this.themeManager.currentThemeName = 'Not a theme'
-      this.themeManager.currentTheme.name.should.equal('Default - Light')
-      this.themeManager.currentThemeName.should.equal('Default - Light')
+      this.themeManager.currentTheme.name.should.equal(this.themeManager.defaultTheme.name)
+      this.themeManager.currentThemeName.should.equal(this.themeManager.defaultTheme.name)
     })
   })
 
