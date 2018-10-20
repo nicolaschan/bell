@@ -4,16 +4,14 @@ const shortid = require('shortid')
 const data = require('../data')
 
 router.get('/version', async (req, res) => {
-  res.set('Content-Type', 'text/plain')
   try {
-    res.send(await data.getVersion())
+    res.json({ version: await data.getVersion() })
   } catch (e) {
     res.status(500).send('Error reading version')
   }
 })
 router.get('/uuid', (req, res) => {
-  res.set('Content-Type', 'text/json')
-  res.send({
+  res.json({
     id: shortid.generate()
   })
 })

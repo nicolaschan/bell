@@ -21,7 +21,7 @@ const requestManager = require('./RequestManager2').default
 let version
 const checkForNewVersion = async () => {
   try {
-    const newVersion = await requestManager.get('/api/version')
+    const newVersion = (await requestManager.get('/api/version')).version
     if (version === undefined) {
       version = newVersion
     } else if (version !== newVersion) {
