@@ -34,6 +34,7 @@ export default class AnalyticsManager {
 
   public async reportAnalytics () {
     await this.initialize()
+    if (!this.newPageLoad) { return }
 
     let send
     try {
