@@ -9,7 +9,7 @@ let newestVersion
 const getNewestVersion = async function () {
   try {
     const version = await request.getAsync('https://bell.plus/api/version')
-    return version.body
+    return JSON.parse(version.body).version
   } catch (e) {
     // Failed to check for a new version
     throw new Error('Failed to check for a new version')
