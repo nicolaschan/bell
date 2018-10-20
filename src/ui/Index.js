@@ -8,6 +8,11 @@ const Loading = require('./Loading').default
 const SettingsIcon = require('./SettingsIcon').default
 const ScrollArrow = require('./ScrollArrow').default
 
+const SimpleLogger = require('../SimpleLogger').default
+const logger = new SimpleLogger()
+const AnalyticsManager = require('../AnalyticsManager2').default
+const analyticsManager = new AnalyticsManager(logger)
+
 const Index = {
   oninit: async function (vnode) {
     const onScroll = function (e) {
@@ -49,10 +54,6 @@ const Index = {
       // in the following catch block and we'll run again in
       // the next load.
       // TODO: Move this somewhere that makes more sense
-      const SimpleLogger = require('../SimpleLogger').default
-      const logger = new SimpleLogger()
-      const AnalyticsManager = require('../AnalyticsManager2').default
-      const analyticsManager = new AnalyticsManager(logger)
       await analyticsManager.reportAnalytics()
     } catch (e) {
       await sourceManager.clearSource()
