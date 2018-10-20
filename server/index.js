@@ -10,10 +10,22 @@ app.use(compression())
 const server = http.createServer(app)
 const path = require('path')
 const timesyncServer = require('timesync/server')
+const WebSocket = require('ws')
 
 const register = require('./register')
 const checkForNewVersion = require('./updates')
 const baseDir = path.join(__dirname, '..')
+
+let wss
+if (process.env.ENABLE_WS_HITS) {
+  wss = new WebSocket.Server({ server })
+}
+
+const broadcast = data => {
+  if (process.env.ENABLE_WS_HITS === 'true') {
+    wss.clients.forEach(client => client.send(data))
+  }
+}
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(baseDir, 'html', 'index.html'))
@@ -108,7 +120,7 @@ setInterval(checkForNewVersion, 24 * 60 * 60 * 1000)
 
 Promise.resolve()
   .then(() => logger.log('Initializing API'))
-  .then(require('./api'))
+  .then(require('./api')(broadcast))
   .then(api => app.use('/api', api))
   .then(() => logger.log('Starting web server'))
   .then(startWebServer)

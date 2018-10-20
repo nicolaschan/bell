@@ -21,8 +21,8 @@ router.get('/error', (req, res) => {
   res.status(400).send('Bad request')
 })
 
-module.exports = async function () {
-  router.use('/stats', await require('./analytics')())
+module.exports = broadcast => async function () {
+  router.use('/stats', await require('./analytics')(broadcast))
   router.use('/data', require('./data'))
   router.use('/sources', require('./sources'))
   return router
