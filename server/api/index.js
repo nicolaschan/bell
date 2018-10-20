@@ -5,7 +5,7 @@ const data = require('../data')
 
 router.get('/version', async (req, res) => {
   try {
-    res.json({ version: await data.getVersion()})
+    res.json({ version: await data.getVersion() })
   } catch (e) {
     res.status(500).send('Error reading version')
   }
