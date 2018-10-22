@@ -45,7 +45,9 @@ module.exports = async function (broadcast) {
         ip: getIp(req)
       })
       res.json({ success: true })
-      broadcast(crypto.createHash('md5').update(req.body.id).digest('hex').substring(0, 1))
+      if (typeof req.body.id === 'string') {
+        broadcast(crypto.createHash('md5').update(req.body.id).digest('hex').substring(0, 1))
+      }
     } catch (e) {
       logger.error(e)
       res.json({ success: false })
