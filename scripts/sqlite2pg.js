@@ -1,11 +1,19 @@
-const UAParser = require('useragent')
-const config = require('../config.json')
-const { Client } = require('pg')
-const pgDb = new Client(config.postgres)
-const Database = require('better-sqlite3')
-const sqliteDb = new Database('../analytics.sqlite')
+require('dotenv-safe').config()
 
-const pgHandler = require('../PostgresAnalyticsHandler.js')
+const path = require('path')
+const UAParser = require('useragent')
+const { Pool } = require('pg')
+const pgDb = new Pool({
+  user: process.env.POSTGRES_USER,
+  host: process.env.POSTGRES_HOST,
+  database: process.env.POSTGRES_DATABASE,
+  password: process.env.POSTGRES_PASSWORD,
+  port: process.env.POSTGRES_PORT
+})
+const Database = require('better-sqlite3')
+const sqliteDb = new Database(path.join(__dirname, '..', 'analytics.sqlite'))
+
+const pgHandler = require('../server/api/analytics/PostgresAnalyticsHandler.js')
 
 // Migrates sqlite database to postgres, in the process re-parsing the useragent string
 
@@ -21,15 +29,16 @@ var recordHit = async function (row) {
   var theme = row.theme
   var source = row.source
   var ip = row.ip
-  var timestamp = row.timestamp
+  var version = row.version
+  var timestamp = `${row.timestamp} UTC`
   var result = UAParser.parse(uaStr)
   var device = getDevice(result)
-  console.log(user, result.family, device, result.os.family, theme, source, ip, timestamp)
+  console.log(user, result.family, device, result.os.family, theme, source, ip, version, timestamp)
   return pgDb.query({
-    text: `INSERT INTO hits (userId, userAgent, browser, device, os, theme, source, ip, timestamp) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+    text: `INSERT INTO hits (userId, userAgent, browser, device, os, theme, source, ip, version, timestamp) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
     values: [
-      user, uaStr, result.family, device, result.os.family, theme, source, ip, timestamp
+      user, uaStr, result.family, device, result.os.family, theme, source, ip, version, timestamp
     ]})
 }
 
@@ -39,16 +48,17 @@ var recordError = async function (row) {
   var theme = row.theme
   var source = row.source
   var ip = row.ip
-  var timestamp = row.timestamp
+  var version = row.version
+  var timestamp = `${row.timestamp} UTC`
   var error = row.error
   var result = UAParser.parse(uaStr)
   var device = getDevice(result)
-  console.log(user, uaStr, result.family, device, result.os.family, theme, source, ip, error, timestamp)
+  console.log(user, uaStr, result.family, device, result.os.family, theme, source, ip, version, error, timestamp)
   return pgDb.query({
-    text: `INSERT INTO errors (userId, userAgent, browser, device, os, theme, source, ip, error, timestamp) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+    text: `INSERT INTO errors (userId, userAgent, browser, device, os, theme, source, ip, version, error, timestamp) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
     values: [
-      user, uaStr, result.family, device, result.os.family, theme, source, ip, error, timestamp
+      user, uaStr, result.family, device, result.os.family, theme, source, ip, version, error, timestamp
     ]})
 }
 
@@ -69,4 +79,10 @@ var migrateErrors = async function () {
 }
 
 pgDb.connect()
-pgHandler.initialize().then(migrateHits).then(migrateErrors).then(async () => pgDb.end()).then(pgHandler.disconnect)
+pgHandler.initialize()
+  .then(migrateHits)
+  .then(migrateErrors)
+  .then(() => console.log('*** transfer completed ***'))
+  .then(() => pgDb.end())
+  .then(pgHandler.disconnect)
+  .then(() => console.log('done'))
