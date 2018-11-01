@@ -83,10 +83,9 @@ export default class PopupModel extends Refresher {
     // @ts-ignore:2348
     const ua = UAParser(navigator.userAgent)
     for (const message of messages) {
-      const matches = !message.agent || (deepCompare(ua, message.agent) && message.message.enabled)
-      if (matches) {
-        this.msgs[message.message.text.trim()] = message.message.href
-      }
+      if (!message.message.enabled) { continue }
+      if (message.agent && !deepCompare(ua, message.agent)) { continue }
+      this.msgs[message.message.text.trim()] = message.message.href
     }
   }
 }
