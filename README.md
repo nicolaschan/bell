@@ -19,7 +19,7 @@ Bell is a **synchronized timer that counts down to the next time the bell rings 
 - Periodic announcements about the status of the website are posted to [blog.bell.plus](https://blog.bell.plus). 
 - Usage statistics are available at [bell.plus/stats](https://bell.plus/stats).
 
-**_As seen in [The Talon](http://archive.is/oGs6I), the Los Altos High School student newspaper_**
+**_As seen in [The Talon](https://web.archive.org/web/20181211080504/https://lahstalon.org/senior-creates-website-for-bell-schedule/), the Los Altos High School student newspaper_**
 
 ## Features
 - Support for weekly schedules
