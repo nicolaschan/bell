@@ -79,6 +79,17 @@ var updateGraphics = function (vnode) {
   ctx.closePath()
   ctx.fill()
 }
+const updateSnowflakes = function (vnode) {
+  const c = vnode.dom
+  const bellTimer = vnode.attrs.bellTimer
+  const themeManager = vnode.attrs.themeManager
+  const ctx = c.getContext('2d')
+  c.width = window.innerWidth
+  c.height = window.innerHeight
+  if (themeManager.currentTheme.specialEffects) {
+    themeManager.currentTheme.specialEffects(ctx, c)
+  }
+}
 
 var Background = {
   onbeforeupdate: function (vnode) {
@@ -133,6 +144,11 @@ module.exports = {
       ]),
       m('canvas.centered', {
         onupdate: updateGraphics,
+        bellTimer: vnode.attrs.bellTimer,
+        themeManager: vnode.attrs.themeManager
+      }),
+      m('canvas.snowflakes', {
+        onupdate: updateSnowflakes,
         bellTimer: vnode.attrs.bellTimer,
         themeManager: vnode.attrs.themeManager
       })

@@ -203,6 +203,7 @@ select:focus {
     font-size: 0.8em;
     padding: 0.2em;
     width: auto;
+    z-index: 3;
 }
 @media (pointer: coarse) {
     .popup {
@@ -289,6 +290,7 @@ select:focus {
     transition: opacity 1s linear;
     font-size: 8em;
     cursor: pointer;
+    z-index: 3;
 }
 .pulse {
     animation: pulse 4s linear infinite;
@@ -577,4 +579,16 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
 
 .checkbox {
     width: 0px;
+}
+
+/** For snowflakes */
+.snowflakes {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    opacity: 1;
+    z-index: 2;
 }

@@ -14,7 +14,7 @@ const greet = require('./Greeter').default
 
 setInterval(function () {
   mithrilUI.redraw()
-}, 1000 / 10)
+}, 1000 / 30)
 
 // TODO: Might be a good idea to move this somewhere else
 const requestManager = require('./RequestManager2').default

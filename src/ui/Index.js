@@ -38,6 +38,7 @@ const Index = {
       new CorrectedDate(new SynchronizedDate()),
       cookieManager.get('periods', {}),
       cookieManager.get('courses', {}))
+    global.bellTimer = bellTimer
     vnode.attrs.bellTimer = bellTimer
     vnode.attrs.cookieManager = cookieManager
     vnode.attrs.periodInTitle = cookieManager.get('title_period', true)
