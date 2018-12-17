@@ -81,7 +81,6 @@ var updateGraphics = function (vnode) {
 }
 const updateSnowflakes = function (vnode) {
   const c = vnode.dom
-  const bellTimer = vnode.attrs.bellTimer
   const themeManager = vnode.attrs.themeManager
   const ctx = c.getContext('2d')
   c.width = window.innerWidth
