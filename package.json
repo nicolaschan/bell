@@ -1,6 +1,6 @@
 {
     "name": "bell-countdown",
-    "version": "4.8.0",
+    "version": "4.9.0",
     "description": "Countdown to the next time the bell rings at school.",
     "main": "index.js",
     "scripts": {
@@ -12,7 +12,7 @@
         "build:dev": "webpack --config webpack.dev.js",
         "build:ts": "webpack --config webpack.config.js",
         "watch": "yarn run build:dev --watch",
-        "build:chrome": "cd chrome_extension; webpack",
+        "build:chrome": "cd chrome_extension; webpack --config webpack.dev.js",
         "build:chrome:watch": "yarn run build:chrome -- --watch",
         "test": "karma start --single-run --browsers ChromeHeadlessNoSandbox && yarn lint",
         "test:manual": "karma start"

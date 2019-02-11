@@ -11,8 +11,6 @@ import { dark as RainbowDark, light as RainbowLight } from './themes/Rainbow'
 import * as Winter from './themes/Winter'
 
 const themes: ITheme[] = [
-  Winter,
-  Halloween,
   DefaultLight,
   DefaultDark,
   GradientLight,
