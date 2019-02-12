@@ -4,11 +4,11 @@ import { dark as BluesDark, light as BluesLight } from './themes/Blues'
 import { dark as DefaultDark, light as DefaultLight } from './themes/Default'
 import * as GradientLight from './themes/GradientLight'
 import { dark as GraysDark, light as GraysLight } from './themes/Grays'
-import * as Halloween from './themes/Halloween'
+// import * as Halloween from './themes/Halloween'
 import * as Jonathan from './themes/Jonathan'
 import { dark as PastelDark, light as PastelLight } from './themes/Pastel'
 import { dark as RainbowDark, light as RainbowLight } from './themes/Rainbow'
-import * as Winter from './themes/Winter'
+// import * as Winter from './themes/Winter'
 
 const themes: ITheme[] = [
   DefaultLight,

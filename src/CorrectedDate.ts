@@ -15,14 +15,14 @@ export default class CorrectedDate {
   get date () {
     if (this.devModeEnabled && this.devModeStart && this.devModeScale !== undefined) {
       return new Date(
-        this.devModeStart 
-        + this.correction 
-        + (this.synchronizedDate.now() - this.devModeEnabled) * this.devModeScale)
+        this.devModeStart
+          + this.correction
+          + (this.synchronizedDate.now() - this.devModeEnabled) * this.devModeScale)
     }
     return new Date(this.synchronizedDate.now() + this.correction)
   }
 
-  enableDevMode (startDate: any, scale: number = 0) {
+  public enableDevMode (startDate: any, scale: number = 0) {
     this.devModeEnabled = Date.now()
     this.devModeStart = startDate.getTime()
     this.devModeScale = scale
