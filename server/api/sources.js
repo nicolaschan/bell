@@ -20,11 +20,15 @@ const dataDirectories = async () => {
 router.get('/', async (req, res) => {
   const directories = await dataDirectories()
   const sources = await Promise.all(directories.map(async directory => {
-    const source = await data.getMeta(directory)
-    source.id = directory
-    return source
+    try {
+      const source = await data.getMeta(directory)
+      source.id = directory
+      return source
+    } catch (e) {
+      return null
+    }
   }))
-  res.json(sources)
+  res.json(sources.filter(x => x))
 })
 
 router.get('/names', async (req, res) => {
