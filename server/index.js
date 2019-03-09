@@ -46,8 +46,8 @@ app.get('/settings', (req, res) => {
   res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 app.get('/stats', (req, res) => {
-  if (process.env.STATS_REDIRECT.startsWith('http://')
-    || process.env.STATS_REDIRECT.startsWith('https://')) {
+  if (process.env.STATS_REDIRECT.startsWith('http://') ||
+    process.env.STATS_REDIRECT.startsWith('https://')) {
     res.redirect(process.env.STATS_REDIRECT)
   } else {
     res.sendFile(path.join(baseDir, 'html', 'stats.html'))
