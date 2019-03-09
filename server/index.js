@@ -46,7 +46,12 @@ app.get('/settings', (req, res) => {
   res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 app.get('/stats', (req, res) => {
-  res.sendFile(path.join(baseDir, 'html', 'stats.html'))
+  if (process.env.STATS_REDIRECT.startsWith('http://')
+    || process.env.STATS_REDIRECT.startsWith('http://')) {
+    res.redirect(process.env.STATS_REDIRECT)
+  } else {
+    res.sendFile(path.join(baseDir, 'html', 'stats.html'))
+  }
 })
 
 app.get('/manifest.json', (req, res) => {
