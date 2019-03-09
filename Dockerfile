@@ -4,7 +4,7 @@ ADD . /bell
 WORKDIR /bell
 RUN git config --global user.email "jenkins@nicolaschan.com"
 RUN git config --global user.name "Jenkins"
-RUN npm version $(git describe)
+RUN npm version $(git describe) || true
 RUN yarn install
 RUN yarn build
 
