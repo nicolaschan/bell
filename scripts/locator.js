@@ -1,7 +1,22 @@
 // Gets a list of all the cities that we get hits from
+require('dotenv-safe').config()
 
-const config = require('../config.json')
+const config = {
+  postgres: {
+    user: process.env.POSTGRES_USER,
+    host: process.env.POSTGRES_HOST,
+    database: process.env.POSTGRES_DATABASE,
+    password: process.env.POSTGRES_PASSWORD,
+    port: process.env.POSTGRES_PORT
+  }
+}
 const logger = require('loggy')
+
+if (process.env.POSTGRES_ENABLED != 'true') {
+  logger.error('Postgres is disabled')
+  process.exit(1)
+}
+
 const { Pool } = require('pg')
 const db = new Pool(config.postgres)
 
