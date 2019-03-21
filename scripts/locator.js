@@ -80,7 +80,9 @@ var main = async function () {
   }
 
   logger.log('Beginning insertion')
-  await Promise.all(hits.rows.map(saveLocation))
+  for (const row of hits.rows) {
+    await saveLocation(row)
+  }
   await db.end()
 }
 main()
