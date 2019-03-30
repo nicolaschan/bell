@@ -29,7 +29,21 @@ var Model = {
       id = shortid.generate()
     }
     Model.data.sections = []
+
+    const withWeekdays = []
+    const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
     for (let section of Sections.data) {
+      if (!section) { continue }
+      if (section[0] === 'Weekdays') {
+        for (let day of weekdays) {
+          withWeekdays.push([day, section[1], section[2]])
+        }
+      } else {
+        withWeekdays.push(section)
+      }
+    }
+
+    for (let section of withWeekdays) {
       try {
         Model.data.sections.push([
           section[0], parseTime(section[1]), parseTime(section[2])])
@@ -141,7 +155,8 @@ const Enter = {
             m('option[value=Thursday]', 'Thursday'),
             m('option[value=Friday]', 'Friday'),
             m('option[value=Saturday]', 'Saturday'),
-            m('option[value=Sunday]', 'Sunday')
+            m('option[value=Sunday]', 'Sunday'),
+            m('option[value=Weekdays]', 'Weekdays')
           ]),
           m('input.inputBox.time-entry[placeholder=Start Time][maxlength=10][type=text]', {
             value: section[1],
