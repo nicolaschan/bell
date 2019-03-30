@@ -12,7 +12,7 @@ const config = {
 }
 const logger = require('loggy')
 
-if (process.env.POSTGRES_ENABLED != 'true') {
+if (process.env.POSTGRES_ENABLED !== 'true') {
   logger.error('Postgres is disabled')
   process.exit(1)
 }
