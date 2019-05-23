@@ -35,7 +35,7 @@
         "dotenv-safe": "^6.0.0",
         "express": "^4.16.2",
         "geoip-database": "^1.0.14",
-        "jquery": "^3.1.1",
+        "jquery": "^3.4.0",
         "karma-typescript": "^3.0.13",
         "karma-webpack": "^3.0.0",
         "localforage": "^1.5.2",
