@@ -1,5 +1,6 @@
 # Bell Schedule Countdown
 [![Build Status](https://img.shields.io/travis/nicolaschan/bell.svg)](https://travis-ci.org/nicolaschan/bell)
+[![Uptime](https://img.shields.io/uptimerobot/ratio/m782803148-c8d6ee04b5151fadab04c9ee.svg)](https://metrics.bell.plus/d/qmmT_-Ciz/traefik-realtime-metrics?orgId=2)
 [![codecov.io](https://img.shields.io/codecov/c/github/nicolaschan/bell/master.svg)](https://codecov.io/github/nicolaschan/bell?branch=master)
 [![codebeat badge](https://codebeat.co/badges/aaca5932-6582-4334-a487-91680d43a994)](https://codebeat.co/projects/github-com-nicolaschan-bell-master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
