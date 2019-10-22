@@ -57,8 +57,8 @@ const Settings = {
         }, 'Edit Classes') : m('a.add#edit-classes-button[href=/periods]', {
           oncreate: m.route.link
         }, 'Edit Periods')),
-        m('.add-link', m('a.add#edit-classes-button[href=https://goo.gl/forms/LQumv10P4NY3jRf92]', 'Request School')),
-        m('.add-link', m('a.add#edit-classes-button[href=https://goo.gl/forms/HgyL96yycOKKT0w22]', 'Report Problem')),
+        m('.add-link', m('a.add#edit-classes-button[href=https://blog.bell.plus/contact/]', 'Request School')),
+        m('.add-link', m('a.add#edit-classes-button[href=https://blog.bell.plus/contact/]', 'Report Problem')),
         m('span',
           m('label.control.control--checkbox', [
             m('input.checkbox[type=checkbox]', {
