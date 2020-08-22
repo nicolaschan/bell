@@ -1,4 +1,4 @@
-/* global self, caches, fetch */
+/* global self, caches, fetch, clients */
 // Based on https://serviceworke.rs/strategy-network-or-cache_service-worker_doc.html
 
 const VERSION = require('../package.json').version
@@ -80,14 +80,14 @@ self.addEventListener('notificationclick', function (event) {
   const clickedNotification = event.notification
   clickedNotification.close()
 
-  const promiseChain = window.clients.matchAll({
+  const promiseChain = clients.matchAll({
     type: 'window',
     includeUncontrolled: true
   }).then((windowClients) => {
     if (windowClients[0]) {
       return windowClients[0].focus()
     } else {
-      return window.clients.openWindow(new URL('/', self.location.origin).href)
+      return clients.openWindow(new URL('/', self.location.origin).href)
     }
   })
   event.waitUntil(promiseChain)
