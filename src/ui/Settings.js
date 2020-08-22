@@ -58,7 +58,7 @@ const Settings = {
         }, 'Edit Classes') : m('a.add#edit-classes-button[href=/periods]', {
           oncreate: m.route.link
         }, 'Edit Periods')),
-        m('.add-link', m('a.add#edit-classes-button[href=/classes]', 'Insert Custom Schedule')),
+        m('.add-link', m('a.add#edit-classes-button[href=/classes]', 'Create Custom Schedule')),
         m('.add-link', m('a.add#edit-classes-button[href=https://blog.bell.plus/contact/]', 'Request School or Report Issue')),
         m('span',
           m('label.control.control--checkbox', [
