@@ -2,7 +2,7 @@ import cookieManager from './LocalForageCookieManager'
 
 // source: https://stackoverflow.com/a/12709880
 declare global {
-    interface Window { Notification: any } // tslint:disable-line
+    interface Window { Notification: any, registration: any } // tslint:disable-line
 }
 
 window.Notification = window.Notification || {}
@@ -26,12 +26,9 @@ class NotificationManager {
   public sendNotification (title: string, body: string) {
     if (this.isEnabled() && title) {
       if (this.registration && ('showNotification' in this.registration)) {
-        this.registration.getNotifications().then((notifications: [any]) => {
-          for (const notification of notifications) {
-            notification.close()
-          }
-        })
-        this.registration.showNotification(title, { body })
+        this.registration.getNotifications()
+          .then((nots: any[]) => Promise.all(nots.map((n: any) => n.close())))
+          .then(this.registration.showNotification(title, { body }))
       } else {
         const notification = new window.Notification(title, { body })
         setTimeout(() => notification.close(), 3 * 60 * 1000)
@@ -44,6 +41,7 @@ class NotificationManager {
   }
 
   public useServiceWorkerRegistration (registration: any) {
+    window.registration = registration
     this.registration = registration
   }
 
