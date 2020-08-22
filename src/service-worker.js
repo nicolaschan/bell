@@ -76,3 +76,19 @@ self.addEventListener('fetch', function (evt) {
       })
   )
 })
+self.addEventListener('notificationclick', function(event) {
+  const clickedNotification = event.notification
+  clickedNotification.close()
+
+  const promiseChain = clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true
+  }).then((windowClients) => {
+    if (windowClients[0]) {
+      return windowClients[0].focus()
+    } else {
+      return clients.openWindow(new URL('/', self.location.origin).href)
+    }
+  })
+  event.waitUntil(promiseChain)
+})

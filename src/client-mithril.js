@@ -41,7 +41,10 @@ window.addEventListener('load', async function () {
 })
 
 if (navigator.serviceWorker) {
+  const notificationManager = require('./NotificationManager').default
   navigator.serviceWorker.register('/bin/service-worker.js', {
     scope: './'
+  }).then((registration) => {
+    notificationManager.useServiceWorkerRegistration(registration)
   })
 }

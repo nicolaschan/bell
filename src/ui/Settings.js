@@ -86,7 +86,7 @@ const Settings = {
               }),
               m('.control__indicator'),
               m('span', (notificationManager.notificationsBlocked())
-                ? `Notifications not available (please allow in your browser if you want them) (${window.Notification.permission})` : 'Send notification when bell rings')
+                ? `Notifications not available (please allow in your browser and refresh if you want them) (${window.Notification.permission})` : 'Send notification when bell rings')
             ]))),
 
         m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {

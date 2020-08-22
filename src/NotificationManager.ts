@@ -12,27 +12,46 @@ const NOTIFICATION_KEY = 'enable_notifications'
 const DEFAULT_NOTIFICATION_STATE = false
 
 class NotificationManager {
+  private registration: any = null
+  private askIgnored: boolean = false
+
   public notificationsAllowed () {
     return ('Notification' in window) && window.Notification.permission === 'granted'
   }
 
   public notificationsBlocked () {
-    return (!('Notification' in window)) || window.Notification.permission === 'denied'
+    return (!('Notification' in window)) || window.Notification.permission === 'denied' || this.askIgnored
   }
 
   public sendNotification (title: string, body: string) {
     if (this.isEnabled() && title) {
-      const notification = new window.Notification(title, { body })
-      setTimeout(() => notification.close(), 3 * 60 * 1000)
+      if (this.registration && ('showNotification' in this.registration)) {
+        this.registration.getNotifications().then((notifications: [any]) => {
+          for (const notification of notifications) {
+            notification.close()
+          }
+        })
+        this.registration.showNotification(title, { body })
+      } else {
+        const notification = new window.Notification(title, { body })
+        setTimeout(() => notification.close(), 3 * 60 * 1000)
+      }
     }
   }
 
   public isEnabled () {
-    return cookieManager.get(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_STATE) // && this.notificationsAllowed()
+    return cookieManager.get(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_STATE) && this.notificationsAllowed()
+  }
+
+  public useServiceWorkerRegistration (registration: any) {
+    this.registration = registration
   }
 
   public async enable () {
-    await this.askPermission()
+    const response = await this.askPermission()
+    if (!response && ('Notification' in window) && (window.Notification.permission === 'default')) {
+      this.askIgnored = true
+    }
     cookieManager.set(NOTIFICATION_KEY, true).catch((e) => {
       // not much we can do
     })
