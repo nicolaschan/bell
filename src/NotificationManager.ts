@@ -28,7 +28,7 @@ class NotificationManager {
       if (this.registration && ('showNotification' in this.registration)) {
         this.registration.getNotifications()
           .then((nots: any[]) => Promise.all(nots.map((n: any) => n.close())))
-          .then(this.registration.showNotification(title, { body }))
+          .then(() => this.registration.showNotification(title, { body }))
       } else {
         const notification = new window.Notification(title, { body })
         setTimeout(() => notification.close(), 3 * 60 * 1000)
