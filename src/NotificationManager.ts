@@ -28,7 +28,7 @@ class NotificationManager {
   }
 
   public isEnabled () {
-    return cookieManager.get(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_STATE) && this.notificationsAllowed()
+    return cookieManager.get(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_STATE) // && this.notificationsAllowed()
   }
 
   public async enable () {

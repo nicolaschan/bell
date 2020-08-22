@@ -52,7 +52,7 @@ const Classes = {
             m('td', [m('a.delete-link[href=javascript:void(0);]', {
               onclick: () => deleteClass(id, vnode.attrs.cookieManager)
             }, 'Delete')]),
-            m('td', [m('a.delete-link[href=javascript:void(0);]', {
+            m('td', [m('a.delete-link', {
               href: `/enter?course=${id}`,
               oncreate: m.route.link
             }, 'Edit')])
