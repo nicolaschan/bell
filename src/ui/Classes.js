@@ -1,4 +1,5 @@
 const m = require('mithril')
+const sourceManager = require('../SourceManager').default
 
 var displayTimeArray = function (time) {
   var [hour, min] = time
@@ -27,6 +28,9 @@ var deleteClass = function (id, cookieManager) {
 }
 
 const Classes = {
+  oninit: function (vnode) {
+    sourceManager.source = 'custom'
+  },
   view: function (vnode) {
     return [
       m('.header', m('h1', 'Enter Classes')),
@@ -45,9 +49,13 @@ const Classes = {
             m('td', `${displayTimeArray(section[1])} - ${displayTimeArray(section[2])}`)
           ])),
           m('tr', [
-            m('a.delete-link[href=javascript:void(0);]', {
+            m('td', [m('a.delete-link[href=javascript:void(0);]', {
               onclick: () => deleteClass(id, vnode.attrs.cookieManager)
-            }, 'Delete')
+            }, 'Delete')]),
+            m('td', [m('a.delete-link[href=javascript:void(0);]', {
+              href: `/enter?course=${id}`,
+              oncreate: m.route.link
+            }, 'Edit')])
           ])
         ]))
       ]))),

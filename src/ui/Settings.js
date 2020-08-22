@@ -3,6 +3,7 @@ const m = require('mithril')
 const cookieManager = require('../LocalForageCookieManager').default
 const requestManager = require('../RequestManager2').default
 const sourceManager = require('../SourceManager').default
+const notificationManager = require('../NotificationManager').default
 const ThemeManager = require('../ThemeManager').default
 const themeManager = new ThemeManager()
 const { Select } = require('mithril-selector')
@@ -38,7 +39,7 @@ const Settings = {
       m('.header', m('h1', 'Settings')),
       m('.settings-section', [
         m('.desc', [
-          'Schedule source or Custom',
+          'School schedule source',
           m('br'),
           '(No guarantee of correctness. Check with school for official schedules.)']),
         m(Select, {
@@ -57,8 +58,8 @@ const Settings = {
         }, 'Edit Classes') : m('a.add#edit-classes-button[href=/periods]', {
           oncreate: m.route.link
         }, 'Edit Periods')),
-        m('.add-link', m('a.add#edit-classes-button[href=https://blog.bell.plus/contact/]', 'Request School')),
-        m('.add-link', m('a.add#edit-classes-button[href=https://blog.bell.plus/contact/]', 'Report Problem')),
+        m('.add-link', m('a.add#edit-classes-button[href=/classes]', 'Insert Custom Schedule')),
+        m('.add-link', m('a.add#edit-classes-button[href=https://blog.bell.plus/contact/]', 'Request School or Report Issue')),
         m('span',
           m('label.control.control--checkbox', [
             m('input.checkbox[type=checkbox]', {
@@ -69,7 +70,24 @@ const Settings = {
             }),
             m('.control__indicator'),
             m('span', 'Show period name in page title')
-          ])),
+          ]),
+          m('span',
+            m('label.control.control--checkbox', [
+              m('input.checkbox[type=checkbox]', {
+                onclick: m.withAttr('checked', checked => {
+                  if (checked) {
+                    return notificationManager.enable()
+                  } else {
+                    return notificationManager.disable()
+                  }
+                }),
+                checked: notificationManager.isEnabled(),
+                disabled: notificationManager.notificationsBlocked()
+              }),
+              m('.control__indicator'),
+              m('span', (notificationManager.notificationsBlocked())
+                ? `Notifications not available (please allow in your browser if you want them) (${window.Notification.permission})` : 'Send notification when bell rings')
+            ]))),
 
         m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
           onclick: () => {

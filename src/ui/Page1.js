@@ -16,6 +16,10 @@ var Timer = {
     var time = bellTimer.getTimeRemainingString()
     var period = bellTimer.getCurrentPeriod().name
 
+    if (bellTimer.displayPeriodNotification()) {
+      vnode.attrs.notificationManager.sendNotification(period, `Starting now with ${time} remaining`)
+    }
+
     // This should be moved out to somewhere that makes sense
     document.title = vnode.attrs.periodInTitle ? `${time} | ${period}` : time
 

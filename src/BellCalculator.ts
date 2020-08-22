@@ -80,8 +80,13 @@ export default class BellCalculator {
     const nextPeriodStart = this.getNextPeriod(date).timestamp.getTime()
 
     const totalTime = nextPeriodStart - currentPeriodStart
-    const elapsedTime = date.getTime() - currentPeriodStart
+    const elapsedTime = this.getTimeElapsedMs(date)
 
     return elapsedTime / totalTime
+  }
+
+  public getTimeElapsedMs (date: Date): number {
+    const currentPeriodStart = this.getCurrentPeriod(date).timestamp.getTime()
+    return date.getTime() - currentPeriodStart
   }
 }

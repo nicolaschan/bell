@@ -334,7 +334,7 @@ a.delete-link:link,
 a.delete-link:visited {
     font-weight: 300;
     text-decoration: none;
-    font-size: 0.7em;
+    font-size: 1em;
     color: #aaa;
 }
 a.delete-link:hover {

@@ -8,6 +8,8 @@ import { default as defaultRequestManager, RequestManager } from './RequestManag
 import { default as Schedule, IPeriodObject } from './Schedule'
 import parseSchedules from './ScheduleParser'
 
+const PERIOD_NOTIFICATION_MARGIN = 5000 // ms
+
 export default class BellTimer {
   public source: string
   public correctedDate: CorrectedDate
@@ -19,6 +21,7 @@ export default class BellTimer {
   public bindings: IBindings | null
   public courses: ICourses | null
   public meta?: object
+  private lastPeriodNotified: string = ''
 
   constructor (source: string,
                correctedDate: CorrectedDate,
@@ -45,6 +48,16 @@ export default class BellTimer {
 
   get calendar (): Calendar {
     return this.calculator.calendar
+  }
+
+  public displayPeriodNotification (): boolean {
+    const withinMargin = this.calculator.getTimeElapsedMs(this.date) < PERIOD_NOTIFICATION_MARGIN
+    const currentPeriodName = this.getCurrentPeriod().name
+    if (withinMargin && (this.lastPeriodNotified !== currentPeriodName)) {
+      this.lastPeriodNotified = currentPeriodName
+      return true
+    }
+    return false
   }
 
   public loadCustomCourses () {
