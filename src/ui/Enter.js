@@ -158,13 +158,13 @@ const Enter = {
             m('option[value=Sunday]', 'Sunday'),
             m('option[value=Weekdays]', 'Weekdays')
           ]),
-          m('input.inputBox.time-entry[placeholder=Start Time][maxlength=10][type=text]', {
+          m('input.inputBox.time-entry[placeholder=Start Time (e.g., 9:00am)][maxlength=10][type=text]', {
             value: section[1],
             oninput: m.withAttr('value', value => {
               section[1] = value
             })
           }),
-          m('input.inputBox.time-entry[placeholder=End Time][maxlength=10][type=text]', {
+          m('input.inputBox.time-entry[placeholder=End Time (e.g., 1:00pm)][maxlength=10][type=text]', {
             value: section[2],
             oninput: m.withAttr('value', value => {
               section[2] = value
