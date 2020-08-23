@@ -15,7 +15,7 @@ const dataDir = path.join(__dirname, '..', 'schedules')
  * @return {boolean} Returns true if source is valid
  */
 const validateSource = function (source) {
-  return source.match(/^[a-zA-Z0-9\-]+$/)
+  return source.match(/^[a-zA-Z0-9-]+$/)
 }
 
 const getLocalData = async function (source, file) {
