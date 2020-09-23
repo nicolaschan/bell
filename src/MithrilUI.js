@@ -15,7 +15,22 @@ const withCookies = function (element) {
       vnode.attrs.cookieManager.initialize()
     },
     view: function (vnode) {
+      if (vnode.attrs.hasScrolled !== window.location.hash) {
+        if (document.getElementById(window.location.hash.substring(1))) {
+          document.getElementById(window.location.hash.substring(1)).scrollIntoView({
+            behavior: 'auto',
+            block: 'start'
+          })
+          vnode.attrs.hasScrolled = window.location.hash
+        }
+      }
       if (!vnode.attrs.cookieManager || !vnode.attrs.cookieManager.initialized) {
+        // For some reason, after recycling oninit isn't called
+        // So sometimes cookieManager is not actually defined
+        if (!vnode.attrs.cookieManager) {
+          vnode.attrs.cookieManager = require('./LocalForageCookieManager').default
+          vnode.attrs.cookieManager.initialize()
+        }
         return m(Loading, 'Loading')
       }
       return m(element, vnode.attrs)
@@ -25,7 +40,7 @@ const withCookies = function (element) {
 
 class MithrilUI {
   constructor () {
-    m.route.prefix('')
+    m.route.prefix('', {})
     m.route(root, '/', {
       '/': withCookies({
         oninit: function (vnode) {
