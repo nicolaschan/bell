@@ -1,3 +1,28 @@
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/roboto/Roboto-Regular.eot); /* For IE6-8 */
+  src: local('Roboto'),
+    local('Roboto-Regular'),
+    url(/fonts/roboto/Roboto-Regular.woff2) format('woff2'),
+    url(/fonts/roboto/Roboto-Regular.woff) format('woff'),
+    url(/fonts/roboto/Roboto-Regular.ttf) format('truetype');
+}
+
+
+/* from http://google.github.io/material-design-icons/#icon-font-for-the-web */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/icons/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url(/icons/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
+    url(/icons/iconfont/MaterialIcons-Regular.woff) format('woff'),
+    url(/icons/iconfont/MaterialIcons-Regular.ttf) format('truetype');
+}
 
 body {
     font-family: Roboto, sans-serif;

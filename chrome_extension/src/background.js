@@ -3,7 +3,7 @@ const ChromeCookieManagerFactory = require('./ChromeCookieManager2.js')
 const BellTimer = require('../../src/BellTimer.js')
 const RequestManager = require('../../src/RequestManager.js')
 
-const hostname = 'http://localhost:8005';
+const hostname = 'https://bell.plus';
 
 (async function () {
   const cookman = await ChromeCookieManagerFactory()
