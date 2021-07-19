@@ -24,6 +24,7 @@ cp -r "icons" $DEST
 cp -r "favicons" $DEST
 log "Copying img"
 cp -r "img" $DEST
+cp -r "chrome_extension/fonts" $DEST
 
 DEST="$DEST/chrome_extension"
 mkdir $DEST
@@ -35,5 +36,6 @@ cp -r "chrome_extension/bin" $DEST
 log "Copying css"
 cp -r "chrome_extension/css" $DEST
 cp -r "chrome_extension/sizedicons" $DEST
+cp -r "chrome_extension/icons" $DEST
 
 zip -r bellxt.zip xt_distr
