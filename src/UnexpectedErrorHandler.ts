@@ -17,7 +17,7 @@ export default class UnexpectedErrorHandler {
       try {
         if (!this.hasSentReport) {
           this.hasSentReport = true
-          await requestManager.post('/api/errors', {
+          await requestManager.post('/api/stats/errors', {
             error: {
               columnNumber: e.reason.columnNumber,
               fileName: e.reason.fileName,
