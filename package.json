@@ -1,6 +1,6 @@
 {
     "name": "bell-countdown",
-    "version": "4.10.20",
+    "version": "4.10.21",
     "description": "Countdown to the next time the bell rings at school.",
     "main": "index.js",
     "scripts": {
@@ -21,7 +21,6 @@
     "license": "MIT",
     "dependencies": {
         "@types/jquery": "^3.3.5",
-        "@types/localforage": "^0.0.34",
         "@types/mithril": "^1.1.12",
         "@types/react": "^16.4.9",
         "@types/ua-parser-js": "^0.7.32",
@@ -38,7 +37,7 @@
         "jquery": "^3.1.1",
         "karma-typescript": "^3.0.13",
         "karma-webpack": "^3.0.0",
-        "localforage": "^1.5.2",
+        "localforage": "^1.10.0",
         "lodash": "^4.17.10",
         "loggy": "^1.0.3",
         "lzutf8": "^0.5.0",
