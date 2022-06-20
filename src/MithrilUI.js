@@ -22,7 +22,7 @@ const withCookies = function (element) {
             behavior: 'auto',
             block: 'start'
           })
-          vnode.attrs.hasScrolled = hash
+          vnode.attrs.hasScrolled = window.location.hash
         }
       }
       if (!vnode.attrs.cookieManager || !vnode.attrs.cookieManager.initialized) {
