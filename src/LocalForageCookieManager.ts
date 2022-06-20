@@ -1,4 +1,5 @@
 import * as localForage from 'localforage'
+import * as memoryDriver from 'localforage-driver-memory'
 import ICookieManager from './CookieManager'
 
 class LocalForageCookieManager implements ICookieManager {
@@ -17,19 +18,29 @@ class LocalForageCookieManager implements ICookieManager {
   constructor () {
     this.cache = {}
     this.initialized = false
-    try {
-      this.storage = localForage.createInstance({
-        name: 'countdown_1'
-      })
-    } catch (e) {
-      console.log(e)
-      console.warn('Failed to create localForage instance. Settings will not be saved after page closes.')
-    }
   }
 
   public async initialize () {
     if (this.initialized) {
       return
+    }
+    try {
+      await localForage.defineDriver(memoryDriver)
+      this.storage = localForage.createInstance({
+        driver: [
+          localForage.INDEXEDDB, localForage.WEBSQL, localForage.LOCALSTORAGE, memoryDriver._driver
+        ],
+        name: 'countdown_1'
+      })
+      this.storage.ready()
+      .then(() => {
+        console.log('Using localForage driver: ' + this.storage.driver())
+      })
+      .catch((e: any) => {
+        console.warn('localForage.ready(): Failed to create localForage instance', e)
+      })
+    } catch (e) {
+      console.warn('Failed to initialize storage', e)
     }
     if (this.storage) {
       const keys = await this.storage.keys()

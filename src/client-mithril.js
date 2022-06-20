@@ -46,7 +46,7 @@ if (navigator.serviceWorker) {
     scope: './'
   }).then((registration) => {
     notificationManager.useServiceWorkerRegistration(registration)
-  }).catch((e) => {
+  }, (e) => {
     console.warn('Failed to register service worker', e)
   })
 }

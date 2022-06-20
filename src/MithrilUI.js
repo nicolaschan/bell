@@ -16,12 +16,13 @@ const withCookies = function (element) {
     },
     view: function (vnode) {
       if (vnode.attrs.hasScrolled !== window.location.hash) {
-        if (document.getElementById(window.location.hash.substring(1))) {
-          document.getElementById(window.location.hash.substring(1)).scrollIntoView({
+        const hash = window.location.hash.substring(1)
+        if (hash && document.getElementById(hash)) {
+          document.getElementById(hash).scrollIntoView({
             behavior: 'auto',
             block: 'start'
           })
-          vnode.attrs.hasScrolled = window.location.hash
+          vnode.attrs.hasScrolled = hash
         }
       }
       if (!vnode.attrs.cookieManager || !vnode.attrs.cookieManager.initialized) {

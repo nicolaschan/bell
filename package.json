@@ -1,6 +1,6 @@
 {
     "name": "bell-countdown",
-    "version": "4.10.22",
+    "version": "4.10.23",
     "description": "Countdown to the next time the bell rings at school.",
     "main": "index.js",
     "scripts": {
@@ -24,7 +24,7 @@
         "@types/mithril": "^1.1.12",
         "@types/react": "^16.4.9",
         "@types/ua-parser-js": "^0.7.32",
-        "better-sqlite3": "^7.1.0",
+        "better-sqlite3": "^7.5.0",
         "bluebird": "^3.5.1",
         "body-parser": "^1.18.2",
         "bootstrap": "^4.1.3",
@@ -36,8 +36,9 @@
         "geoip-database": "^1.0.14",
         "jquery": "^3.1.1",
         "karma-typescript": "^3.0.13",
-        "karma-webpack": "^3.0.0",
+        "karma-webpack": "^5.0.0",
         "localforage": "^1.10.0",
+        "localforage-driver-memory": "^1.0.5",
         "lodash": "^4.17.10",
         "loggy": "^1.0.3",
         "lzutf8": "^0.5.0",
@@ -53,6 +54,7 @@
         "selectize": "^0.12.6",
         "shortid": "^2.2.6",
         "standard": "^11.0.0",
+        "terser-webpack-plugin": "^5.3.3",
         "timesync": "^1.0.1",
         "typescript": "^3.0.1",
         "ua-parser-js": "^0.7.18",
@@ -87,10 +89,9 @@
         "tslint": "^5.11.0",
         "tslint-config-standard": "^7.1.0",
         "typescript-eslint-parser": "^18.0.0",
-        "uglifyjs-webpack-plugin": "^1.0.1",
-        "webpack": "^4.1.0",
-        "webpack-cli": "^3.1.0",
-        "webpack-dev-middleware": "^3.0.0",
-        "webpack-merge": "^4.1.2"
+        "webpack": "^5.73.0",
+        "webpack-cli": "^4.10.0",
+        "webpack-dev-middleware": "^5.3.3",
+        "webpack-merge": "^5.8.0"
     }
 }
