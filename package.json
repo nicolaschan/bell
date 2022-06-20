@@ -1,6 +1,6 @@
 {
     "name": "bell-countdown",
-    "version": "4.10.25",
+    "version": "4.10.26",
     "description": "Countdown to the next time the bell rings at school.",
     "main": "index.js",
     "scripts": {
@@ -47,7 +47,7 @@
         "mithril": "^1.1.6",
         "mithril-selector": "^0.0.9",
         "mocha": "^5.0.1",
-        "pg": "^7.4.0",
+        "pg": "^8.7.3",
         "query-string": "^6.1.0",
         "request": "^2.88.0",
         "roboto-fontface": "^0.10.0",
