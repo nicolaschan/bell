@@ -1,4 +1,4 @@
-FROM node:19
+FROM node:18
 
 ADD . /bell
 WORKDIR /bell
