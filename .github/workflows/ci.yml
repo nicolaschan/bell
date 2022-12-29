@@ -50,6 +50,6 @@ jobs:
         docker buildx build \
         --pull \
         --push \
-        --platform linux/amd64,linux/arm64,linux/arm/v7 \
+        --platform linux/amd64 \
         --tag ghcr.io/nicolaschan/bell:${GITHUB_REF#refs/*/} \
         --tag ghcr.io/nicolaschan/bell:latest .
