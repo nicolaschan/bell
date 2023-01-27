@@ -4,6 +4,7 @@ const ScheduleDisplay = require('./ScheduleDisplay')
 const Page1 = require('./Page1')
 const Popup = require('./Popup')
 const SchoolIndicator = require('./SchoolIndicator')
+const { default: ErrorIcon } = require('./ErrorIcon')
 const Loading = require('./Loading').default
 const SettingsIcon = require('./SettingsIcon').default
 const ScrollArrow = require('./ScrollArrow').default
@@ -59,11 +60,16 @@ const Index = {
       await analyticsManager.reportAnalytics()
     } catch (e) {
       await sourceManager.clearSource()
-      m.route.set('/') // School data not available
+      vnode.attrs.error = [m('span', 'School not found'), m('br'), m('a[href=/settings]', {
+        oncreate: m.route.link
+      }, 'Try another')]
     }
   },
   view: function (vnode) {
     if (!vnode.attrs.bellTimer || !vnode.attrs.bellTimer.initialized) {
+      if (vnode.attrs.error) {
+        return m(ErrorIcon, vnode.attrs.error)
+      }
       return m(Loading, 'Synchronizing')
     }
     return [

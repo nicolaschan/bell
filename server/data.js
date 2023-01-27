@@ -20,13 +20,24 @@ const validateSource = function (source) {
 
 const getLocalData = async function (source, file) {
   if (!validateSource(source)) { throw new Error('Source contains invalid characters') }
+  return getLocalDataUnvalidated(source, file)
+}
+
+const getLocalDataUnvalidated = async function (source, file) {
   const data = await fs.readFileAsync(path.join(dataDir, source, file))
   return data.toString()
 }
 
 const getWebData = async function (source, file, url) {
   if (!validateSource(source)) { throw new Error('Source contains invalid characters') }
-  const response = await request.getAsync(`${url}/api/data/${source}/${file.split('.')[0]}`)
+  const path = `${url}/${source}/${file.split('.')[0]}`
+  const response = await request.getAsync(path)
+  if (response.statusCode === 404) {
+    throw new Error('Not found')
+  }
+  if (response.statusCode !== 200) {
+    throw new Error('Invalid status code')
+  }
   return response.body
 }
 
@@ -39,7 +50,9 @@ const fetch = async function (source, file) {
       try {
         return (await getWebData(source, file, sourceData.url))
       } catch (e) {
-        logger.warn(`Connection to ${sourceData.url} failed`)
+        if (e.message !== 'Not found') {
+          logger.warn(`Connection to ${sourceData.url} failed`)
+        }
         return getLocalData(source, file)
       }
   }
@@ -62,7 +75,11 @@ const getMeta = cache(async function (source) {
   }
 })
 const getSource = cache(async function (source) {
-  source = await getLocalData(source, 'source.json')
+  try {
+    source = await getLocalData(source, 'source.json')
+  } catch (e) {
+    source = await getLocalDataUnvalidated('_default', 'source.json')
+  }
   return JSON.parse(source.toString())
 })
 const getMessage = cache(async function (source) {

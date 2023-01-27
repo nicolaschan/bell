@@ -65,10 +65,7 @@ export default class BellTimer {
     this.calendar = getCustomCalendar(this.courses!)
   }
 
-  public loadData (sources: string[], correction: number, schedules: string, calendar: string) {
-    if (sources.indexOf(this.source) < 0) {
-      throw new Error(`Source not found: ${this.source}`)
-    }
+  public loadData (correction: number, schedules: string, calendar: string) {
     this.correctedDate.correction = correction
     this.calendar = parseCalendar(calendar, parseSchedules(schedules, this.bindings!))
   }
@@ -77,12 +74,9 @@ export default class BellTimer {
     if (this.source === 'custom') {
       return this.loadCustomCourses()
     }
-    const [sources, data] = await Promise.all([
-      this.requestManager.get('/api/sources/names', []),
-      this.requestManager.get(`/api/data/${this.source}`)
-    ])
+    const data = await this.requestManager.get(`/api/data/${this.source}`)
     this.meta = data.meta
-    return this.loadData(sources, Number(data.correction), data.schedules, data.calendar)
+    return this.loadData(Number(data.correction), data.schedules, data.calendar)
   }
 
   public refresh (refreshInterval: number) {
