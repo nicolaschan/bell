@@ -20,6 +20,7 @@ const dataDirectories = async () => {
 router.get('/', async (req, res) => {
   const directories = await dataDirectories()
   const sources = await Promise.all(directories.map(async directory => {
+    if (directory.startsWith('_')) return null
     try {
       const source = await data.getMeta(directory)
       source.id = directory

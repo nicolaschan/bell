@@ -8,6 +8,15 @@ const ThemeManager = require('../ThemeManager').default
 const themeManager = new ThemeManager()
 const { Select } = require('mithril-selector')
 
+function containsCurrentSource(sources, currentSource) {
+  for (let source of sources) {
+    if (source.value === currentSource) {
+      return true
+    }
+  }
+  return false
+}
+
 const Settings = {
   oninit: async function (vnode) {
     vnode.state.sources = (await requestManager.get('/api/sources'))
@@ -15,6 +24,14 @@ const Settings = {
         display: `${source.name} (${source.id})`,
         value: source.id
       }))
+
+    if (!containsCurrentSource(vnode.state.sources, sourceManager.source)) {
+      const currentSchool = await requestManager.get(`/api/data/${sourceManager.source}/meta`)
+      vnode.state.sources.push({
+        display: currentSchool.name,
+        value: sourceManager.source
+      })
+    }
   },
   onupdate: function (vnode) {
     var source = sourceManager.source
