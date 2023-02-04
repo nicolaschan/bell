@@ -8,7 +8,7 @@ const ThemeManager = require('../ThemeManager').default
 const themeManager = new ThemeManager()
 const { Select } = require('mithril-selector')
 
-function containsCurrentSource(sources, currentSource) {
+function containsCurrentSource (sources, currentSource) {
   for (let source of sources) {
     if (source.value === currentSource) {
       return true
