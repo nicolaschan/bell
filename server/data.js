@@ -30,7 +30,7 @@ const getLocalDataUnvalidated = async function (source, file) {
 
 const getWebData = async function (source, file, url) {
   if (!validateSource(source)) { throw new Error('Source contains invalid characters') }
-  const path = `${url}/${source}/${file.split('.')[0]}`
+  const path = file == null ? `${url}/${source}` : `${url}/${source}/${file.split('.')[0]}`
   const response = await request.getAsync(path)
   if (response.statusCode === 404) {
     throw new Error('Not found')
@@ -57,42 +57,62 @@ const fetch = async function (source, file) {
       }
   }
 }
-const getCorrection = cache(async function (source) {
+
+const getCorrection = async function (source) {
   return fetch(source, 'correction.txt')
-})
-const getSchedules = cache(async function (source) {
+}
+const getSchedules = async function (source) {
   return fetch(source, 'schedules.bell')
-})
-const getCalendar = cache(async function (source) {
+}
+const getCalendar = async function (source) {
   return fetch(source, 'calendar.bell')
-})
-const getMeta = cache(async function (source) {
+}
+const getMeta = async function (source) {
   try {
     const meta = await fetch(source, 'meta.json')
     return JSON.parse(meta)
   } catch (e) {
     return JSON.parse(await getLocalData(source, 'meta.json'))
   }
-})
-const getSource = cache(async function (source) {
+}
+const getSource = async function (source) {
   try {
     source = await getLocalData(source, 'source.json')
   } catch (e) {
     source = await getLocalDataUnvalidated('_default', 'source.json')
   }
   return JSON.parse(source.toString())
-})
-const getMessage = cache(async function (source) {
+}
+const getMessage = async function (source) {
   try {
     return JSON.parse(await fetch(source, 'message.json'))
   } catch (e) {
     return JSON.parse(await fs.readFileAsync(path.join(dataDir, 'message.json')))
   }
-})
+}
 const getVersion = cache(async function () {
   const version = await fs.readFileAsync(path.join(__dirname, '..', 'package.json'))
   return JSON.parse(version.toString()).version
-})
+}, 60 * 60 * 24)
+
+const getAll = async function (source) {
+  const sourceData = await getSource(source)
+  if (sourceData.location === 'web') {
+    return JSON.parse(await getWebData(source, null, sourceData.url))
+  }
+
+  const [meta, correction, calendar, schedules, message] = await Promise.all([
+    getMeta(source),
+    getCorrection(source),
+    getCalendar(source),
+    getSchedules(source),
+    getMessage(source)
+  ])
+
+  return {
+    meta, correction, calendar, schedules, message
+  }
+}
 
 module.exports = {
   getCorrection,
@@ -101,5 +121,6 @@ module.exports = {
   getMeta,
   getSource,
   getMessage,
-  getVersion
+  getVersion,
+  getAll
 }
