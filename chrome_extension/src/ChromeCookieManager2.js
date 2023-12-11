@@ -1,7 +1,5 @@
 /* global chrome */
 
-const $ = require('jquery')
-
 const CookieSerializer = require('../../src/CookieSerializer')
 const cookieSerializer = new CookieSerializer()
 
@@ -41,34 +39,7 @@ var CookieManagerFactory = async function () {
   // Offline => get cookies from local storage
   var items = await new Promise((resolve, reject) =>
     chrome.storage.local.get(resolve))
-  var cookieManager = new CookieManager(items);
-
-  (async () => {
-    // Load data in the background (so it opens faster)
-    var frame = $(`<iframe src="${require('./Hostname').default}"></iframe>`)
-    $('#iframe').append(frame)
-
-    var port = await new Promise((resolve, reject) =>
-      chrome.runtime.onConnectExternal.addListener(resolve))
-    var cookies = await new Promise((resolve, reject) => {
-      port.onMessage.addListener(msg => resolve(msg.value))
-    })
-    cookies = cookieSerializer.serializeAll(cookies)
-    chrome.storage.local.get('requestCache', cache => {
-      cache = cache.requestCache
-      if (!cache) {
-        cache = cookieSerializer.serialize({})
-      }
-      // console.log(cache)
-      cookies['requestCache'] = cache
-      cookieManager.cookies = cookies
-      chrome.storage.local.set(cookies)
-
-      global.extUIModel.needsUpdate = true
-    })
-  })()
-
-  return cookieManager
+  return new CookieManager(items)
 }
 
 module.exports = CookieManagerFactory

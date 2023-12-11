@@ -1,22 +1,13 @@
-const AlarmManager = require('./AlarmManager.js')
-const ChromeCookieManagerFactory = require('./ChromeCookieManager2.js')
-const BellTimer = require('../../src/BellTimer.js')
-const RequestManager = require('../../src/RequestManager.js')
+/* global chrome */
 
-const hostname = 'https://bell.plus';
+const CookieSerializer = require('../../src/CookieSerializer')
+const cookieSerializer = new CookieSerializer()
 
-(async function () {
-  const cookman = await ChromeCookieManagerFactory()
-  const reqman = new RequestManager(cookman, hostname)
-  const bellTimer = new BellTimer(cookman, reqman)
-  global.bellTimer = bellTimer
-  await bellTimer.initialize()
-  const alarmManager = new AlarmManager(bellTimer, cookman)
-  global.alarmManager = alarmManager
-
-  if (alarmManager) {
-    alarmManager.start()
-  } else {
-    console.log('Failed to load alarms.')
-  }
-})()
+chrome.runtime.onConnectExternal.addListener(port => {
+  port.onMessage.addListener((message) => {
+    if (message.type === 'all_cookies') {
+      var cookies = cookieSerializer.serializeAll(message.value)
+      chrome.storage.local.set(cookies)
+    }
+  })
+})

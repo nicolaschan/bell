@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Bell Countdown Extension",
     "description": "An extension that displays the time remaining in classes.",
-    "version": "4.11.0",
+    "version": "4.11.3",
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self';"
     },
@@ -14,8 +14,14 @@
     "permissions": [
         "storage"
     ],
+    "background": {
+        "service_worker": "chrome_extension/bin/background.js"
+    },
     "externally_connectable": {
-        "matches": ["http://bell.plus/*", "https://bell.plus/*"]
+        "matches": [
+            "http://bell.plus/*",
+            "https://bell.plus/*"
+        ]
     },
     "icons": {
         "128": "icons/icon128.png"
