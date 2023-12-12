@@ -4,6 +4,7 @@ const cookieManager = require('../LocalForageCookieManager').default
 const requestManager = require('../RequestManager2').default
 const sourceManager = require('../SourceManager').default
 const notificationManager = require('../NotificationManager').default
+const soundManager = require('../SoundManager').default
 const ThemeManager = require('../ThemeManager').default
 const themeManager = new ThemeManager()
 const { Select } = require('mithril-selector')
@@ -70,12 +71,13 @@ const Settings = {
           options: themeManager.availableThemes,
           onselect: theme => cookieManager.set('theme', theme)
         }),
-        m('.add-link', (vnode.state.editClasses) ? m('a.add#edit-classes-button[href=/classes]', {
+        m('.add-link', (vnode.state.editClasses) ? null : m('a.add#edit-classes-button[href=/periods]', {
           oncreate: m.route.link
-        }, 'Edit Classes') : m('a.add#edit-classes-button[href=/periods]', {
+        }, 'Edit Period Names')),
+        m('.add-link', m('a.add#edit-classes-button[href=https://edit.bell.plus]', 'Create Shared Schedule')),
+        m('.add-link', m('a.add#edit-classes-button[href=/classes]', {
           oncreate: m.route.link
-        }, 'Edit Periods')),
-        m('.add-link', m('a.add#edit-classes-button[href=/classes]', 'Create Custom Schedule')),
+        }, (vnode.state.editClasses ? 'Edit' : 'Use') + ' Custom Schedule (private)')),
         m('.add-link', m('a.add#edit-classes-button[href=https://blog.bell.plus/contact/]', 'Request School or Report Issue')),
         m('span',
           m('label.control.control--checkbox', [
@@ -104,7 +106,17 @@ const Settings = {
               m('.control__indicator'),
               m('span', (notificationManager.notificationsBlocked())
                 ? `Notifications not available (please allow in your browser and refresh if you want them) (${window.Notification.permission})` : 'Send notification when bell rings')
-            ]))),
+            ])),
+          m('span',
+            m('label.control.control--checkbox', [
+              m('input.checkbox[type=checkbox]', {
+                onclick: m.withAttr('checked', soundManager.setEnabled),
+                checked: soundManager.isEnabled()
+              }),
+              m('.control__indicator'),
+              m('span', 'Play sound when bell rings')
+            ])
+          )),
 
         m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
           onclick: () => {

@@ -100,6 +100,7 @@ app.use('/favicons', express.static('favicons'))
 app.use('/bin', express.static('bin'))
 app.use('/css', express.static('css'))
 app.use('/img', express.static('img'))
+app.use('/sounds', express.static('sounds'))
 app.use('/icons', express.static(path.join(baseDir, 'node_modules', 'material-design-icons'), {
   maxage: '24h'
 }))

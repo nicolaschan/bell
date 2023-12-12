@@ -17,7 +17,9 @@ var Timer = {
     var period = bellTimer.getCurrentPeriod().name
 
     if (bellTimer.displayPeriodNotification()) {
+      console.log('display notification')
       vnode.attrs.notificationManager.sendNotification(period, `Starting now with ${time} remaining`)
+      vnode.attrs.soundManager.playSound()
     }
 
     // This should be moved out to somewhere that makes sense
@@ -134,6 +136,33 @@ var Background = {
   }
 }
 
+var SoundInteraction = {
+  view: function (vnode) {
+    var bellTimer = vnode.attrs.bellTimer
+    var theme = vnode.attrs.themeManager.currentTheme.theme(bellTimer)
+    if (!vnode.attrs.soundManager ||
+      !vnode.attrs.soundManager.isEnabled() ||
+      vnode.attrs.soundManager.getHasInteracted()) {
+      return null
+    }
+    return m('.sound-interaction', {
+      style: theme.contrast
+    }, [
+      m('i.material-icons', {
+        style: {
+          'font-size': '1.3em',
+          'vertical-align': 'middle'
+        }
+      }, 'volume_off'),
+      m('span.sound-interaction-text', {
+        onclick: function () {
+          vnode.attrs.soundManager.reportInteraction()
+        }
+      }, ' Click to enable sound')
+    ])
+  }
+}
+
 module.exports = {
   view: function (vnode) {
     return m('.container#page1', {
@@ -141,6 +170,7 @@ module.exports = {
     }, [
       m(Background, vnode.attrs),
       m('.centered.time-text', [
+        m(SoundInteraction, vnode.attrs),
         m(Timer, vnode.attrs),
         m(Period, vnode.attrs),
         m(ScheduleName, vnode.attrs)

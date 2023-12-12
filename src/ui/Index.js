@@ -28,6 +28,7 @@ const Index = {
       window.addEventListener('scroll', onScroll)
     }
     vnode.attrs.notificationManager = require('../NotificationManager').default
+    vnode.attrs.soundManager = require('../SoundManager').default
     const ThemeManager = require('../ThemeManager').default
     vnode.attrs.themeManager = new ThemeManager(vnode.attrs.cookieManager.get('theme'))
     const sourceManager = require('../SourceManager').default

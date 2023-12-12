@@ -21,7 +21,7 @@ export default class BellTimer {
   public bindings: IBindings | null
   public courses: ICourses | null
   public meta?: object
-  private lastPeriodNotified: string = ''
+  private lastPeriodNotified: string | null = null
 
   constructor (source: string,
                correctedDate: CorrectedDate,

@@ -38,6 +38,11 @@ window.addEventListener('load', async function () {
   logger.info(`bell-countdown version ${VERSION}`)
   logger.success('Ready!')
   greet()
+
+  const soundManager = require('./SoundManager').default
+  document.addEventListener('click', function (event) {
+    soundManager.reportInteraction()
+  })
 })
 
 if (navigator.serviceWorker) {

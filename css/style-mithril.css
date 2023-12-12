@@ -11,62 +11,67 @@ body {
 }
 
 @font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  src: url(/fonts/roboto/Roboto-Regular.eot); /* For IE6-8 */
-  src: local('Roboto'),
-    local('Roboto-Regular'),
-    url(/fonts/roboto/Roboto-Regular.woff2) format('woff2'),
-    url(/fonts/roboto/Roboto-Regular.woff) format('woff'),
-    url(/fonts/roboto/Roboto-Regular.ttf) format('truetype');
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/fonts/roboto/Roboto-Regular.eot);
+    /* For IE6-8 */
+    src: local('Roboto'),
+        local('Roboto-Regular'),
+        url(/fonts/roboto/Roboto-Regular.woff2) format('woff2'),
+        url(/fonts/roboto/Roboto-Regular.woff) format('woff'),
+        url(/fonts/roboto/Roboto-Regular.ttf) format('truetype');
 }
 
 
 /* from http://google.github.io/material-design-icons/#icon-font-for-the-web */
 @font-face {
-  font-family: 'Material Icons';
-  font-style: normal;
-  font-weight: 400;
-  src: url(/icons/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
-  src: local('Material Icons'),
-    local('MaterialIcons-Regular'),
-    url(/icons/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
-    url(/icons/iconfont/MaterialIcons-Regular.woff) format('woff'),
-    url(/icons/iconfont/MaterialIcons-Regular.ttf) format('truetype');
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/icons/iconfont/MaterialIcons-Regular.eot);
+    /* For IE6-8 */
+    src: local('Material Icons'),
+        local('MaterialIcons-Regular'),
+        url(/icons/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
+        url(/icons/iconfont/MaterialIcons-Regular.woff) format('woff'),
+        url(/icons/iconfont/MaterialIcons-Regular.ttf) format('truetype');
 }
 
 .material-icons {
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;  /* Preferred icon size */
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
 
-  /* Support for all WebKit browsers. */
-  -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
-  text-rendering: optimizeLegibility;
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
 
-  /* Support for Firefox. */
-  -moz-osx-font-smoothing: grayscale;
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
 
-  /* Support for IE. */
-  font-feature-settings: 'liga';
+    /* Support for IE. */
+    font-feature-settings: 'liga';
 }
 
 .selector input {
     width: 100%;
 }
+
 .selector-dropdown {
     max-height: 12em !important;
 }
+
 .centered {
     position: absolute;
     top: 50%;
@@ -120,6 +125,7 @@ body {
 #enter-section select {
     margin: 0.1em 0.5em;
 }
+
 select {
     -webkit-appearance: none;
     -webkit-border-radius: 0px;
@@ -133,6 +139,7 @@ select {
     outline: none;
     transition: border-color 1s ease;
 }
+
 select:focus {
     border-color: darkturquoise;
 }
@@ -146,23 +153,33 @@ select:focus {
     opacity: 0;
     transition: opacity 2s ease;
 }
+
 .school-indicator:hover {
     opacity: 0.5;
 }
+
 @keyframes fade-out-school-indicator {
-    from {opacity: 0.5;}
-    to {opacity: 0;}
+    from {
+        opacity: 0.5;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
-.selectize-dropdown, .selectize-input {
+.selectize-dropdown,
+.selectize-input {
     border-radius: 0;
     border: 1px solid #fff;
     line-height: 32px;
     font-size: 16px;
 }
+
 .selectize-input input {
     font-size: 16px;
 }
+
 .selectize-input.dropdown-active {
     border-radius: 0;
     border-color: darkturquoise;
@@ -189,10 +206,16 @@ select:focus {
 .loading-icon {
     font-size: 6em;
 }
+
 .spin {
     animation: spin 0.8s linear infinite;
 }
-@keyframes spin { 100% { transform:rotate(-360deg); } }
+
+@keyframes spin {
+    100% {
+        transform: rotate(-360deg);
+    }
+}
 
 .no-decoration {
     text-decoration: none;
@@ -205,6 +228,7 @@ select:focus {
     width: auto;
     z-index: 3;
 }
+
 @media (pointer: coarse) {
     .popup {
         width: 100%;
@@ -212,19 +236,23 @@ select:focus {
         padding: 0;
         font-size: 2em;
     }
+
     .popup table {
         margin: auto auto;
     }
 }
+
 @media (pointer: coarse) and (-webkit-min-device-pixel-ratio: 3) {
     .popup {
         font-size: 1.5em;
     }
 }
 
-.link:link, .link:visited {
+.link:link,
+.link:visited {
     text-decoration: none;
 }
+
 .link:hover {
     text-decoration: underline;
 }
@@ -232,10 +260,13 @@ select:focus {
 .dismiss-enter i {
     font-size: 16px;
 }
-.dismiss-enter:link, .dismiss-enter:visited {
+
+.dismiss-enter:link,
+.dismiss-enter:visited {
     color: #aaaaaa;
     transition: color 0.5s ease;
 }
+
 .dismiss-enter:hover {
     color: red;
 }
@@ -245,19 +276,28 @@ select:focus {
     margin-bottom: 0.3em;
     font-size: 1em;
 }
+
 .collapse-icon {
     margin-top: 0.1em;
     margin-bottom: 0.1em;
     font-size: 1.4em;
 }
-.dismiss, .collapse {
+
+.dismiss,
+.collapse {
     font-size: 1em;
 }
-.dismiss:link, .dismiss:visited, .collapse:link, .collapse:visited {
+
+.dismiss:link,
+.dismiss:visited,
+.collapse:link,
+.collapse:visited {
     color: #aaaaaa;
     transition: color 0.5s ease;
 }
-.dismiss:hover, .collapse:hover {
+
+.dismiss:hover,
+.collapse:hover {
     color: red;
 }
 
@@ -269,16 +309,20 @@ select:focus {
     position: absolute;
     top: 0px;
 }
+
 .right {
     position: absolute;
     right: 0px;
 }
+
 .left {
     position: absolute;
     left: 0px;
 }
+
 .bottom {
-    position: absolute;;
+    position: absolute;
+    ;
     bottom: 0px;
 }
 
@@ -292,6 +336,7 @@ select:focus {
     cursor: pointer;
     z-index: 3;
 }
+
 .pulse {
     animation: pulse 4s linear infinite;
 }
@@ -300,6 +345,7 @@ input.course-name {
     margin: 2em 0.5em;
     width: 20em;
 }
+
 input.subscribe-name {
     margin-bottom: 0.3em;
 }
@@ -326,6 +372,7 @@ table.sections tbody tr td {
     padding: 0;
     padding-right: 0.4em;
 }
+
 table.sections tbody tr td.day {
     font-weight: 800;
 }
@@ -337,9 +384,11 @@ a.delete-link:visited {
     font-size: 1em;
     color: #aaa;
 }
+
 a.delete-link:hover {
     color: red;
 }
+
 a.delete-link {
     transition: color 0.6s ease;
 }
@@ -349,17 +398,27 @@ a.course-link:visited {
     color: #000;
     text-decoration: none;
 }
+
 a.course-link:hover {
     color: darkturquoise;
 }
+
 a.course-link {
     transition: color 0.6s ease;
 }
 
-@keyframes pulse { 
-    0% { opacity: 0; }
-    50% { opacity: 0.5; }
-    100% { opacity: 0; }
+@keyframes pulse {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 .footer-right {
@@ -368,17 +427,20 @@ a.course-link {
     bottom: 1em;
     color: #aaa;
 }
+
 .footer-left {
     position: absolute;
     left: 1em;
     bottom: 1em;
 }
+
 .footer-left a:link,
 .footer-left a:visited {
     color: #aaa;
     text-decoration: none;
     transition: color 1s ease;
 }
+
 .footer-left a:hover {
     color: #000;
 }
@@ -389,9 +451,11 @@ a.course-link {
     transition: color 1s ease, transform 1s ease;
     font-size: 4em;
 }
+
 .done-icon:hover {
     color: limegreen;
 }
+
 .settings-icon:hover {
     color: black;
     transform: rotate(2rad);
@@ -412,10 +476,12 @@ a.course-link {
     width: 12em;
     transition: border-color 1s ease;
 }
+
 .inputBox:focus {
     border-color: darkturquoise;
     outline: none;
 }
+
 .inputBox:disabled {
     text-decoration: line-through;
     background-color: #eeeeee;
@@ -426,7 +492,9 @@ a.course-link {
     margin: 2em;
     margin-top: 1em;
 }
-a.add:link, a.add:visited {
+
+a.add:link,
+a.add:visited {
     text-decoration: none;
     color: #aaa;
     margin: 0 0.5em;
@@ -434,6 +502,7 @@ a.add:link, a.add:visited {
     border: 1px solid #aaa;
     transition: color 0.5s ease, border-color 0.5s ease;
 }
+
 a.add:hover {
     color: darkturquoise;
     border-color: darkturquoise;
@@ -450,26 +519,41 @@ a.add:hover {
 .fade-in {
     animation: fade-in 0.5s;
 }
+
 @keyframes fade-in {
-    from {opacity: 0;}
-    to {opacity: 1;}
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
+
 .fade-out {
     animation: fade-out 0.5s;
 }
+
 @keyframes fade-out {
-    from {opacity: 1;}
-    to {opacity: 0;}
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 div.time {
     font-size: 10em;
     transition: color 3s ease;
 }
+
 .period {
     font-size: 3em;
     transition: color 3s ease;
 }
+
 .schedule {
     font-size: 3em;
     transition: color 3s ease;
@@ -481,20 +565,25 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
 }
+
 td {
     padding: 0.5em;
 }
+
 td.time {
     color: #999;
     text-align: right;
 }
+
 tr.current {
     background-color: #eee;
     font-size: 1.75em;
 }
+
 tr.current td {
     padding: 0.3em;
 }
+
 tr.completed {
     color: #999;
     text-decoration: line-through;
@@ -509,6 +598,23 @@ canvas {
     width: 24em;
 }
 
+.sound-interaction {
+    display: inline-block;
+    margin: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    border: none;
+    border-radius: 0.5em;
+    transition: border-color 1s ease;
+}
+
+.sound-interaction-text {
+    position: relative;
+    top: 0.075em;
+}
+
 /*
 checkbox css is modified from https://kyusuf.com/post/completely-css-custom-checkbox-radio-buttons-and-select-boxes
 */
@@ -521,8 +627,9 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     text-align: left;
     vertical-align: top;
     background: #fff;
-    box-shadow: 0 1px 2px rgba(0,0,0,.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
 }
+
 .control {
     font-size: 18px;
     position: relative;
@@ -537,6 +644,7 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     z-index: -1;
     opacity: 0;
 }
+
 .control__indicator {
     position: absolute;
     top: 0px;
@@ -544,12 +652,12 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     width: 20px;
     height: 20px;
     background: #e6e6e6;
-    transform: rotate(135deg);
+    transform: rotate(180deg);
     transition: background-color 0.5s ease, transform 0.5s ease;
 }
 
 /* Checked state */
-.control input:checked ~ .control__indicator {
+.control input:checked~.control__indicator {
     background: darkturquoise;
     transform: rotate(0deg);
 }
@@ -562,7 +670,7 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
 }
 
 /* Show check mark */
-.control input:checked ~ .control__indicator:after {
+.control input:checked~.control__indicator:after {
     display: block;
 }
 
