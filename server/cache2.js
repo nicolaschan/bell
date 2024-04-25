@@ -7,12 +7,16 @@ class Cache {
   async get (key, f) {
     const cached = this.cache[key]
     if (cached && Date.now() > cached.expires) {
-      const value = await f(key)
-      if (value) {
-        this.set(key, value, this.defaultTtlSeconds)
-	return value
+      try {
+        const value = await f(key)
+        if (value) {
+          this.set(key, value, this.defaultTtlSeconds)
+      	  return value
+        }
+        return cached.value
+      } catch (e) {
+        return cached.value
       }
-      return cached.value
     }
     if (cached) {
       return cached.value
