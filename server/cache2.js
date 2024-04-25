@@ -11,7 +11,7 @@ class Cache {
         const value = await f(key)
         if (value) {
           this.set(key, value, this.defaultTtlSeconds)
-      	  return value
+          return value
         }
         return cached.value
       } catch (e) {
