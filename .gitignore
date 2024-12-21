@@ -75,3 +75,5 @@ dist
 # Postgres credentials
 config.json
 
+# NixOS direnv
+.direnv
