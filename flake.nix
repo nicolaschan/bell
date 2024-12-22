@@ -17,6 +17,7 @@
             nodejs_22
             yarn
             python3
+            firefox
           ];
 
           shellHook = ''

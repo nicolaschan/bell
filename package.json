@@ -14,7 +14,7 @@
         "watch": "yarn run build:dev --watch",
         "build:chrome": "cd chrome_extension; webpack --config webpack.dev.js",
         "build:chrome:watch": "yarn run build:chrome -- --watch",
-        "test": "karma start --single-run --browsers ChromeHeadlessNoSandbox && yarn lint",
+        "test": "karma start --single-run --browsers Firefox && yarn lint",
         "test:manual": "karma start"
     },
     "author": "Nicolas Chan",
