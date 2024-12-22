@@ -44,6 +44,11 @@ yarn build
 cp .env.dev .env
 ```
 
+### Set up schedules
+```bash
+git submodule update --init --recursive
+```
+
 ### Start the server!
 ```
 yarn start
