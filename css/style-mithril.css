@@ -79,12 +79,18 @@ body {
     transform: translate(-50%, -50%);
 }
 
+/* Add padding when reminders are present */
+.schedule-container {
+    padding-top: 0;
+}
+
 .container {
     padding: 0;
     margin: 0;
     height: 100vh;
     position: relative;
     -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
     overflow-x: hidden;
     background-position: center;
     animation: fade-in 0.5s;
@@ -128,6 +134,7 @@ body {
 
 select {
     -webkit-appearance: none;
+    appearance: none;
     -webkit-border-radius: 0px;
     width: 13em;
     font-family: 'Roboto', sans-serif;
@@ -699,4 +706,659 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     overflow: hidden;
     opacity: 1;
     z-index: 2;
+}
+
+/** Weekly schedule view */
+.schedule-container {
+    text-align: center;
+    max-width: 95vw;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.week-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75em;
+    margin-bottom: 0.75em;
+}
+
+.week-nav-button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.8em;
+    padding: 0.4em 0.9em;
+    background-color: white;
+    border: 2px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    font-weight: 500;
+}
+
+.week-nav-button:hover:not(:disabled) {
+    background-color: limegreen;
+    color: white;
+    border-color: limegreen;
+}
+
+.week-nav-button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.week-nav-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.week-nav-button.current-week:not(:disabled) {
+    border-color: limegreen;
+    color: limegreen;
+}
+
+.week-nav-button.current-week:hover:not(:disabled) {
+    background-color: limegreen;
+    color: white;
+    border-color: limegreen;
+}
+
+.view-toggle {
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9em;
+    padding: 0.4em 1.2em;
+    margin-bottom: 0.75em;
+    background-color: white;
+    border: 2px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    font-weight: 500;
+}
+
+.view-toggle:hover {
+    background-color: limegreen;
+    color: white;
+    border-color: limegreen;
+}
+
+.view-toggle:active {
+    transform: scale(0.95);
+}
+
+.weekly-schedule-container {
+    width: 95vw;
+    max-width: 1400px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-size: 0.85em;
+}
+
+.weekly-header-row {
+    display: grid;
+    grid-template-columns: 80px repeat(5, 1fr);
+    border-bottom: 2px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 10;
+    padding-right: 17px; /* Account for scrollbar width */
+}
+
+.time-axis-header {
+    border-right: 1px solid #e0e0e0;
+    font-size: 0.75em;
+    color: #999;
+}
+
+.weekly-day-header {
+    padding: 0.4em 0.3em;
+    text-align: center;
+    border-right: 1px solid #e0e0e0;
+    background-color: #fafafa;
+    transition: background-color 0.3s ease;
+}
+
+.weekly-day-header:last-child {
+    border-right: none;
+}
+
+.weekly-day-header.today {
+    background-color: #e3f2fd;
+}
+
+.day-name {
+    font-weight: 600;
+    font-size: 0.95em;
+    color: #333;
+    margin-bottom: 0.15em;
+}
+
+.weekly-day-header.today .day-name {
+    color: #1976d2;
+}
+
+.schedule-name {
+    font-size: 0.7em;
+    color: #666;
+    opacity: 0.8;
+}
+
+.weekly-grid-container {
+    display: grid;
+    grid-template-columns: 80px repeat(5, 1fr);
+    position: relative;
+    height: 60vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.time-axis {
+    position: relative;
+    border-right: 1px solid #e0e0e0;
+    background-color: #fafafa;
+    min-height: 900px;
+}
+
+.time-label {
+    position: absolute;
+    right: 10px;
+    transform: translateY(-50%);
+    font-size: 0.7em;
+    color: #666;
+    white-space: nowrap;
+    text-align: right;
+    font-weight: 500;
+}
+
+.weekly-grid {
+    display: contents;
+}
+
+.weekly-day-column {
+    position: relative;
+    border-right: 1px solid #e0e0e0;
+    background-color: white;
+    min-height: 900px;
+}
+
+.weekly-day-column:last-child {
+    border-right: none;
+}
+
+.weekly-day-column.today {
+    background-color: #f5f9ff;
+}
+
+.period-block {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    background: linear-gradient(135deg, #7ed957 0%, #32cd32 100%);
+    border-radius: 3px;
+    padding: 4px 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-left: 2px solid #228b22;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.period-block:hover {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.24);
+    z-index: 5;
+    transform: scale(1.02);
+}
+
+.period-block .period-name {
+    font-size: 0.75em;
+    font-weight: 600;
+    margin-bottom: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+    width: 100%;
+    color: white;
+}
+
+.period-block .period-time {
+    font-size: 0.65em;
+    opacity: 0.95;
+    line-height: 1.2;
+    width: 100%;
+    color: white;
+}
+
+/* All columns use the same color for simplicity */
+
+/* Responsive design for smaller screens */
+@media (max-width: 900px) {
+    .weekly-schedule-container {
+        width: 98vw;
+    }
+    
+    .weekly-header-row,
+    .weekly-grid-container {
+        grid-template-columns: 80px repeat(5, 1fr);
+    }
+    
+    .time-label {
+        font-size: 0.7em;
+        right: 6px;
+    }
+    
+    .period-block {
+        padding: 0.25em 0.3em;
+    }
+    
+    .period-block .period-name {
+        font-size: 0.65em;
+    }
+    
+    .period-block .period-time {
+        font-size: 0.55em;
+    }
+}
+
+@media (max-width: 600px) {
+    .schedule-container {
+        max-width: 98vw;
+    }
+    
+    .view-toggle {
+        font-size: 1em;
+        padding: 0.6em 1.2em;
+    }
+    
+    .week-navigation {
+        flex-wrap: wrap;
+        gap: 0.5em;
+    }
+    
+    .week-nav-button {
+        font-size: 0.8em;
+        padding: 0.5em 0.8em;
+    }
+    
+    .day-name {
+        font-size: 0.9em;
+    }
+    
+    .schedule-name {
+        font-size: 0.65em;
+    }
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fade-in 0.2s;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slide-up 0.3s;
+}
+
+@keyframes slide-up {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 1.5em;
+    border-bottom: 1px solid #eee;
+    position: relative;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.modal-subtitle {
+    margin: 0.5em 0 0 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+}
+
+.modal-body {
+    padding: 1.5em;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.existing-reminders h3,
+.add-reminder-section h3 {
+    margin: 0 0 1em 0;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.no-reminders {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    margin: 2em 0;
+}
+
+.reminder-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2em 0;
+}
+
+.reminder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8em;
+    margin-bottom: 0.5em;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    border-left: 3px solid limegreen;
+    transition: background-color 0.2s;
+}
+
+.reminder-item:hover {
+    background-color: #f0f0f0;
+}
+
+.reminder-text {
+    flex: 1;
+    color: #333;
+}
+
+.delete-reminder {
+    color: #999;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.delete-reminder:hover {
+    color: red;
+}
+
+.delete-reminder i {
+    font-size: 1.2em;
+}
+
+.add-reminder-section {
+    margin-top: 1em;
+}
+
+.reminder-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 0.8em;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+.reminder-input:focus {
+    border-color: limegreen;
+}
+
+.add-reminder-button {
+    margin-top: 1em;
+    padding: 0.7em 1.5em;
+    background-color: limegreen;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.add-reminder-button:hover:not(:disabled) {
+    background-color: #2ecc40;
+}
+
+.add-reminder-button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.add-reminder-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Reminders Display Styles */
+.reminders-display {
+    position: fixed;
+    top: 1em;
+    right: 1em;
+    width: 350px;
+    max-width: calc(100vw - 2em);
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    transition: all 0.3s ease;
+}
+
+.reminders-display.collapsed {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.reminders-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.8em 1em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    user-select: none;
+    border-radius: 8px 8px 0 0;
+}
+
+.reminders-header:hover {
+    background-color: #f9f9f9;
+}
+
+.reminders-display.collapsed .reminders-header {
+    border-radius: 8px;
+}
+
+.reminder-icon {
+    color: limegreen;
+    font-size: 1.5em;
+}
+
+.reminders-header h3 {
+    margin: 0;
+    font-size: 1em;
+    color: #333;
+    flex: 1;
+}
+
+.expand-icon {
+    color: #666;
+    font-size: 1.5em;
+    transition: transform 0.3s;
+}
+
+.reminders-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em;
+    padding: 0 1em 1em 1em;
+    max-height: 70vh;
+    overflow-y: auto;
+    animation: slide-down 0.3s ease;
+}
+
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 70vh;
+    }
+}
+
+.reminder-card {
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    border-left: 4px solid limegreen;
+    border-radius: 6px;
+    padding: 0.8em;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.reminder-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.reminder-card.today {
+    border-left-color: #ff6b6b;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+}
+
+.reminder-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.7em;
+}
+
+.reminder-date {
+    display: flex;
+    flex-direction: column;
+}
+
+.day-label {
+    font-weight: 700;
+    font-size: 0.85em;
+    color: #333;
+}
+
+.date-label {
+    font-size: 0.7em;
+    color: #666;
+}
+
+.reminder-period {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.period-time {
+    font-weight: 600;
+    font-size: 0.85em;
+    color: limegreen;
+}
+
+.reminder-card.today .period-time {
+    color: #ff6b6b;
+}
+
+.period-name {
+    font-size: 0.7em;
+    color: #666;
+}
+
+.reminder-card-body {
+    color: #333;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .modal-header,
+    .modal-body {
+        padding: 1em;
+    }
+    
+    .modal-title {
+        font-size: 1.2em;
+    }
+    
+    .reminders-display {
+        width: calc(100vw - 2em);
+        right: 1em;
+        top: 0.5em;
+    }
+    
+    .reminders-header {
+        padding: 0.6em 0.8em;
+    }
+    
+    .reminders-header h3 {
+        font-size: 0.9em;
+    }
+    
+    .reminder-icon,
+    .expand-icon {
+        font-size: 1.3em;
+    }
+    
+    .reminders-list-container {
+        padding: 0 0.8em 0.8em 0.8em;
+    }
+    
+    .reminder-card {
+        padding: 0.6em;
+    }
 }
