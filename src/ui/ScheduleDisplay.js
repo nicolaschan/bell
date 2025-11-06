@@ -28,6 +28,51 @@ var ScheduleDisplay = {
       }
     }, vnode.state.weeklyView ? 'Daily View' : 'Weekly View')
 
+    var exportToCSV = function (weekSchedules, monday) {
+      // Prepare CSV content
+      var csvContent = 'Day,Date,Schedule,Period,Time,Duration,Reminders\n'
+      
+      weekSchedules.forEach(function (daySchedule) {
+        var dateStr = (daySchedule.date.getMonth() + 1) + '/' + daySchedule.date.getDate() + '/' + daySchedule.date.getFullYear()
+        var dayName = daySchedule.day
+        var scheduleName = daySchedule.schedule.display || daySchedule.schedule.name
+        
+        daySchedule.periods.forEach(function (period) {
+          // Get reminders for this period
+          var reminderKey = ReminderModal.getReminderKey(daySchedule.date, period.name, period.originalPeriod.time)
+          var reminders = ReminderModal.getReminders(reminderKey)
+          var reminderText = reminders.map(function (r) { return r.text }).join('; ')
+          
+          // Calculate duration
+          var startMinutes = period.originalPeriod.time.hour * 60 + period.originalPeriod.time.min
+          var endMinutes = startMinutes + (period.heightPercent / 100 * (latestMinutes - earliestMinutes))
+          var durationMinutes = Math.round(endMinutes - startMinutes)
+          
+          // Escape quotes in text
+          var escapedPeriodName = '"' + period.name.replace(/"/g, '""') + '"'
+          var escapedReminderText = '"' + reminderText.replace(/"/g, '""') + '"'
+          
+          csvContent += dayName + ',' + dateStr + ',' + scheduleName + ',' + 
+                       escapedPeriodName + ',' + period.time + ',' + 
+                       durationMinutes + ' min,' + escapedReminderText + '\n'
+        })
+      })
+      
+      // Create and download the CSV file
+      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      var link = document.createElement('a')
+      var url = URL.createObjectURL(blob)
+      
+      var weekStartStr = (monday.getMonth() + 1) + '-' + monday.getDate() + '-' + monday.getFullYear()
+      link.setAttribute('href', url)
+      link.setAttribute('download', 'schedule_export_week_' + weekStartStr + '.csv')
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+
+
     if (vnode.state.weeklyView) {
       // Weekly view logic
       var today = new Date(bellTimer.date)
@@ -134,6 +179,86 @@ var ScheduleDisplay = {
       
       // Build weekly view
       var weeklyContent = m('.weekly-schedule-container', [
+        m('.weekly-export-button-container', [
+          m('button.export-button-small', {
+            onclick: function () {
+              var today = new Date(bellTimer.date)
+              var currentDay = today.getDay()
+              var daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay
+              var monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + daysFromMonday + (vnode.state.weekOffset * 7))
+              
+              // Need to rebuild weekSchedules for export
+              var weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+              var weekSchedulesExport = []
+              var earliestMinutes = Infinity
+              var latestMinutes = 0
+              
+              for (let i = 0; i < 5; i++) {
+                var date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)
+                var schedule = bellTimer.calculator.getCurrentSchedule(date)
+                
+                for (let period of schedule.periods) {
+                  var periodMinutes = period.time.hour * 60 + period.time.min
+                  if (periodMinutes < earliestMinutes) earliestMinutes = periodMinutes
+                  if (periodMinutes > latestMinutes) latestMinutes = periodMinutes
+                }
+              }
+              
+              earliestMinutes = Math.floor(earliestMinutes / 60) * 60
+              latestMinutes = Math.ceil(latestMinutes / 60) * 60 + 60
+              var totalMinutes = latestMinutes - earliestMinutes
+              
+              for (let i = 0; i < 5; i++) {
+                var date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)
+                var schedule = bellTimer.calculator.getCurrentSchedule(date)
+                var periods = schedule.periods
+                
+                var periodBlocks = []
+                for (let j = 0; j < periods.length; j++) {
+                  var period = periods[j]
+                  var periodName = period.display(bellTimer.bindings || {})
+                  
+                  if (periodName !== 'Free' && 
+                      periodName !== 'Passing to Free' && 
+                      !periodName.startsWith('Passing to ')) {
+                    
+                    var startMinutes = period.time.hour * 60 + period.time.min
+                    var endMinutes
+                    if (j + 1 < periods.length) {
+                      var nextPeriod = periods[j + 1]
+                      endMinutes = nextPeriod.time.hour * 60 + nextPeriod.time.min
+                    } else {
+                      endMinutes = startMinutes + 45
+                    }
+                    
+                    var topPercent = ((startMinutes - earliestMinutes) / totalMinutes) * 100
+                    var heightPercent = ((endMinutes - startMinutes) / totalMinutes) * 100
+                    var durationMinutes = endMinutes - startMinutes
+                    
+                    if (durationMinutes >= 30) {
+                      periodBlocks.push({
+                        name: periodName,
+                        time: displayTimeArray(period.time),
+                        topPercent: topPercent,
+                        heightPercent: heightPercent,
+                        originalPeriod: period
+                      })
+                    }
+                  }
+                }
+                
+                weekSchedulesExport.push({
+                  day: weekDays[i],
+                  date: date,
+                  schedule: schedule,
+                  periods: periodBlocks
+                })
+              }
+              
+              exportToCSV(weekSchedulesExport, monday)
+            }
+          }, '📥 Export CSV')
+        ]),
         m('.weekly-header-row', [
           m('.time-axis-header', ''),
           weekSchedules.map(function (daySchedule) {
@@ -153,6 +278,10 @@ var ScheduleDisplay = {
           m('.weekly-grid', weekSchedules.map(function (daySchedule) {
             return m('.weekly-day-column' + (daySchedule.isToday ? '.today' : ''), [
               daySchedule.periods.map(function (period) {
+                // Get reminders for this period
+                var reminderKey = ReminderModal.getReminderKey(daySchedule.date, period.name, period.originalPeriod.time)
+                var reminders = ReminderModal.getReminders(reminderKey)
+                
                 return m('.period-block', {
                   style: {
                     top: period.topPercent + '%',
@@ -168,7 +297,12 @@ var ScheduleDisplay = {
                   }
                 }, [
                   m('.period-name', period.name),
-                  m('.period-time', period.time)
+                  m('.period-time', period.time),
+                  reminders.length > 0 ? m('.period-reminders', 
+                    reminders.map(function (reminder) {
+                      return m('.period-reminder-item', reminder.text)
+                    })
+                  ) : null
                 ])
               })
             ])
