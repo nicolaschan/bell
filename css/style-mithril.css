@@ -723,7 +723,8 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     justify-content: center;
     align-items: center;
     gap: 0.75em;
-    margin-bottom: 0.75em;
+    margin: 0 auto 0.75em auto;
+    width: 100%;
 }
 
 .week-nav-button {
@@ -732,7 +733,7 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     padding: 0.4em 0.9em;
     background-color: white;
     border: 2px solid #ddd;
-    border-radius: 20px;
+    border-radius: 0;
     cursor: pointer;
     transition: all 0.3s ease;
     outline: none;
@@ -769,14 +770,15 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     font-family: 'Roboto', sans-serif;
     font-size: 0.9em;
     padding: 0.4em 1.2em;
-    margin-bottom: 0.75em;
+    margin: 0 auto 0.75em auto;
     background-color: white;
     border: 2px solid #ddd;
-    border-radius: 20px;
+    border-radius: 0;
     cursor: pointer;
     transition: all 0.3s ease;
     outline: none;
     font-weight: 500;
+    display: block;
 }
 
 .view-toggle:hover {
@@ -802,7 +804,7 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     padding: 0.35em 0.65em;
     background-color: rgba(250, 250, 250, 0.95);
     border: 1px solid #e0e0e0;
-    border-radius: 4px;
+    border-radius: 0;
     cursor: pointer;
     transition: all 0.2s ease;
     outline: none;
@@ -1240,7 +1242,7 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     position: fixed;
     top: 1em;
     right: 1em;
-    width: 350px;
+    width: 300px;
     max-width: calc(100vw - 2em);
     background-color: white;
     border-radius: 8px;
@@ -1256,8 +1258,8 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
 .reminders-header {
     display: flex;
     align-items: center;
-    gap: 0.5em;
-    padding: 0.8em 1em;
+    gap: 0.4em;
+    padding: 0.6em 0.8em;
     cursor: pointer;
     transition: background-color 0.2s;
     user-select: none;
@@ -1274,27 +1276,27 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
 
 .reminder-icon {
     color: limegreen;
-    font-size: 1.5em;
+    font-size: 1.3em;
 }
 
 .reminders-header h3 {
     margin: 0;
-    font-size: 1em;
+    font-size: 0.9em;
     color: #333;
     flex: 1;
 }
 
 .expand-icon {
     color: #666;
-    font-size: 1.5em;
+    font-size: 1.3em;
     transition: transform 0.3s;
 }
 
 .reminders-list-container {
     display: flex;
     flex-direction: column;
-    gap: 0.6em;
-    padding: 0 1em 1em 1em;
+    gap: 0.5em;
+    padding: 0 0.8em 0.8em 0.8em;
     max-height: 70vh;
     overflow-y: auto;
     animation: slide-down 0.3s ease;
@@ -1313,9 +1315,9 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
 
 .reminder-card {
     background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
-    border-left: 4px solid limegreen;
+    border-left: 3px solid limegreen;
     border-radius: 6px;
-    padding: 0.8em;
+    padding: 0.6em;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -1333,7 +1335,7 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.7em;
+    margin-bottom: 0.5em;
 }
 
 .reminder-date {
@@ -1343,12 +1345,12 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
 
 .day-label {
     font-weight: 700;
-    font-size: 0.85em;
+    font-size: 0.75em;
     color: #333;
 }
 
 .date-label {
-    font-size: 0.7em;
+    font-size: 0.65em;
     color: #666;
 }
 
@@ -1360,7 +1362,7 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
 
 .period-time {
     font-weight: 600;
-    font-size: 0.85em;
+    font-size: 0.75em;
     color: limegreen;
 }
 
@@ -1369,14 +1371,82 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
 }
 
 .period-name {
-    font-size: 0.7em;
+    font-size: 0.65em;
     color: #666;
 }
 
 .reminder-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5em;
+}
+
+.reminder-text {
     color: #333;
-    font-size: 0.9em;
+    font-size: 0.85em;
     line-height: 1.4;
+    flex: 1;
+}
+
+.reminder-card.completed .reminder-text {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.reminder-card.completed {
+    opacity: 0.7;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+}
+
+.reminder-card.completed.today {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+}
+
+.reminder-actions {
+    display: flex;
+    gap: 0.3em;
+    flex-shrink: 0;
+}
+
+.reminder-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3em;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.reminder-action-btn i.material-icons {
+    font-size: 1.1em;
+}
+
+.reminder-action-btn.complete-btn {
+    color: limegreen;
+}
+
+.reminder-action-btn.complete-btn i.material-icons {
+    font-size: 1.4em;
+}
+
+.reminder-action-btn.complete-btn:hover {
+    background-color: rgba(50, 205, 50, 0.1);
+}
+
+.reminder-action-btn.delete-btn {
+    color: #ff6b6b;
+}
+
+.reminder-action-btn.delete-btn:hover {
+    background-color: rgba(255, 107, 107, 0.1);
+}
+
+.reminder-action-btn:active {
+    transform: scale(0.95);
 }
 
 @media (max-width: 600px) {

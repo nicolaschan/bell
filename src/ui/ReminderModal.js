@@ -35,9 +35,18 @@ var ReminderModal = {
     }
     allReminders[key].push({
       text: reminder,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      completed: false
     })
     localStorage.setItem('bellReminders', JSON.stringify(allReminders))
+  },
+  
+  toggleComplete: function (key, index) {
+    var allReminders = JSON.parse(localStorage.getItem('bellReminders') || '{}')
+    if (allReminders[key] && allReminders[key][index]) {
+      allReminders[key][index].completed = !allReminders[key][index].completed
+      localStorage.setItem('bellReminders', JSON.stringify(allReminders))
+    }
   },
   
   deleteReminder: function (key, index) {
