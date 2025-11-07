@@ -1,33 +1,35 @@
+/* global localStorage */
+
 const m = require('mithril')
 
 var ReminderModal = {
   oninit: function (vnode) {
     vnode.state.reminderText = ''
   },
-  
+
   onbeforeupdate: function (vnode) {
     // Reset text when modal closes
     if (!vnode.attrs.isOpen) {
       vnode.state.reminderText = ''
     }
   },
-  
+
   getReminderKey: function (date, periodName, periodTime) {
-    var dateStr = date.getFullYear() + '-' + 
-                  String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+    var dateStr = date.getFullYear() + '-' +
+                  String(date.getMonth() + 1).padStart(2, '0') + '-' +
                   String(date.getDate()).padStart(2, '0')
     return dateStr + '|' + periodName + '|' + periodTime.hour + ':' + periodTime.min
   },
-  
+
   getReminders: function (key) {
     var allReminders = JSON.parse(localStorage.getItem('bellReminders') || '{}')
     return allReminders[key] || []
   },
-  
+
   getAllReminders: function () {
     return JSON.parse(localStorage.getItem('bellReminders') || '{}')
   },
-  
+
   saveReminder: function (key, reminder) {
     var allReminders = JSON.parse(localStorage.getItem('bellReminders') || '{}')
     if (!allReminders[key]) {
@@ -40,7 +42,7 @@ var ReminderModal = {
     })
     localStorage.setItem('bellReminders', JSON.stringify(allReminders))
   },
-  
+
   toggleComplete: function (key, index) {
     var allReminders = JSON.parse(localStorage.getItem('bellReminders') || '{}')
     if (allReminders[key] && allReminders[key][index]) {
@@ -48,7 +50,7 @@ var ReminderModal = {
       localStorage.setItem('bellReminders', JSON.stringify(allReminders))
     }
   },
-  
+
   deleteReminder: function (key, index) {
     var allReminders = JSON.parse(localStorage.getItem('bellReminders') || '{}')
     if (allReminders[key]) {
@@ -59,19 +61,19 @@ var ReminderModal = {
       localStorage.setItem('bellReminders', JSON.stringify(allReminders))
     }
   },
-  
+
   view: function (vnode) {
     if (!vnode.attrs.isOpen) return null
-    
+
     var period = vnode.attrs.period
     var date = vnode.attrs.date
     var onClose = vnode.attrs.onClose
-    
+
     var reminderKey = ReminderModal.getReminderKey(date, period.name, period.time)
-    
+
     // Load reminders fresh every time the view renders
     var existingReminders = ReminderModal.getReminders(reminderKey)
-    
+
     var handleAddReminder = function () {
       if (vnode.state.reminderText.trim()) {
         ReminderModal.saveReminder(reminderKey, vnode.state.reminderText.trim())
@@ -79,14 +81,14 @@ var ReminderModal = {
         m.redraw()
       }
     }
-    
+
     var handleDeleteReminder = function (index) {
       ReminderModal.deleteReminder(reminderKey, index)
       m.redraw()
     }
-    
+
     var dateStr = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear()
-    
+
     // Format time properly
     var timeStr = ''
     if (period.time) {
@@ -96,7 +98,7 @@ var ReminderModal = {
       var ampm = period.time.hour >= 12 ? 'PM' : 'AM'
       timeStr = hours + ':' + minutes + ' ' + ampm
     }
-    
+
     return m('.modal-overlay', {
       onclick: function (e) {
         if (e.target.className === 'modal-overlay') {
@@ -122,7 +124,7 @@ var ReminderModal = {
           existingReminders.length > 0 ? [
             m('.existing-reminders', [
               m('h3', 'Current Reminders'),
-              m('ul.reminder-list', 
+              m('ul.reminder-list',
                 existingReminders.map(function (reminder, index) {
                   return m('li.reminder-item', [
                     m('span.reminder-text', reminder.text),
@@ -167,4 +169,3 @@ var ReminderModal = {
 }
 
 module.exports = ReminderModal
-

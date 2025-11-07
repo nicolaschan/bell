@@ -1,3 +1,5 @@
+/* global Blob */
+
 const m = require('mithril')
 const ReminderModal = require('./ReminderModal')
 const RemindersDisplay = require('./RemindersDisplay')
@@ -31,38 +33,38 @@ var ScheduleDisplay = {
     var exportToCSV = function (weekSchedules, monday) {
       // Prepare CSV content
       var csvContent = 'Day,Date,Schedule,Period,Time,Duration,Reminders\n'
-      
+
       weekSchedules.forEach(function (daySchedule) {
         var dateStr = (daySchedule.date.getMonth() + 1) + '/' + daySchedule.date.getDate() + '/' + daySchedule.date.getFullYear()
         var dayName = daySchedule.day
         var scheduleName = daySchedule.schedule.display || daySchedule.schedule.name
-        
+
         daySchedule.periods.forEach(function (period) {
           // Get reminders for this period
           var reminderKey = ReminderModal.getReminderKey(daySchedule.date, period.name, period.originalPeriod.time)
           var reminders = ReminderModal.getReminders(reminderKey)
           var reminderText = reminders.map(function (r) { return r.text }).join('; ')
-          
+
           // Calculate duration
           var startMinutes = period.originalPeriod.time.hour * 60 + period.originalPeriod.time.min
           var endMinutes = startMinutes + (period.heightPercent / 100 * (latestMinutes - earliestMinutes))
           var durationMinutes = Math.round(endMinutes - startMinutes)
-          
+
           // Escape quotes in text
           var escapedPeriodName = '"' + period.name.replace(/"/g, '""') + '"'
           var escapedReminderText = '"' + reminderText.replace(/"/g, '""') + '"'
-          
-          csvContent += dayName + ',' + dateStr + ',' + scheduleName + ',' + 
-                       escapedPeriodName + ',' + period.time + ',' + 
+
+          csvContent += dayName + ',' + dateStr + ',' + scheduleName + ',' +
+                       escapedPeriodName + ',' + period.time + ',' +
                        durationMinutes + ' min,' + escapedReminderText + '\n'
         })
       })
-      
+
       // Create and download the CSV file
       var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
       var link = document.createElement('a')
       var url = URL.createObjectURL(blob)
-      
+
       var weekStartStr = (monday.getMonth() + 1) + '-' + monday.getDate() + '-' + monday.getFullYear()
       link.setAttribute('href', url)
       link.setAttribute('download', 'schedule_export_week_' + weekStartStr + '.csv')
@@ -72,61 +74,59 @@ var ScheduleDisplay = {
       document.body.removeChild(link)
     }
 
-
     if (vnode.state.weeklyView) {
       // Weekly view logic
       var today = new Date(bellTimer.date)
       var currentDay = today.getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-      
+
       // Calculate the start of the week (Monday) with offset
       var daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay
       var monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + daysFromMonday + (vnode.state.weekOffset * 7))
-      
+
       var weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
       var weekSchedules = []
-      
+
       // Find the earliest and latest times across all days
       var earliestMinutes = Infinity
       var latestMinutes = 0
-      
+
       for (let i = 0; i < 5; i++) {
         var date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)
-        var schedule = bellTimer.calculator.getCurrentSchedule(date)
-        
+        let schedule = bellTimer.calculator.getCurrentSchedule(date)
+
         for (let period of schedule.periods) {
           var periodMinutes = period.time.hour * 60 + period.time.min
           if (periodMinutes < earliestMinutes) earliestMinutes = periodMinutes
           if (periodMinutes > latestMinutes) latestMinutes = periodMinutes
         }
       }
-      
+
       // Add some padding
       earliestMinutes = Math.floor(earliestMinutes / 60) * 60 // Round down to nearest hour
       latestMinutes = Math.ceil(latestMinutes / 60) * 60 + 60 // Round up and add an hour
       var totalMinutes = latestMinutes - earliestMinutes
-      
+
       for (let i = 0; i < 5; i++) {
-        var date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)
-        var schedule = bellTimer.calculator.getCurrentSchedule(date)
+        let date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)
+        let schedule = bellTimer.calculator.getCurrentSchedule(date)
         var periods = schedule.periods
-        
-        var isToday = date.getDate() === today.getDate() && 
-                      date.getMonth() === today.getMonth() && 
+
+        var isToday = date.getDate() === today.getDate() &&
+                      date.getMonth() === today.getMonth() &&
                       date.getFullYear() === today.getFullYear()
-        
+
         // Calculate period positions and heights
         var periodBlocks = []
         for (let j = 0; j < periods.length; j++) {
           var period = periods[j]
           var periodName = period.display(bellTimer.bindings || {})
-          
+
           // Filter out Free periods and Passing periods from DISPLAY only
-          if (periodName !== 'Free' && 
-              periodName !== 'Passing to Free' && 
+          if (periodName !== 'Free' &&
+              periodName !== 'Passing to Free' &&
               !periodName.startsWith('Passing to ')) {
-            
             var startMinutes = period.time.hour * 60 + period.time.min
-            
+
             // Find the end time by looking at the VERY NEXT period (including passing periods)
             // This ensures accurate timing with natural gaps where passing periods exist
             var endMinutes
@@ -137,11 +137,11 @@ var ScheduleDisplay = {
               // Last period - assume 45 min duration
               endMinutes = startMinutes + 45
             }
-            
-            var topPercent = ((startMinutes - earliestMinutes) / totalMinutes) * 100
+
+            let topPercent = ((startMinutes - earliestMinutes) / totalMinutes) * 100
             var heightPercent = ((endMinutes - startMinutes) / totalMinutes) * 100
             var durationMinutes = endMinutes - startMinutes
-            
+
             // Only show periods that are 30 minutes or longer
             if (durationMinutes >= 30) {
               periodBlocks.push({
@@ -154,7 +154,7 @@ var ScheduleDisplay = {
             }
           }
         }
-        
+
         weekSchedules.push({
           day: weekDays[i],
           date: date,
@@ -163,12 +163,12 @@ var ScheduleDisplay = {
           isToday: isToday
         })
       }
-      
+
       // Build time labels for the left axis
       var timeLabels = []
       for (let hour = Math.floor(earliestMinutes / 60); hour <= Math.ceil(latestMinutes / 60); hour++) {
         var minutes = hour * 60
-        var topPercent = ((minutes - earliestMinutes) / totalMinutes) * 100
+        let topPercent = ((minutes - earliestMinutes) / totalMinutes) * 100
         var displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour)
         var ampm = hour >= 12 ? 'PM' : 'AM'
         timeLabels.push({
@@ -176,7 +176,7 @@ var ScheduleDisplay = {
           topPercent: topPercent
         })
       }
-      
+
       // Build weekly view
       var weeklyContent = m('.weekly-schedule-container', [
         m('.weekly-export-button-container', [
@@ -186,42 +186,41 @@ var ScheduleDisplay = {
               var currentDay = today.getDay()
               var daysFromMonday = currentDay === 0 ? -6 : 1 - currentDay
               var monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + daysFromMonday + (vnode.state.weekOffset * 7))
-              
+
               // Need to rebuild weekSchedules for export
               var weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
               var weekSchedulesExport = []
               var earliestMinutes = Infinity
               var latestMinutes = 0
-              
+
               for (let i = 0; i < 5; i++) {
-                var date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)
-                var schedule = bellTimer.calculator.getCurrentSchedule(date)
-                
+                let date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)
+                let schedule = bellTimer.calculator.getCurrentSchedule(date)
+
                 for (let period of schedule.periods) {
                   var periodMinutes = period.time.hour * 60 + period.time.min
                   if (periodMinutes < earliestMinutes) earliestMinutes = periodMinutes
                   if (periodMinutes > latestMinutes) latestMinutes = periodMinutes
                 }
               }
-              
+
               earliestMinutes = Math.floor(earliestMinutes / 60) * 60
               latestMinutes = Math.ceil(latestMinutes / 60) * 60 + 60
               var totalMinutes = latestMinutes - earliestMinutes
-              
+
               for (let i = 0; i < 5; i++) {
-                var date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)
-                var schedule = bellTimer.calculator.getCurrentSchedule(date)
+                let date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)
+                let schedule = bellTimer.calculator.getCurrentSchedule(date)
                 var periods = schedule.periods
-                
+
                 var periodBlocks = []
                 for (let j = 0; j < periods.length; j++) {
                   var period = periods[j]
                   var periodName = period.display(bellTimer.bindings || {})
-                  
-                  if (periodName !== 'Free' && 
-                      periodName !== 'Passing to Free' && 
+
+                  if (periodName !== 'Free' &&
+                      periodName !== 'Passing to Free' &&
                       !periodName.startsWith('Passing to ')) {
-                    
                     var startMinutes = period.time.hour * 60 + period.time.min
                     var endMinutes
                     if (j + 1 < periods.length) {
@@ -230,11 +229,11 @@ var ScheduleDisplay = {
                     } else {
                       endMinutes = startMinutes + 45
                     }
-                    
-                    var topPercent = ((startMinutes - earliestMinutes) / totalMinutes) * 100
+
+                    let topPercent = ((startMinutes - earliestMinutes) / totalMinutes) * 100
                     var heightPercent = ((endMinutes - startMinutes) / totalMinutes) * 100
                     var durationMinutes = endMinutes - startMinutes
-                    
+
                     if (durationMinutes >= 30) {
                       periodBlocks.push({
                         name: periodName,
@@ -246,7 +245,7 @@ var ScheduleDisplay = {
                     }
                   }
                 }
-                
+
                 weekSchedulesExport.push({
                   day: weekDays[i],
                   date: date,
@@ -254,7 +253,7 @@ var ScheduleDisplay = {
                   periods: periodBlocks
                 })
               }
-              
+
               exportToCSV(weekSchedulesExport, monday)
             }
           }, '📥 Export CSV')
@@ -281,7 +280,7 @@ var ScheduleDisplay = {
                 // Get reminders for this period
                 var reminderKey = ReminderModal.getReminderKey(daySchedule.date, period.name, period.originalPeriod.time)
                 var reminders = ReminderModal.getReminders(reminderKey)
-                
+
                 return m('.period-block', {
                   style: {
                     top: period.topPercent + '%',
@@ -298,7 +297,7 @@ var ScheduleDisplay = {
                 }, [
                   m('.period-name', period.name),
                   m('.period-time', period.time),
-                  reminders.length > 0 ? m('.period-reminders', 
+                  reminders.length > 0 ? m('.period-reminders',
                     reminders.map(function (reminder) {
                       return m('.period-reminder-item', reminder.text)
                     })
@@ -309,7 +308,7 @@ var ScheduleDisplay = {
           }))
         ])
       ])
-      
+
       var weekNavigation = m('.week-navigation', [
         m('button.week-nav-button', {
           onclick: function () {
@@ -328,7 +327,7 @@ var ScheduleDisplay = {
           }
         }, 'Next Week →')
       ])
-      
+
       return [
         m(RemindersDisplay, { bellTimer: bellTimer }),
         m('.centered.schedule-container', [

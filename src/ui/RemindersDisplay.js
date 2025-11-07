@@ -4,36 +4,36 @@ var RemindersDisplay = {
   oninit: function (vnode) {
     vnode.state.isExpanded = false
   },
-  
+
   view: function (vnode) {
     var bellTimer = vnode.attrs.bellTimer
     var ReminderModal = require('./ReminderModal')
-    
+
     // Get all reminders
     var allReminders = ReminderModal.getAllReminders()
-    
+
     // Get today's date
     var today = new Date(bellTimer.date)
     today.setHours(0, 0, 0, 0)
-    
+
     // Get reminders for the next 5 days
     var upcomingReminders = []
-    
+
     for (var i = 0; i < 5; i++) {
       var checkDate = new Date(today)
       checkDate.setDate(today.getDate() + i)
-      
-      var dateStr = checkDate.getFullYear() + '-' + 
-                    String(checkDate.getMonth() + 1).padStart(2, '0') + '-' + 
+
+      var dateStr = checkDate.getFullYear() + '-' +
+                    String(checkDate.getMonth() + 1).padStart(2, '0') + '-' +
                     String(checkDate.getDate()).padStart(2, '0')
-      
+
       // Find all reminders for this date
       Object.keys(allReminders).forEach(function (key) {
         if (key.startsWith(dateStr)) {
           var parts = key.split('|')
           var periodName = parts[1]
           var periodTime = parts[2]
-          
+
           allReminders[key].forEach(function (reminder, reminderIndex) {
             upcomingReminders.push({
               date: checkDate,
@@ -51,7 +51,7 @@ var RemindersDisplay = {
         }
       })
     }
-    
+
     // Sort by completion status first (incomplete first), then date and time
     upcomingReminders.sort(function (a, b) {
       // Sort by completed status first (false before true)
@@ -65,11 +65,11 @@ var RemindersDisplay = {
       // Then by time
       return a.periodTime.localeCompare(b.periodTime)
     })
-    
+
     if (upcomingReminders.length === 0) {
       return null
     }
-    
+
     return m('.reminders-display' + (vnode.state.isExpanded ? '.expanded' : '.collapsed'), [
       m('.reminders-header', {
         onclick: function () {
@@ -82,24 +82,24 @@ var RemindersDisplay = {
       ]),
       vnode.state.isExpanded ? m('.reminders-list-container',
         upcomingReminders.map(function (reminder) {
-          var dayLabel = reminder.isToday ? 'Today' : 
-                        reminder.daysAway === 1 ? 'Tomorrow' :
-                        ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][reminder.date.getDay()]
-          
+          var dayLabel = reminder.isToday ? 'Today'
+            : reminder.daysAway === 1 ? 'Tomorrow'
+              : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][reminder.date.getDay()]
+
           var displayDate = (reminder.date.getMonth() + 1) + '/' + reminder.date.getDate()
-          
+
           var handleToggleComplete = function (e) {
             e.stopPropagation()
             ReminderModal.toggleComplete(reminder.reminderKey, reminder.reminderIndex)
             m.redraw()
           }
-          
+
           var handleDelete = function (e) {
             e.stopPropagation()
             ReminderModal.deleteReminder(reminder.reminderKey, reminder.reminderIndex)
             m.redraw()
           }
-          
+
           return m('.reminder-card' + (reminder.isToday ? '.today' : '') + (reminder.completed ? '.completed' : ''), [
             m('.reminder-card-header', [
               m('.reminder-date', [
@@ -136,4 +136,3 @@ var RemindersDisplay = {
 }
 
 module.exports = RemindersDisplay
-
