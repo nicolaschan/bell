@@ -1,9 +1,10 @@
 name: Docker Image CI
-
 on:
   push:
     tags:
-    - v*
+      - v*
+    branches:
+      - beta
 
 jobs:
   test:
@@ -18,6 +19,7 @@ jobs:
       run: yarn
     - name: Run tests
       run: yarn test
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -30,9 +32,10 @@ jobs:
       run: yarn
     - name: Run linting
       run: yarn lint
+
   docker:
     runs-on: ubuntu-latest
-    needs: [test,lint]
+    needs: [test, lint]
     steps:
     - uses: actions/checkout@v3
     - name: Set up QEMU
@@ -45,11 +48,30 @@ jobs:
         version: latest
     - name: ghcr.io login
       run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+    
+    - name: Set Docker tags
+      id: docker_tags
+      run: |
+        if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          # For version tags (v*)
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "TAGS=ghcr.io/nicolaschan/bell:${VERSION},ghcr.io/nicolaschan/bell:latest" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == refs/heads/beta ]]; then
+          # For beta branch - include timestamp
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          echo "TAGS=ghcr.io/nicolaschan/bell:beta-${TIMESTAMP},ghcr.io/nicolaschan/bell:beta" >> $GITHUB_OUTPUT
+        fi
+    
     - name: Run Buildx
       run: |
+        IFS=',' read -ra TAGS_ARRAY <<< "${{ steps.docker_tags.outputs.TAGS }}"
+        TAG_ARGS=""
+        for tag in "${TAGS_ARRAY[@]}"; do
+          TAG_ARGS="$TAG_ARGS --tag $tag"
+        done
+        
         docker buildx build \
         --pull \
         --push \
         --platform linux/amd64 \
-        --tag ghcr.io/nicolaschan/bell:${GITHUB_REF#refs/*/} \
-        --tag ghcr.io/nicolaschan/bell:latest .
+        $TAG_ARGS .
