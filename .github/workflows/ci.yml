@@ -52,14 +52,14 @@ jobs:
     - name: Set Docker tags
       id: docker_tags
       run: |
-        if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-          # For version tags (v*)
-          VERSION=${GITHUB_REF#refs/tags/}
-          echo "TAGS=ghcr.io/nicolaschan/bell:${VERSION},ghcr.io/nicolaschan/bell:latest" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.ref }}" == refs/heads/beta ]]; then
+        if [[ "${{ github.ref }}" == refs/heads/beta ]]; then
           # For beta branch - include timestamp
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
           echo "TAGS=ghcr.io/nicolaschan/bell:beta-${TIMESTAMP},ghcr.io/nicolaschan/bell:beta" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          # For version tags (v*)
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "TAGS=ghcr.io/nicolaschan/bell:${VERSION},ghcr.io/nicolaschan/bell:latest" >> $GITHUB_OUTPUT
         fi
     
     - name: Run Buildx
