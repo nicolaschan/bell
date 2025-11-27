@@ -2,33 +2,33 @@ name: Test & Lint CI
 
 on:
   push:
-    branches: ['**']
+    branches: ["**"]
   pull_request:
-    branches: ['**']
+    branches: ["**"]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16.x'
-    - name: Install dependencies
-      run: yarn
-    - name: Run tests
-      run: yarn test
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "24.x"
+      - name: Install dependencies
+        run: yarn
+      - name: Run tests
+        run: yarn test
 
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16.x'
-    - name: Install dependencies
-      run: yarn
-    - name: Run linting
-      run: yarn lint
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "24.x"
+      - name: Install dependencies
+        run: yarn
+      - name: Run linting
+        run: yarn lint
