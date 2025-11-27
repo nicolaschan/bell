@@ -66,5 +66,4 @@ jobs:
           for tag in "${TAGS_ARRAY[@]}"; do
             TAG_ARGS="$TAG_ARGS --tag $tag"
           done
-
           docker build . --push $TAG_ARGS
