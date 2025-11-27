@@ -36,7 +36,9 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     needs: [test, lint]
-    environment: docker build
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v3
       - name: Set up QEMU
