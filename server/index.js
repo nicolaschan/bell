@@ -2,12 +2,22 @@ require('dotenv-safe').config()
 
 const Promise = require('bluebird')
 const logger = require('loggy')
-const http = require('http')
 const express = require('express')
-const app = express()
+
+const setupApp = useH2 => {
+  logger.info(`Using HTTP/${useH2 ? '2' : '1.1'}`)
+  const http2Express = require('http2-express')
+  const app = useH2 ? http2Express(express) : express()
+  const http = require(useH2 ? 'http2' : 'http')
+  const server = http.createServer(app)
+  return [app, server]
+}
+
+const [app, server] = setupApp(process.env.USE_H2 === 'true')
+
 const compression = require('compression')
 app.use(compression())
-const server = http.createServer(app)
+
 const path = require('path')
 const timesyncServer = require('timesync/server')
 const WebSocket = require('ws')
