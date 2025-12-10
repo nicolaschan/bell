@@ -128,8 +128,17 @@ var startWebServer = function () {
   })
 }
 
-app.get('/:source', (req, res) => {
-  res.sendFile(path.join(baseDir, 'html', 'index.html'))
+const data = require('./data')
+const Cache = require('./cache2')
+const redirectCache = new Cache(10 * 60)
+const getRedirectCached = redirectCache.cached(key => data.getRedirect(key))
+
+app.get('/:source', async (req, res) => {
+  let redirect = await getRedirectCached(req.params.source)
+  if (redirect) {
+    return res.redirect(`/${redirect}`)
+  }
+  return res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 
 setInterval(checkForNewVersion, 24 * 60 * 60 * 1000)

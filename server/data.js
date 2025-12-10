@@ -58,6 +58,12 @@ const fetch = async function (source, file) {
   }
 }
 
+const getRedirect = async function (source) {
+  const sourceData = await getSource(source)
+  if (sourceData.location === 'redirect') {
+    return sourceData.to
+  }
+}
 const getCorrection = async function (source) {
   return fetch(source, 'correction.txt')
 }
@@ -115,6 +121,7 @@ const getAll = async function (source) {
 }
 
 module.exports = {
+  getRedirect,
   getCorrection,
   getSchedules,
   getCalendar,
