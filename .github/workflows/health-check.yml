@@ -14,7 +14,7 @@ jobs:
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://bell.plus)
           echo "status=$STATUS" >> $GITHUB_OUTPUT
-          if [ "$STATUS" != "201" ]; then
+          if [ "$STATUS" != "200" ]; then
             echo "bell.plus returned $STATUS"
             exit 1
           fi
@@ -25,7 +25,7 @@ jobs:
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://edit.bell.plus)
           echo "status=$STATUS" >> $GITHUB_OUTPUT
-          if [ "$STATUS" != "201" ]; then
+          if [ "$STATUS" != "200" ]; then
             echo "edit.bell.plus returned $STATUS"
             exit 1
           fi
