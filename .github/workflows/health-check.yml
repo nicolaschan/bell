@@ -1,0 +1,56 @@
+name: Health Check
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Check https://bell.plus
+        id: check-bell
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://bell.plus)
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          if [ "$STATUS" != "201" ]; then
+            echo "bell.plus returned $STATUS"
+            exit 1
+          fi
+        continue-on-error: true
+
+      - name: Check https://edit.bell.plus
+        id: check-edit
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://edit.bell.plus)
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          if [ "$STATUS" != "201" ]; then
+            echo "edit.bell.plus returned $STATUS"
+            exit 1
+          fi
+        continue-on-error: true
+
+      - name: Send notification if bell.plus is down
+        if: steps.check-bell.outcome == 'failure'
+        run: |
+          curl -X POST \
+            -H "Title: bell.plus is down" \
+            -H "Priority: high" \
+            -H "Tags: warning" \
+            -d "bell.plus returned HTTP ${{ steps.check-bell.outputs.status }}" \
+            https://ntfy.sh/nicolaschan_alerts
+
+      - name: Send notification if edit.bell.plus is down
+        if: steps.check-edit.outcome == 'failure'
+        run: |
+          curl -X POST \
+            -H "Title: edit.bell.plus is down" \
+            -H "Priority: high" \
+            -H "Tags: warning" \
+            -d "edit.bell.plus returned HTTP ${{ steps.check-edit.outputs.status }}" \
+            https://ntfy.sh/nicolaschan_alerts
+
+      - name: Fail workflow if any check failed
+        if: steps.check-bell.outcome == 'failure' || steps.check-edit.outcome == 'failure'
+        run: exit 1
