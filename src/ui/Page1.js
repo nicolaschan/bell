@@ -80,18 +80,12 @@ var updateGraphics = function (vnode) {
   var posX = width / 2
   var posY = height / 2
 
-  // Check if current theme is Valentines
-  if (themeManager.currentTheme.name === 'Valentines') {
-    // Draw heart countdown instead of circle - same size and behavior
-    Valentines.drawHeartCountdown(ctx, posX, posY, radius, proportion)
-  } else {
-    // Draw the normal circle countdown
-    ctx.beginPath()
-    ctx.arc(posX, posY, radius, (Math.PI / -2), (Math.PI / -2) + (-2 * Math.PI) * (1 - proportion), true)
-    ctx.lineTo(posX, posY)
-    ctx.closePath()
-    ctx.fill()
-  }
+  // Draw the background circle countdown
+  ctx.beginPath()
+  ctx.arc(posX, posY, radius, (Math.PI / -2), (Math.PI / -2) + (-2 * Math.PI) * (1 - proportion), true)
+  ctx.lineTo(posX, posY)
+  ctx.closePath()
+  ctx.fill()
 }
 const updateSnowflakes = function (vnode) {
   const c = vnode.dom
@@ -177,6 +171,12 @@ module.exports = {
       style: vnode.state.bottomStyle
     }, [
       m(Background, vnode.attrs),
+      // Move snowflakes canvas to the back
+      m('canvas.snowflakes', {
+        onupdate: updateSnowflakes,
+        bellTimer: vnode.attrs.bellTimer,
+        themeManager: vnode.attrs.themeManager
+      }),
       m('.centered.time-text', [
         m(SoundInteraction, vnode.attrs),
         m(Timer, vnode.attrs),
@@ -185,11 +185,6 @@ module.exports = {
       ]),
       m('canvas.centered', {
         onupdate: updateGraphics,
-        bellTimer: vnode.attrs.bellTimer,
-        themeManager: vnode.attrs.themeManager
-      }),
-      m('canvas.snowflakes', {
-        onupdate: updateSnowflakes,
         bellTimer: vnode.attrs.bellTimer,
         themeManager: vnode.attrs.themeManager
       })
