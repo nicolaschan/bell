@@ -3,6 +3,7 @@ const ColorSchemeTransformations = require('./ColorSchemeTransformations')
 const BasicTiming = require('./timings/BasicTiming')
 
 const hearts = new Set()
+const OFFSCREEN_BUFFER = 50 // Extra pixels below viewport before removing heart
 
 function drawHeart (ctx, x, y, size, rotation) {
   ctx.save()
@@ -34,6 +35,7 @@ function drawHeart (ctx, x, y, size, rotation) {
     0, topCurveHeight
   )
   ctx.closePath()
+  ctx.fill()
   ctx.restore()
 }
 
@@ -93,14 +95,14 @@ function drawHeartCountdown (ctx, x, y, radius, proportion) {
 }
 
 module.exports = {
-  name: 'Valentines',
+  name: "Valentine's",
   drawHeartCountdown: drawHeartCountdown,
   enabled: (secrets) => {
     const now = new Date();
     // Only enabled for 10 days ending on Feb 14th
     const month = now.getMonth() + 1;
     const day = now.getDate();
-    return month === 1 && day >= 5 && day <= 34;
+    return month === 2 && day >= 5 && day <= 14;
   },
   specialEffects: (ctx, canvas) => {
     if (hearts.size < 30 && Math.random() < 0.08) {
@@ -123,12 +125,12 @@ module.exports = {
       ctx.globalAlpha = heart.opacity
       ctx.fillStyle = heart.clicked ? '#ffffff' : heart.color
 
-      // Calculate pulse scale (subtle pulse between 0.9 and 1.1)
       const pulseScale = 1 + Math.sin(heart.pulsePhase) * 0.3
       const currentSize = heart.clicked ? heart.size * 1.5 : heart.size
-      drawHeart(ctx, heart.x, heart.y, currentSize * pulseScale, heart.rotation)
-      ctx.fill()
-      if (heart.y > window.innerHeight + 50) {
+      const renderedSize = currentSize * pulseScale
+      drawHeart(ctx, heart.x, heart.y, renderedSize, heart.rotation)
+
+      if (heart.y > window.innerHeight + OFFSCREEN_BUFFER) {
         hearts.delete(heart)
       }
       heart.y += heart.ySpeed
@@ -139,8 +141,11 @@ module.exports = {
     ctx.globalAlpha = 1.0
     canvas.addEventListener('mousedown', function (e) {
       for (const heart of hearts) {
+        const pulseScale = 1 + Math.sin(heart.pulsePhase) * 0.3
+        const currentSize = heart.clicked ? heart.size * 1.5 : heart.size
+        const renderedSize = currentSize * pulseScale
         const distance = Math.sqrt(Math.pow(heart.x - e.x, 2) + Math.pow(heart.y - e.y, 2))
-        if (distance < heart.size) {
+        if (distance < renderedSize) {
           heart.clicked = !heart.clicked
           break
         }
@@ -155,16 +160,16 @@ module.exports = {
         'background-image': 'linear-gradient(135deg, #ff6b9d 0%, #ffc3e0 100%)',
         'background-color': '#ff85b3'
       },
-      text: '#8b0028',
-      subtext: '#c41e5c',
+      text: '#4a0016',
+      subtext: '#7a1038',
       contrast: 'white'
     }, {
       background: {
         'background-image': 'linear-gradient(135deg, #ff1f5a 0%, #ff6b9d 100%)',
         'background-color': '#ff4578'
       },
-      text: '#8b0028',
-      subtext: '#c41e5c',
+      text: '#4a0016',
+      subtext: '#600020',
       contrast: 'white'
     }, {
       background: {
