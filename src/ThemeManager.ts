@@ -46,7 +46,6 @@ export default class ThemeManager {
     }
   }
 
-
   get defaultTheme (): ITheme {
     // The first available theme in the array is the default
     for (const theme of themes) {

@@ -11,6 +11,11 @@ class BellTimer {
     this.startTime = 0
     this.timeScale = 1
 
+    const devModeCookie = this.cookieManager.get('dev_mode')
+    if (devModeCookie) {
+      this.devMode = true
+      this.timeScale = devModeCookie.scale
+    }
   }
 
   loadCustomCourses () {
