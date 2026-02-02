@@ -98,11 +98,11 @@ module.exports = {
   name: "Valentine's",
   drawHeartCountdown: drawHeartCountdown,
   enabled: (secrets) => {
-    const now = new Date();
+    const now = new Date()
     // Only enabled for 10 days ending on Feb 14th
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    return month === 2 && day >= 5 && day <= 14;
+    const month = now.getMonth() + 1
+    const day = now.getDate()
+    return month === 2 && day >= 5 && day <= 14
   },
   specialEffects: (ctx, canvas) => {
     if (hearts.size < 30 && Math.random() < 0.08) {

@@ -1,5 +1,4 @@
 const m = require('mithril')
-const Valentines = require('../themes/Valentines') // To replace the circle with a heart on Valentines theme
 
 var getIconImage = function (min) {
   var faviconColors = {
