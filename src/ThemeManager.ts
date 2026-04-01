@@ -26,7 +26,7 @@ const themes: ITheme[] = [
   GraysDark,
   BluesLight,
   BluesDark,
-  Jonathan,
+  Jonathan
 ]
 
 export default class ThemeManager {
