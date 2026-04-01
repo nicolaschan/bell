@@ -14,6 +14,7 @@ import * as Winter from './themes/Winter'
 const themes: ITheme[] = [
   Winter,
   Halloween,
+  Quack,
   DefaultLight,
   DefaultDark,
   GradientLight,
@@ -26,7 +27,6 @@ const themes: ITheme[] = [
   BluesLight,
   BluesDark,
   Jonathan,
-  Quack
 ]
 
 export default class ThemeManager {
