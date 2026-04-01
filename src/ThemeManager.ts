@@ -9,7 +9,6 @@ import * as Jonathan from './themes/Jonathan'
 import { dark as PastelDark, light as PastelLight } from './themes/Pastel'
 import { dark as RainbowDark, light as RainbowLight } from './themes/Rainbow'
 import * as Winter from './themes/Winter'
-import * as Quack from './themes/Quack'
 
 const themes: ITheme[] = [
   Winter,
@@ -25,8 +24,7 @@ const themes: ITheme[] = [
   GraysDark,
   BluesLight,
   BluesDark,
-  Jonathan,
-  Quack
+  Jonathan
 ]
 
 export default class ThemeManager {
