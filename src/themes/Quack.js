@@ -28,11 +28,11 @@ module.exports = {
         const duckX = window.innerWidth - duckSize - 200
         const duckY = waveHeight * Math.sin((duckX / waveLength) + (time * waveSpeed)) + (window.innerHeight - waveHeight) - duckSize - 120
         const duckImg = new Image()
-        duckImg.src = '../img/ducky.png'
+        duckImg.src = '../img/duck.svg'
         ctx.save()
         ctx.translate(duckX + duckSize / 2, duckY + duckSize / 2)
-        ctx.scale(3, 3)
-        const waveAngle = Math.atan(waveHeight * Math.cos((duckX / waveLength) + (time * waveSpeed)) / waveLength)
+        ctx.scale(-3, 3)
+        const waveAngle = Math.atan(waveHeight * Math.sin((duckX / waveLength) + (time * waveSpeed)) / waveLength)
         ctx.rotate(waveAngle)
         ctx.translate(-duckX - duckSize / 2, -duckY - duckSize / 2)
         ctx.drawImage(duckImg, duckX, duckY, duckSize, duckSize)
