@@ -1,6 +1,7 @@
 const m = require('mithril')
 
 const ScheduleDisplay = require('./ScheduleDisplay')
+const TodoList = require('./TodoList')
 const Page1 = require('./Page1')
 const Popup = require('./Popup')
 const SchoolIndicator = require('./SchoolIndicator')
@@ -81,7 +82,15 @@ const Index = {
       }, [
         m(Page1, vnode.attrs),
         m('.container#page2', [
-          m(ScheduleDisplay, vnode.attrs),
+          m('.page2-content', [
+            m('.page2-left', [
+              m(ScheduleDisplay, vnode.attrs)
+            ]),
+            m('.page2-right', [
+              m(TodoList, vnode.attrs)
+            ])
+          ]),
+          m('.page2-footer', 'Saved by the bell.plus!'),
           m(SettingsIcon)
         ])
       ]),

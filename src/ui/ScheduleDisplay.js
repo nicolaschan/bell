@@ -34,7 +34,15 @@ var ScheduleDisplay = {
     future = future.slice(0, numberOfFuturePeriods)
 
     if (!completed.length && !future.length && current.name === 'Free') {
-      return m('.centered', m('.no-classes', 'No classes today'))
+      return m('.schedule-tile', [
+        m('.schedule-tile-header', 
+          m('.schedule-tile-title', [
+            m('i.material-icons', 'schedule'),
+            'Schedule'
+          ])
+        ),
+        m('.centered', m('.no-classes', 'No classes today'))
+      ])
     }
 
     var rows = []
@@ -47,7 +55,15 @@ var ScheduleDisplay = {
     }
     for (let period of future) { rows.push(m('tr.future', [m('td.time', displayTimeArray(period.time)), m('td', period.name)])) }
 
-    return m('.centered', m('table', rows))
+    return m('.schedule-tile', [
+      m('.schedule-tile-header', 
+        m('.schedule-tile-title', [
+          m('i.material-icons', 'schedule'),
+          'Schedule'
+        ])
+      ),
+      m('.centered', m('table', rows))
+    ])
   }
 }
 
