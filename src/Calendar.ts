@@ -1,4 +1,5 @@
 import Schedule from './Schedule'
+import scheduleOverrideManager from './ScheduleOverrideManager'
 
 type Day = 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun'
 interface IScheduleName {
@@ -60,6 +61,27 @@ export default class Calendar {
   }
 
   public getSchedule (date: Date): Schedule {
+    // Check for local override first
+    const override = scheduleOverrideManager.getOverrideForDate(date)
+    if (override) {
+      const schedule = this.schedules[override.scheduleName]
+      if (schedule) {
+        return schedule.overrideDisplay(override.display)
+      }
+    }
+    
+    // Fall back to regular calendar logic
+    const {
+      name,
+      display
+    } = this.special[Calendar.dateToString(date)] || this.week[Calendar.dayOfWeek(date)]
+    let schedule = this.schedules[name]
+    schedule = schedule.overrideDisplay(display)
+    return schedule
+  }
+
+  // Get the schedule that would be used without any local overrides. This is used for displaying the default schedule in the settings UI and for deciding whether to show the Unsynced | tag.
+  public getDefaultSchedule (date: Date): Schedule {
     const {
       name,
       display

@@ -7,6 +7,8 @@ const notificationManager = require('../NotificationManager').default
 const soundManager = require('../SoundManager').default
 const ThemeManager = require('../ThemeManager').default
 const themeManager = new ThemeManager()
+const scheduleOverrideManager = require('../ScheduleOverrideManager').default
+const parseSchedules = require('../ScheduleParser').default
 const { Select } = require('mithril-selector')
 
 function containsCurrentSource (sources, currentSource) {
@@ -33,6 +35,29 @@ const Settings = {
         value: sourceManager.source
       })
     }
+
+    // Load available schedules for override
+    try {
+      const source = sourceManager.source
+      const data = await requestManager.get(`/api/data/${source}`)
+      const parsedSchedules = parseSchedules(data.schedules)
+      vnode.state.availableSchedules = Object.keys(parsedSchedules)
+        .filter(name => parsedSchedules[name].periods.length > 0) // Filter out empty schedules like weekend/holiday
+        .map(name => ({
+          display: parsedSchedules[name].display || name,
+          value: name
+        }))
+        .sort((a, b) => a.display.localeCompare(b.display))
+      
+      // Check if there's an override for today
+      await scheduleOverrideManager.waitForCache()
+      const override = scheduleOverrideManager.getTodayOverride()
+      vnode.state.currentOverride = override ? override.scheduleName : null
+      // pendingOverride is set when the user changes the selector but hasn't saved
+      vnode.state.pendingOverride = undefined
+    } catch (e) {
+      vnode.state.availableSchedules = []
+    }
   },
   onupdate: function (vnode) {
     var source = sourceManager.source
@@ -58,8 +83,8 @@ const Settings = {
       m('.settings-section', [
         m('.desc', [
           'School schedule source',
-          m('br'),
-          '(No guarantee of correctness. Check with school for official schedules.)']),
+          m('br'), 
+          m('small'), '(No guarantee of correctness. Check with school for official schedules.)']),
         m(Select, {
           value: (vnode.state.sources) ? sourceManager.source : '',
           options: vnode.state.sources || [''],
@@ -71,6 +96,23 @@ const Settings = {
           options: themeManager.availableThemes,
           onselect: theme => cookieManager.set('theme', theme)
         }),
+        // Schedule override selector
+        (vnode.state.availableSchedules && vnode.state.availableSchedules.length > 0) ? [
+          m('.desc', [
+            'Override Today\'s Schedule (Local Only)',
+            m('br'),
+            m('small', 'If your schedule ')
+          ]),
+          m(Select, {
+            value: (vnode.state.pendingOverride !== undefined) ? vnode.state.pendingOverride : (vnode.state.currentOverride ? vnode.state.currentOverride : '__default__'),
+            options: [{ display: '-- Use Default Schedule --', value: '__default__' }].concat(vnode.state.availableSchedules),
+            onselect: (scheduleName) => {
+              // Don't apply immediately — let the user Save using the done button
+              vnode.state.pendingOverride = scheduleName
+              m.redraw()
+            }
+          }),
+        ] : null,
         m('.add-link', (vnode.state.editClasses) ? null : m('a.add#edit-classes-button[href=/periods]', {
           oncreate: m.route.link
         }, 'Edit Period Names')),
@@ -119,8 +161,24 @@ const Settings = {
           )),
 
         m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
-          onclick: () => {
-            m.route.set('/')
+          onclick: async () => {
+            try {
+              if (vnode.state.pendingOverride !== undefined) {
+                if (vnode.state.pendingOverride === '__default__') {
+                  await scheduleOverrideManager.clearOverrideForToday()
+                  vnode.state.currentOverride = null
+                } else {
+                  await scheduleOverrideManager.setOverrideForToday(vnode.state.pendingOverride)
+                  vnode.state.currentOverride = vnode.state.pendingOverride
+                }
+                vnode.state.pendingOverride = undefined
+                if (global && global.bellTimer && global.bellTimer.reloadData) {
+                  try { await global.bellTimer.reloadData() } catch (e) { /* ignore */ }
+                }
+              }
+            } finally {
+              m.route.set('/')
+            }
           }
         }, m('i.done-icon.icon.material-icons', 'done'))),
         m('.footer-left[style=position: fixed;]', [m('a[style=margin-right: 2em;]', {
