@@ -1,0 +1,35 @@
+name: Update Schedules Submodule
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [schedules-updated]
+
+permissions:
+  contents: write
+
+jobs:
+  update-schedules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Bell
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update schedules to latest master
+        run: git submodule update --remote schedules
+
+      - name: Commit updated schedules pointer
+        run: |
+          if git diff --quiet -- schedules; then
+            echo "schedules is already up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add schedules
+          git commit -m "Update schedules submodule"
+          git push

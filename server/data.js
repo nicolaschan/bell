@@ -2,7 +2,6 @@ const Promise = require('bluebird')
 const request = Promise.promisifyAll(require('request'))
 const fs = Promise.promisifyAll(require('fs'))
 const path = require('path')
-const logger = require('loggy')
 const cache = require('./cache')
 
 const dataDir = path.join(__dirname, '..', 'schedules')
@@ -51,7 +50,7 @@ const fetch = async function (source, file) {
         return (await getWebData(source, file, sourceData.url))
       } catch (e) {
         if (e.message !== 'Not found') {
-          logger.warn(`Connection to ${sourceData.url} failed`)
+          console.warn(`Connection to ${sourceData.url} failed`)
         }
         return getLocalData(source, file)
       }

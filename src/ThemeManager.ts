@@ -2,10 +2,13 @@ import { ITheme } from './themes/timings/Timing'
 
 import { dark as BluesDark, light as BluesLight } from './themes/Blues'
 import { dark as DefaultDark, light as DefaultLight } from './themes/Default'
+import * as GradientDark from './themes/GradientDark'
 import * as GradientLight from './themes/GradientLight'
 import { dark as GraysDark, light as GraysLight } from './themes/Grays'
+import { dark as GreenDark, light as GreenLight } from './themes/Green'
 import * as Halloween from './themes/Halloween'
 import * as Jonathan from './themes/Jonathan'
+import { dark as PurpleDark, light as PurpleLight } from './themes/Purple'
 import { dark as PastelDark, light as PastelLight } from './themes/Pastel'
 import * as Quack from './themes/Quack'
 import { dark as RainbowDark, light as RainbowLight } from './themes/Rainbow'
@@ -18,6 +21,7 @@ const themes: ITheme[] = [
   DefaultLight,
   DefaultDark,
   GradientLight,
+  GradientDark,
   PastelLight,
   PastelDark,
   RainbowLight,
@@ -26,6 +30,10 @@ const themes: ITheme[] = [
   GraysDark,
   BluesLight,
   BluesDark,
+  PurpleLight,
+  PurpleDark,
+  GreenLight,
+  GreenDark,
   Jonathan
 ]
 

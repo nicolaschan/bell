@@ -4,6 +4,7 @@
     "outDir": "./dist/",
     "module": "commonjs",
     "target": "es5",
+    "ignoreDeprecations": "6.0",
     "jsx": "react",
     "jsxFactory": "m",
     "allowJs": true,

@@ -1,3 +1,4 @@
 [submodule "schedules"]
 	path = schedules
-	url = https://github.com/nicolaschan/schedules.git
+	url = https://github.com/amah853/schedules.git
+	branch = master

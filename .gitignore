@@ -77,3 +77,5 @@ config.json
 
 # NixOS direnv
 .direnv
+.vercel
+.env*.local
