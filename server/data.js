@@ -24,7 +24,7 @@ const getLocalData = async function (source, file) {
 }
 
 const getLocalDataUnvalidated = async function (source, file) {
-  const data = await fs.readFileAsync(path.join(dataDir, source, file))
+  const data = await fs.readFileAsync(path.join(dataDir, 'schools', source, file))
   return data.toString()
 }
 
