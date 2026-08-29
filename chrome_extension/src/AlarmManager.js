@@ -40,8 +40,7 @@ class AlarmManager {
     this.bellTimer = bellTimer
     this.cookman = cookman
     this.started = false
-    // DEBUG
-    this.timeScale = bellTimer.devMode ? bellTimer.timeScale : 1
+    this.timeScale = 1
   }
 
   start () {

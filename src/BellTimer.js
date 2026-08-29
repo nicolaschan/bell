@@ -8,14 +8,13 @@ class BellTimer {
     this.cookieManager = cookieManager
     this.requestManager = requestManager
 
-    this.debug = function () {}
-    this.devMode = false
     this.startTime = 0
     this.timeScale = 1
 
-    var devModeCookie = this.cookieManager.get('dev_mode')
+    const devModeCookie = this.cookieManager.get('dev_mode')
     if (devModeCookie) {
-      this.enableDevMode(devModeCookie.startDate, devModeCookie.scale)
+      this.devMode = true
+      this.timeScale = devModeCookie.scale
     }
   }
 
@@ -104,8 +103,7 @@ class BellTimer {
       interval: 4 * 60 * 1000
     })
 
-    ts.on('change', offset =>
-      this.debug('Timesync offset: ' + offset))
+    // ts.on('change', offset => {}) // Debug removed
 
     this.ts = ts
 

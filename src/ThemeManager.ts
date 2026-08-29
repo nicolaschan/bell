@@ -9,11 +9,13 @@ import * as Jonathan from './themes/Jonathan'
 import { dark as PastelDark, light as PastelLight } from './themes/Pastel'
 import * as Quack from './themes/Quack'
 import { dark as RainbowDark, light as RainbowLight } from './themes/Rainbow'
+import * as Valentines from './themes/Valentines'
 import * as Winter from './themes/Winter'
 
 const themes: ITheme[] = [
   Winter,
   Halloween,
+  Valentines,
   Quack,
   DefaultLight,
   DefaultDark,
