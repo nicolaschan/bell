@@ -7,6 +7,7 @@ import { IBindings } from './FormatString'
 import { default as defaultRequestManager, RequestManager } from './RequestManager2'
 import { default as Schedule, IPeriodObject } from './Schedule'
 import parseSchedules from './ScheduleParser'
+import scheduleOverrideManager from './ScheduleOverrideManager'
 
 const PERIOD_NOTIFICATION_MARGIN = 5000 // ms
 
@@ -95,6 +96,8 @@ export default class BellTimer {
 
   public async initialize (refreshInterval: number = 4 * 60 * 1000) {
     if (!this.initialized) {
+      // Ensure schedule overrides are loaded before initializing
+      await scheduleOverrideManager.waitForCache()
       await this.reloadData()
       this.initialized = true
     }

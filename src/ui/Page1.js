@@ -48,9 +48,21 @@ var ScheduleName = {
   view: function (vnode) {
     var bellTimer = vnode.attrs.bellTimer
     var theme = vnode.attrs.themeManager.currentTheme.theme(bellTimer)
+    var scheduleDisplay = vnode.attrs.bellTimer.getCurrentSchedule().display
+    // Detect if the current schedule is different from the default (i.e., unsynced/local override)
+    try {
+      var defaultSchedule = vnode.attrs.bellTimer.calendar.getDefaultSchedule(vnode.attrs.bellTimer.date)
+      if (defaultSchedule && defaultSchedule.name) {
+        if (defaultSchedule.name !== vnode.attrs.bellTimer.getCurrentSchedule().name) {
+          scheduleDisplay = 'Unsynced | ' + scheduleDisplay
+        }
+      }
+    } catch (e) {
+      // ignore errors and fall back to normal display
+    }
     return m('.schedule', {
       style: theme.subtext
-    }, vnode.attrs.bellTimer.getCurrentSchedule().display)
+    }, scheduleDisplay)
   }
 }
 var updateGraphics = function (vnode) {
