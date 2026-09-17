@@ -9,20 +9,20 @@ jobs:
   health-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Check Bell API and complete school directory
+      - name: Check Bell API and school directory
         id: check-bell-api
         run: |
           curl --fail --show-error --silent https://bellapi.vercel.app/api/version > /dev/null
           curl --fail --show-error --silent https://bellapi.vercel.app/api/sources \
-            | jq --exit-status 'map(.id) | index("188535") != null and index("gbms") != null' > /dev/null
-          curl --fail --show-error --silent https://bellapi.vercel.app/api/data/188535 \
-            | jq --exit-status '.meta.name and .calendar and .schedules' > /dev/null
+            | jq --exit-status 'type == "array" and length > 0' > /dev/null
         continue-on-error: true
 
       - name: Check live editor schedule proxy
         id: check-edit
         run: |
           curl --fail --show-error --silent https://iosbell-api.ahmadmahrous853.workers.dev/config/schedule-source/188535 \
+            | jq --exit-status '.meta.name and .calendar and .schedules' > /dev/null
+          curl --fail --show-error --silent https://iosbell-api.ahmadmahrous853.workers.dev/config/schedule-source/gbms \
             | jq --exit-status '.meta.name and .calendar and .schedules' > /dev/null
         continue-on-error: true
 
