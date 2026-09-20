@@ -14,7 +14,12 @@ jobs:
         run: |
           curl --fail --show-error --silent https://bellapi.vercel.app/api/version > /dev/null
           curl --fail --show-error --silent https://bellapi.vercel.app/api/sources \
-            | jq --exit-status 'type == "array" and length > 0' > /dev/null
+            | jq --exit-status 'type == "array" and length >= 120 and
+                any(.[]; .id == "188535") and
+                any(.[]; .id == "064188") and
+                any(.[]; .id == "gbms")' > /dev/null
+          curl --fail --show-error --silent https://bellapi.vercel.app/api/data/188535 \
+            | jq --exit-status '.meta.name and .calendar and .schedules' > /dev/null
         continue-on-error: true
 
       - name: Check live editor schedule proxy
