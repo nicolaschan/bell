@@ -18,6 +18,8 @@ const validateSource = function (source) {
   return source.match(/^[a-zA-Z0-9-]+$/)
 }
 
+const sourceLinkPattern = /^\.\.\/([a-zA-Z0-9-]+)\/source\.json$/
+
 const getLocalData = async function (source, file) {
   if (!validateSource(source)) { throw new Error('Source contains invalid characters') }
   return getLocalDataUnvalidated(source, file)
@@ -61,25 +63,47 @@ const getWebData = async function (source, file, url) {
   return response.body
 }
 
+const resolveSource = async function (source, visited = []) {
+  if (!validateSource(source)) { throw new Error('Source contains invalid characters') }
+  if (visited.includes(source)) { throw new Error('Circular source reference') }
+
+  let rawSource
+  try {
+    rawSource = await getLocalData(source, 'source.json')
+  } catch (e) {
+    rawSource = await getLocalDataUnvalidated('_default', 'source.json')
+  }
+
+  const sourceText = rawSource.toString().trim()
+  const linkMatch = sourceText.match(sourceLinkPattern)
+  if (linkMatch) {
+    return resolveSource(linkMatch[1], [...visited, source])
+  }
+
+  return { source, sourceData: JSON.parse(sourceText) }
+}
+
 const fetch = async function (source, file) {
-  const sourceData = await getSource(source)
+  const resolved = await resolveSource(source)
+  const resolvedSource = resolved.source
+  const sourceData = resolved.sourceData
   switch (sourceData.location) {
     case 'local':
-      return getLocalData(source, file)
+      return getLocalData(resolvedSource, file)
     case 'web':
       try {
-        return (await getWebData(source, file, sourceData.url))
+        return (await getWebData(resolvedSource, file, sourceData.url))
       } catch (e) {
         if (e.message !== 'Not found') {
           console.warn(`Connection to ${sourceData.url} failed`)
         }
-        return getLocalData(source, file)
+        return getLocalData(resolvedSource, file)
       }
   }
 }
 
 const getRedirect = async function (source) {
-  const sourceData = await getSource(source)
+  const { sourceData } = await resolveSource(source)
   if (sourceData.location === 'redirect') {
     return sourceData.to
   }
@@ -102,12 +126,7 @@ const getMeta = async function (source) {
   }
 }
 const getSource = async function (source) {
-  try {
-    source = await getLocalData(source, 'source.json')
-  } catch (e) {
-    source = await getLocalDataUnvalidated('_default', 'source.json')
-  }
-  return JSON.parse(source.toString())
+  return (await resolveSource(source)).sourceData
 }
 const getMessage = async function (source) {
   try {
@@ -122,17 +141,22 @@ const getVersion = cache(async function () {
 }, 60 * 60 * 24)
 
 const getAll = async function (source) {
-  const sourceData = await getSource(source)
+  const resolved = await resolveSource(source)
+  const resolvedSource = resolved.source
+  const sourceData = resolved.sourceData
+  if (sourceData.location === 'redirect') {
+    return getAll(sourceData.to)
+  }
   if (sourceData.location === 'web') {
-    return JSON.parse(await getWebData(source, null, sourceData.url))
+    return JSON.parse(await getWebData(resolvedSource, null, sourceData.url))
   }
 
   const [meta, correction, calendar, schedules, message] = await Promise.all([
-    getMeta(source),
-    getCorrection(source),
-    getCalendar(source),
-    getSchedules(source),
-    getMessage(source)
+    getMeta(resolvedSource),
+    getCorrection(resolvedSource),
+    getCalendar(resolvedSource),
+    getSchedules(resolvedSource),
+    getMessage(resolvedSource)
   ])
 
   return {
