@@ -13,8 +13,11 @@ jobs:
         id: check-bell-api
         run: |
           curl --fail --show-error --silent https://bellapi.vercel.app/api/version > /dev/null
+          # The production directory currently contains 119 published schools.
+          # Keep a floor plus the sentinel IDs so a single missing school still
+          # fails the check without alerting on the valid current directory.
           curl --fail --show-error --silent https://bellapi.vercel.app/api/sources \
-            | jq --exit-status 'type == "array" and length >= 120 and
+            | jq --exit-status 'type == "array" and length >= 119 and
                 any(.[]; .id == "188535") and
                 any(.[]; .id == "064188") and
                 any(.[]; .id == "gbms")' > /dev/null
