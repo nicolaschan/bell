@@ -2209,17 +2209,6 @@ button.pill-notice {
   to { transform: rotate(4deg); }
 }
 
-@media (max-width: 600px) {
-  .lanterns svg {
-    width: calc(42px * var(--size));
-    height: calc(76px * var(--size));
-  }
-
-  .lanterns .lantern {
-    margin-left: calc(-21px * var(--size));
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .lanterns .lantern {
     animation: none;

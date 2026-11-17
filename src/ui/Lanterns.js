@@ -13,9 +13,9 @@ const WIDE = [
   { left: 69, string: 4, size: 0.85, sway: 4.6, delay: -3.0 }
 ]
 const NARROW = [
-  { left: 8, string: 62, size: 0.9, sway: 3.8, delay: -0.4 },
-  { left: 33, string: 6, size: 0.8, sway: 4.3, delay: -2.1 },
-  { left: 92, string: 70, size: 1, sway: 4.0, delay: -1.3 }
+  { left: 9, string: 62, size: 1, sway: 3.8, delay: -0.4 },
+  { left: 33, string: 6, size: 0.9, sway: 4.3, delay: -2.1 },
+  { left: 91, string: 70, size: 1, sway: 4.0, delay: -1.3 }
 ]
 
 const RED = '#d7261e'
