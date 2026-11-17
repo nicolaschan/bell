@@ -133,6 +133,12 @@ const Settings = {
       close.focus()
     }
   },
+  // Fade and shrink away before being removed
+  onbeforeremove (vnode) {
+    vnode.dom.classList.add('closing')
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    return new Promise(resolve => setTimeout(resolve, reduce ? 0 : 180))
+  },
   onremove (vnode) {
     document.removeEventListener('keydown', vnode.state.onKeyDown)
   },

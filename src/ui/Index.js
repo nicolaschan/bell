@@ -203,11 +203,11 @@ const Index = {
       m('header.page-header', [
         m(SchoolMenu, { name, isCustom }),
         m('nav.header-actions', [
-          m('button.icon-button.bordered[type=button]', {
+          m('button.icon-button.settings-button[type=button]', {
             'aria-label': 'Settings',
             title: 'Settings',
             onclick: setPanel('settings')
-          }, m(Icon, { name: 'settings', size: 24 })),
+          }, m(Icon, { name: 'settings', size: 36 })),
           isCustom && hasCourses ? m('a.icon-button.bordered[href=/classes]', {
             'aria-label': 'Edit your schedule',
             title: 'Edit your schedule',
