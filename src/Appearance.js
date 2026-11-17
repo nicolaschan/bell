@@ -60,9 +60,27 @@ const luminance = hex => {
 const isDarkTheme = theme =>
   theme.stops.reduce((sum, color) => sum + luminance(color), 0) / theme.stops.length < 0.179
 
+// Lunar New Year: a golden pie (shown instead of the chosen theme while the
+// "lunar" seasonal overlay is on)
+const lunarTheme = {
+  id: 'lunar-new-year',
+  name: 'Lunar New Year',
+  type: 'dynamic',
+  stops: ['#ffd36b', '#f2b33d', '#e19a22', '#f5c451', '#ffe28f', '#e8a92f']
+}
+
 const Appearance = {
   colorThemes,
   dynamicThemes,
+  lunarTheme,
+
+  // A holiday theme that temporarily replaces the chosen one (set by the timer page)
+  holidayTheme: null,
+
+  // The theme being shown: the holiday theme if there is one, else the chosen theme
+  get current () {
+    return Appearance.holidayTheme || Appearance.theme
+  },
 
   get theme () {
     return findTheme(cookieManager.get(THEME_KEY)) || DEFAULT_THEME
@@ -88,7 +106,7 @@ const Appearance = {
   },
 
   // CSS background for surfaces painted in the theme color (e.g. the schedule page)
-  background (theme = Appearance.theme) {
+  background (theme = Appearance.current) {
     if (theme.stops.length === 1) {
       return theme.stops[0]
     }
@@ -103,7 +121,7 @@ const Appearance = {
       root.setAttribute('data-bell-theme', dark ? 'dark' : 'light')
     }
     // Text on surfaces painted in the theme color turns white for dark themes
-    const surface = isDarkTheme(Appearance.theme) ? 'dark' : 'light'
+    const surface = isDarkTheme(Appearance.current) ? 'dark' : 'light'
     if (root.getAttribute('data-bell-surface') !== surface) {
       root.setAttribute('data-bell-surface', surface)
     }

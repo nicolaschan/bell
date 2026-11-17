@@ -13,11 +13,36 @@ const inRange = (date, [startMonth, startDay], [endMonth, endDay]) => {
   return start <= end ? value >= start && value <= end : value >= start || value <= end
 }
 
+// Lunar New Year falls on a different day each year (month, day)
+const LUNAR_NEW_YEAR = {
+  2025: [1, 29],
+  2026: [2, 17],
+  2027: [2, 6],
+  2028: [1, 26],
+  2029: [2, 13],
+  2030: [2, 3],
+  2031: [1, 23],
+  2032: [2, 11],
+  2033: [1, 31],
+  2034: [2, 19],
+  2035: [2, 8],
+  2036: [1, 28],
+  2037: [2, 15],
+  2038: [2, 4],
+  2039: [1, 24],
+  2040: [2, 12]
+}
+
+const isLunarNewYear = date => {
+  const day = LUNAR_NEW_YEAR[date.getFullYear()]
+  return !!day && inRange(date, day, day)
+}
+
 const OVERLAYS = [
   {
     id: 'snow',
     name: 'Snowflakes',
-    activeOn: date => inRange(date, [12, 1], [1, 1])
+    activeOn: date => inRange(date, [12, 1], [12, 31])
   },
   {
     id: 'lights',
@@ -25,9 +50,24 @@ const OVERLAYS = [
     activeOn: date => inRange(date, [12, 25], [12, 25])
   },
   {
+    id: 'fireworks',
+    name: 'Fireworks',
+    activeOn: date => inRange(date, [1, 1], [1, 1])
+  },
+  {
+    id: 'lunar',
+    name: 'Lunar New Year theme',
+    activeOn: isLunarNewYear
+  },
+  {
     id: 'heart',
     name: 'Valentine’s heart',
     activeOn: date => inRange(date, [2, 14], [2, 14])
+  },
+  {
+    id: 'earth',
+    name: 'Spinning Earth',
+    activeOn: date => inRange(date, [4, 22], [4, 22])
   }
 ]
 
@@ -43,6 +83,11 @@ const Seasonal = {
   showing (date) {
     const off = hidden()
     return Seasonal.available(date).filter(overlay => !off[overlay.id])
+  },
+
+  // Whether the overlay `id` is showing on `date`
+  has (date, id) {
+    return Seasonal.showing(date).some(overlay => overlay.id === id)
   },
 
   isOn (id) {

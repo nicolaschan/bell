@@ -101,7 +101,7 @@ const ScheduleView = {
       ]
     }
 
-    const dynamic = Appearance.theme.type === 'dynamic'
+    const dynamic = Appearance.current.type === 'dynamic'
     return m('.schedule-page', { role: 'dialog', 'aria-label': 'Schedule', className: dynamic ? 'dynamic' : '' }, [
       m('header.page-header', [
         m('.header-title', formatDateTime(bellTimer.date)),

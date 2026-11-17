@@ -19,6 +19,7 @@ const makeFlakes = () => {
   for (let i = 0; i < flakeCount(); i++) {
     const size = random(100, 260) * scale
     const fall = random(22, 48) / (0.6 + size / 400) // seconds per screen; bigger flakes fall a bit faster
+    const sway = random(4, 8)
     flakes.push({
       design: 1 + Math.floor(Math.random() * FLAKE_DESIGNS),
       size: Math.round(size),
@@ -26,8 +27,9 @@ const makeFlakes = () => {
       fall,
       // A negative delay starts each flake partway down, so the screen begins full
       delay: -random(0, fall),
-      sway: random(4, 8),
+      sway,
       swayDistance: Math.round(random(12, 40)),
+      swayDelay: -random(0, sway),
       spin: random(30, 70),
       spinDirection: Math.random() < 0.5 ? 'normal' : 'reverse'
     })
@@ -51,11 +53,8 @@ const Snowfall = {
           'animation-delay': `${flake.delay}s`
         }
       }, m('.flake-sway', {
-        style: {
-          '--sway': `${flake.swayDistance}px`,
-          'animation-duration': `${flake.sway}s`,
-          'animation-delay': `${-random(0, flake.sway)}s`
-        }
+        // A style string, because Mithril 1 can't set custom properties from a style object
+        style: `--sway: ${flake.swayDistance}px; animation-duration: ${flake.sway}s; animation-delay: ${flake.swayDelay}s;`
       }, m('img', {
         src: `/img/redesign/snowflakes/flake-${flake.design}.webp`,
         alt: '',

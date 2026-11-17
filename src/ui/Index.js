@@ -10,6 +10,8 @@ const SwitchDesignModal = require('./SwitchDesignModal')
 const DesignToggle = require('./DesignToggle')
 const Snowfall = require('./Snowfall')
 const ChristmasLights = require('./ChristmasLights')
+const Fireworks = require('./Fireworks')
+const Lanterns = require('./Lanterns')
 const Seasonal = require('../Seasonal')
 const ScheduleView = require('./ScheduleView')
 const { Dropdown, MenuSeparator, MenuButton } = require('./Dropdown')
@@ -222,6 +224,9 @@ const prefetchImages = () => {
   else setTimeout(run, 1500)
 }
 
+// Seasonal overlays drawn over the whole page (the others change the pie or the date)
+const OVERLAY_COMPONENTS = { snow: Snowfall, fireworks: Fireworks, lunar: Lanterns }
+
 const Index = {
   oncreate: prefetchImages,
   oninit: async function (vnode) {
@@ -270,9 +275,13 @@ const Index = {
   view: function (vnode) {
     const attrs = vnode.attrs
     const bellTimer = attrs.bellTimer
+    const ready = bellTimer && bellTimer.initialized
+    // Lunar New Year swaps in its golden theme while it's on
+    const lunar = ready && Seasonal.has(bellTimer.date, 'lunar')
+    Appearance.holidayTheme = lunar ? Appearance.lunarTheme : null
     Appearance.apply()
 
-    if (!bellTimer || !bellTimer.initialized) {
+    if (!ready) {
       if (attrs.error) {
         return m(ErrorIcon, attrs.error)
       }
@@ -283,7 +292,7 @@ const Index = {
     const hasCourses = Object.keys(attrs.cookieManager.get('courses', {})).length > 0
     const meta = bellTimer.meta || {}
     const name = isCustom ? 'Your personal schedule' : (meta.name || attrs.source)
-    const theme = Appearance.theme
+    const theme = Appearance.current
     // On days without classes the page takes the theme color and the pie takes
     // the page color (cream in light mode, near-black in dark mode)
     // (An empty personal schedule keeps the normal page; it shows its own empty state.)
@@ -292,7 +301,11 @@ const Index = {
     const setPanel = panel => () => { vnode.state.panel = panel }
 
     return m('.timer-page', {
-      className: [noClasses ? 'no-classes' : '', noClasses && theme.type === 'dynamic' ? 'dynamic' : ''].join(' ')
+      className: [
+        noClasses ? 'no-classes' : '',
+        noClasses && theme.type === 'dynamic' ? 'dynamic' : '',
+        lunar ? 'lunar-new-year' : ''
+      ].join(' ')
     }, [
       m('header.page-header', [
         m(SchoolMenu, { name, isCustom }),
@@ -316,14 +329,13 @@ const Index = {
         m(Pie, {
           proportionElapsed: bellTimer.getProportionElapsed(),
           theme: pieTheme,
-          heart: Seasonal.showing(bellTimer.date).some(overlay => overlay.id === 'heart')
-            ? Appearance.heartColor(theme, noClasses)
-            : null
+          heart: Seasonal.has(bellTimer.date, 'heart') ? Appearance.heartColor(theme, noClasses) : null,
+          earth: Seasonal.has(bellTimer.date, 'earth')
         }),
         m(Countdown, attrs)
       ]),
       m('footer.page-footer', [
-        m('.header-title', Seasonal.showing(bellTimer.date).some(overlay => overlay.id === 'lights')
+        m('.header-title', Seasonal.has(bellTimer.date, 'lights')
           ? m(ChristmasLights, { text: formatDateTime(bellTimer.date) })
           : formatDateTime(bellTimer.date)),
         m('.footer-notices', [
@@ -334,7 +346,10 @@ const Index = {
       ]),
       m(SeasonalEffects, attrs),
       // Holiday overlays (each can be turned off in Settings while it's active)
-      Seasonal.showing(bellTimer.date).map(overlay => overlay.id === 'snow' ? m(Snowfall, { key: overlay.id }) : null),
+      Seasonal.showing(bellTimer.date).map(overlay => {
+        const Overlay = OVERLAY_COMPONENTS[overlay.id]
+        return Overlay ? m(Overlay, { key: overlay.id }) : null
+      }),
       vnode.state.panel === 'schedule' ? m(ScheduleView, { bellTimer, onclose: setPanel(null) }) : null,
       vnode.state.panel === 'settings' ? m(Settings, {
         onclose: setPanel(null),
@@ -356,6 +371,7 @@ const Index = {
     ])
   },
   onremove: function (vnode) {
+    Appearance.holidayTheme = null
     if (vnode.attrs.bellTimer) {
       vnode.attrs.bellTimer.stopRefreshing()
     }

@@ -1,4 +1,5 @@
 const m = require('mithril')
+const { paintGlobe } = require('./Globe')
 
 // The countdown pie. The slice that remains is the time left in the current
 // period: its left edge is fixed at 12 o'clock and its right edge sweeps
@@ -71,7 +72,7 @@ const paintTexture = (texture, size, stops, seconds) => {
   })
 }
 
-const draw = (canvas, state, proportionElapsed, theme, seconds, heart) => {
+const draw = (canvas, state, proportionElapsed, theme, seconds, heart, earth) => {
   const parent = canvas.parentNode
   if (!parent) {
     return
@@ -112,7 +113,19 @@ const draw = (canvas, state, proportionElapsed, theme, seconds, heart) => {
   ctx.closePath()
 
   ctx.save()
-  if (theme.stops.length === 1) {
+  if (earth) {
+    // Earth Day: a spinning globe fills the slice (unmirrored, so the map reads right)
+    if (!state.globe) {
+      state.globe = document.createElement('canvas')
+    }
+    const size = Math.min(520, Math.max(32, Math.ceil(radius * 1.4)))
+    paintGlobe(state, state.globe, size, seconds, () => state.render && state.render())
+    ctx.clip()
+    ctx.scale(-1, 1)
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(state.globe, -radius, -radius, 2 * radius, 2 * radius)
+  } else if (theme.stops.length === 1) {
     ctx.fillStyle = theme.stops[0]
     ctx.fill()
   } else {
@@ -158,6 +171,9 @@ const heartPath = (ctx, size) => {
   ctx.closePath()
 }
 
+// Dynamic themes and the globe animate on their own clock; solid colors redraw with the app
+const animated = attrs => attrs.earth || attrs.theme.stops.length > 1
+
 const Pie = {
   oncreate (vnode) {
     const state = vnode.state
@@ -165,15 +181,14 @@ const Pie = {
     state.started = Date.now()
     state.lastFrame = 0
     const render = () => {
-      const { proportionElapsed, theme, heart } = state.attrs
-      const seconds = reducedMotion() ? 0 : DRIFT_SPEED * (Date.now() - state.started) / 1000
-      draw(vnode.dom, state, proportionElapsed, theme, seconds, heart)
+      const { proportionElapsed, theme, heart, earth } = state.attrs
+      const elapsed = reducedMotion() ? 0 : (Date.now() - state.started) / 1000
+      draw(vnode.dom, state, proportionElapsed, theme, (earth ? 1 : DRIFT_SPEED) * elapsed, heart, earth)
     }
     state.render = render
-    // Dynamic themes animate on their own clock; solid ones redraw with the app
     const loop = time => {
       state.frame = window.requestAnimationFrame(loop)
-      if (state.attrs.theme.stops.length > 1 && !reducedMotion() && time - state.lastFrame >= FRAME_INTERVAL) {
+      if (animated(state.attrs) && !reducedMotion() && time - state.lastFrame >= FRAME_INTERVAL) {
         state.lastFrame = time
         render()
       }
@@ -183,7 +198,7 @@ const Pie = {
   },
   onupdate (vnode) {
     vnode.state.attrs = vnode.attrs
-    if (vnode.attrs.theme.stops.length === 1 || reducedMotion()) {
+    if (!animated(vnode.attrs) || reducedMotion()) {
       vnode.state.render()
     }
   },
