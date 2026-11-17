@@ -75,6 +75,25 @@ const SoundNotice = {
   }
 }
 
+// Horizontal extent of the ':' glyph's ink relative to where it starts, for the
+// font the countdown is drawn in (cached per font)
+const inkCache = {}
+const colonInk = el => {
+  const style = window.getComputedStyle(el)
+  const font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
+  if (font in inkCache) return inkCache[font]
+  const ctx = document.createElement('canvas').getContext('2d')
+  ctx.font = font
+  const metrics = ctx.measureText(':')
+  const ink = metrics.actualBoundingBoxRight === undefined ? null : {
+    left: -metrics.actualBoundingBoxLeft,
+    right: metrics.actualBoundingBoxRight
+  }
+  // Only cache once web fonts have loaded, so a fallback font isn't remembered
+  if (!document.fonts || document.fonts.status === 'loaded') inkCache[font] = ink
+  return ink
+}
+
 // Shift the countdown so the colon sits on the pie's 12 o'clock edge (the
 // horizontal center of the hero). With hours (H:MM:SS) the middle group is
 // centered on the edge instead.
@@ -86,8 +105,11 @@ const alignToPie = vnode => {
   const current = vnode.state.shift || 0
   let anchor
   if (colons.length === 1) {
+    // Center the colon's visible ink, not its text box: the glyph's side
+    // bearings are uneven and letter-spacing trims only its right side
     const r = colons[0].getBoundingClientRect()
-    anchor = r.left + r.width / 2
+    const ink = colonInk(colons[0])
+    anchor = ink ? r.left + (ink.left + ink.right) / 2 : r.left + r.width / 2
   } else {
     anchor = (colons[0].getBoundingClientRect().right + colons[1].getBoundingClientRect().left) / 2
   }
