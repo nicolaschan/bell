@@ -101,7 +101,12 @@ const EmptyPersonalSchedule = {
   view () {
     return m('.empty-state', [
       m('p.empty-title', 'Your schedule is empty'),
-      m('img', { src: '/img/redesign/empty-schedule.png', width: 204, height: 215, alt: '' }),
+      m('img', {
+        src: `/img/redesign/${Appearance.darkMode ? 'empty-schedule-dark' : 'empty-schedule'}.png`,
+        width: 204,
+        height: 215,
+        alt: ''
+      }),
       m('p.empty-body', 'Add your classes to stay organized throughout the day.'),
       m('a.button.primary[href=/classes]', { oncreate: m.route.link }, 'Build schedule')
     ])
