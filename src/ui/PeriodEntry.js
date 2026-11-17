@@ -1,23 +1,38 @@
 const m = require('mithril')
 
-const Appearance = require('../Appearance')
 const requestManager = require('../RequestManager2').default
 const Icon = require('./Icon')
 
-// Rename a school's periods (e.g. "Period 3" -> "Chemistry") or mark them as free
-const PeriodEntry = {
-  oninit: function (vnode) {
-    const source = vnode.attrs.cookieManager.get('source')
-    vnode.state.source = source
-    requestManager.get(`/api/data/${source}/meta`).then(meta => {
+const reducedMotion = () =>
+  window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+// Modal for renaming a school's blocks (e.g. "Period 3" -> "Chemistry").
+// attrs: source, cookieManager, onclose
+const BlockNames = {
+  oninit (vnode) {
+    requestManager.get(`/api/data/${vnode.attrs.source}/meta`).then(meta => {
       vnode.state.meta = meta
       m.redraw()
     })
   },
-  view: function (vnode) {
-    Appearance.apply()
-    document.title = 'Customize block names'
-    const cookieManager = vnode.attrs.cookieManager
+  oncreate (vnode) {
+    vnode.state.onKeyDown = e => {
+      if (e.key === 'Escape') {
+        vnode.attrs.onclose()
+        m.redraw()
+      }
+    }
+    document.addEventListener('keydown', vnode.state.onKeyDown)
+  },
+  onbeforeremove (vnode) {
+    vnode.dom.classList.add('closing')
+    return new Promise(resolve => setTimeout(resolve, reducedMotion() ? 0 : 180))
+  },
+  onremove (vnode) {
+    document.removeEventListener('keydown', vnode.state.onKeyDown)
+  },
+  view (vnode) {
+    const { cookieManager, onclose } = vnode.attrs
     const meta = vnode.state.meta
     const names = cookieManager.get('periods', {})
     const update = (period, value) => {
@@ -26,22 +41,22 @@ const PeriodEntry = {
       cookieManager.set('periods', periods)
     }
 
-    return m('.builder-page', [
-      m('header.page-header.builder-header', [
-        m('.builder-heading', [
-          m('h1.header-title', 'Customize block names'),
-          m('p.header-subtitle', meta
-            ? `Rename your class blocks at ${meta.name} so your schedule matches your real day.`
-            : 'Loading…')
-        ]),
-        m('a.icon-button.plain.close-button', {
-          href: `/${vnode.state.source}`,
-          'aria-label': 'Done, back to timer',
-          title: 'Back to timer',
-          oncreate: m.route.link
-        }, m(Icon, { name: 'close', size: 28 }))
+    return m('.modal-backdrop', {
+      onclick: e => {
+        if (e.target === e.currentTarget) onclose()
+      }
+    }, m('.modal.block-names[role=dialog][aria-modal=true][aria-labelledby=block-names-title]', [
+      m('.modal-title-row', [
+        m('h2#block-names-title.modal-title', 'Customize block names'),
+        m('button.icon-button.plain.close-button[type=button]', {
+          'aria-label': 'Close',
+          onclick: onclose
+        }, m(Icon, { name: 'x' }))
       ]),
-      m('main.builder-content', meta ? m('.card.period-card', (meta.periods || []).map(period =>
+      m('p.caption.block-names-intro', meta
+        ? `Rename your class blocks at ${meta.name} so your schedule matches your real day.`
+        : 'Loading…'),
+      meta ? m('.period-list', (meta.periods || []).map(period =>
         m('.period-row', { key: period }, [
           m('label.period-label', { for: `period-${period}` }, period),
           m('input.text-input[type=text][maxlength=20]', {
@@ -51,9 +66,9 @@ const PeriodEntry = {
             oninput: e => update(period, e.target.value)
           })
         ])
-      )) : null)
-    ])
+      )) : null
+    ]))
   }
 }
 
-module.exports = PeriodEntry
+module.exports = BlockNames

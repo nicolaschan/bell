@@ -207,7 +207,7 @@ const Settings = {
             m('span.section-title', 'Customize block names'),
             m('span.caption', 'Rename your class blocks so your schedule matches your real day — like “Math,” “English,” or “PE.”')
           ]),
-          m('a.button.outline[href=/periods]', { oncreate: m.route.link }, [
+          m('button.button.outline[type=button]', { onclick: vnode.attrs.oncustomize }, [
             m(Icon, { name: 'edit' }),
             m('span', 'Customize')
           ])

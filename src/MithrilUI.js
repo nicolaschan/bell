@@ -2,7 +2,6 @@ const m = require('mithril')
 const root = document.body
 
 const Index = require('./ui/Index')
-const PeriodEntry = require('./ui/PeriodEntry')
 const Classes = require('./ui/Classes')
 const Landing = require('./ui/Landing')
 const { About, Contact } = require('./ui/InfoPages')
@@ -52,17 +51,17 @@ const Home = {
   }
 }
 
-// Old bookmarks of /settings open the timer with the settings panel showing
-const OpenSettings = {
+// Old bookmarks of /settings and /periods open the timer with that panel showing
+const OpenPanel = panel => ({
   oninit: function () {
     const sourceManager = require('./SourceManager').default
-    Index.openTimerWith('settings')
+    Index.openTimerWith(panel)
     m.route.set(`/${sourceManager.source}`, null, { replace: true })
   },
   view: function () {
     return m('')
   }
-}
+})
 
 const Redirect = path => ({
   oninit: () => m.route.set(path, null, { replace: true }),
@@ -78,8 +77,8 @@ class MithrilUI {
       '/home': withCookies(Landing),
       '/about': withCookies(About),
       '/contact': withCookies(Contact),
-      '/settings': withCookies(OpenSettings),
-      '/periods': withCookies(PeriodEntry),
+      '/settings': withCookies(OpenPanel('settings')),
+      '/periods': withCookies(OpenPanel('customize')),
       '/classes': withCookies(Classes),
       '/enter': Redirect('/classes'),
       '/:source': withCookies(Index)

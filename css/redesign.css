@@ -374,6 +374,37 @@ input, select {
   overflow: hidden;
 }
 
+/* Dark themes (e.g. Twilight, Cocoa): white text wherever the theme color is the
+   background, i.e. the schedule page and the timer on days without classes */
+:root[data-bell-surface='dark'] .schedule-page {
+  --foreground-primary: #ffffff;
+  --stroke-primary: rgba(255, 255, 255, 0.85);
+  --icon-filter: invert(1);
+  color: #ffffff;
+}
+
+:root[data-bell-surface='dark'] .schedule-row.completed {
+  color: rgba(255, 255, 255, 0.45);
+  mix-blend-mode: normal;
+}
+
+:root[data-bell-surface='dark'] .timer-page.no-classes .school-select,
+:root[data-bell-surface='dark'] .timer-page.no-classes .countdown,
+:root[data-bell-surface='dark'] .timer-page.no-classes .page-footer > .header-title {
+  color: #ffffff;
+}
+
+/* In light mode the countdown spans both the cream pie and the dark page, so
+   it inverts whatever is behind it to stay readable on both */
+:root[data-bell-surface='dark']:not([data-bell-theme='dark']) .timer-page.no-classes .countdown {
+  mix-blend-mode: difference;
+}
+
+:root[data-bell-surface='dark'] .timer-page.no-classes .school-select .icon,
+:root[data-bell-surface='dark'] .timer-page.no-classes .settings-button .icon {
+  filter: invert(1);
+}
+
 /* Days without classes (weekends, holidays, breaks): the page takes the theme
    color and the pie takes the page color */
 .timer-page.no-classes {
@@ -1539,10 +1570,15 @@ button.pill-notice {
   color: var(--foreground-secondary);
 }
 
-.period-card {
+.period-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.block-names-intro {
+  margin-top: -12px;
+  font-size: 14px;
 }
 
 .period-row {

@@ -45,6 +45,21 @@ const DEFAULT_THEME = colorThemes[0]
 
 const findTheme = id => allThemes.find(theme => theme.id === id)
 
+// WCAG relative luminance of a #rrggbb color
+const luminance = hex => {
+  const n = parseInt(hex.slice(1), 16)
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => {
+    v /= 255
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
+  })
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+// True when white text reads better than black on the theme's color(s).
+// 0.179 is where black and white text have equal contrast.
+const isDarkTheme = theme =>
+  theme.stops.reduce((sum, color) => sum + luminance(color), 0) / theme.stops.length < 0.179
+
 const Appearance = {
   colorThemes,
   dynamicThemes,
@@ -87,11 +102,18 @@ const Appearance = {
     if (root.getAttribute('data-bell-theme') !== (dark ? 'dark' : 'light')) {
       root.setAttribute('data-bell-theme', dark ? 'dark' : 'light')
     }
+    // Text on surfaces painted in the theme color turns white for dark themes
+    const surface = isDarkTheme(Appearance.theme) ? 'dark' : 'light'
+    if (root.getAttribute('data-bell-surface') !== surface) {
+      root.setAttribute('data-bell-surface', surface)
+    }
     const background = Appearance.background()
     if (root.style.getPropertyValue('--brand-color-background') !== background) {
       root.style.setProperty('--brand-color-background', background)
     }
   }
 }
+
+Appearance.isDarkTheme = isDarkTheme
 
 module.exports = Appearance

@@ -5,6 +5,7 @@ const Pie = require('./Pie')
 const Icon = require('./Icon')
 const Popup = require('./Popup')
 const Settings = require('./Settings')
+const BlockNames = require('./PeriodEntry')
 const ScheduleView = require('./ScheduleView')
 const favicon = require('./favicon')
 const { Dropdown, MenuSeparator, MenuButton } = require('./Dropdown')
@@ -74,7 +75,38 @@ const SoundNotice = {
   }
 }
 
+// Shift the countdown so the colon sits on the pie's 12 o'clock edge (the
+// horizontal center of the hero). With hours (H:MM:SS) the middle group is
+// centered on the edge instead.
+const alignToPie = vnode => {
+  const el = vnode.dom
+  const hero = el.parentNode
+  const colons = el.querySelectorAll('.time .colon')
+  if (!hero || colons.length === 0) return
+  const current = vnode.state.shift || 0
+  let anchor
+  if (colons.length === 1) {
+    const r = colons[0].getBoundingClientRect()
+    anchor = r.left + r.width / 2
+  } else {
+    anchor = (colons[0].getBoundingClientRect().right + colons[1].getBoundingClientRect().left) / 2
+  }
+  const heroRect = hero.getBoundingClientRect()
+  const target = heroRect.left + heroRect.width / 2
+  // Keep the block on screen on narrow windows
+  const elRect = el.getBoundingClientRect()
+  let shift = Math.round(current + target - anchor)
+  const naturalLeft = elRect.left - current
+  shift = Math.max(heroRect.left - naturalLeft, Math.min(shift, heroRect.right - (naturalLeft + elRect.width)))
+  if (shift !== current) {
+    vnode.state.shift = shift
+    el.style.transform = `translateX(${shift}px)`
+  }
+}
+
 const Countdown = {
+  oncreate: alignToPie,
+  onupdate: alignToPie,
   view (vnode) {
     const { bellTimer, notificationManager, soundManager, periodInTitle } = vnode.attrs
     const time = bellTimer.getTimeRemainingString()
@@ -90,7 +122,10 @@ const Countdown = {
     favicon.update(time)
 
     return m('.countdown', [
-      m('.time', time),
+      m('.time', { 'aria-label': time }, time.split(':').map((group, i) => [
+        i > 0 ? m('span.colon', ':') : null,
+        m('span.group', group)
+      ])),
       m('.period', period),
       schedule ? m('.schedule-name', schedule) : null
     ])
@@ -238,7 +273,18 @@ const Index = {
       vnode.state.panel === 'schedule' ? m(ScheduleView, { bellTimer, onclose: setPanel(null) }) : null,
       vnode.state.panel === 'settings' ? m(Settings, {
         onclose: setPanel(null),
+        oncustomize: setPanel('customize'),
         showCustomize: !isCustom && Array.isArray(meta.periods) && meta.periods.length > 0
+      }) : null,
+      vnode.state.panel === 'customize' ? m(BlockNames, {
+        source: attrs.source,
+        cookieManager: attrs.cookieManager,
+        onclose: () => {
+          // Apply the new names to the running countdown
+          bellTimer.bindings = attrs.cookieManager.get('periods', {})
+          bellTimer.reloadData().then(() => m.redraw(), () => {})
+          vnode.state.panel = null
+        }
       }) : null
     ])
   },
