@@ -1,4 +1,5 @@
 const m = require('mithril')
+const { paintGlobe } = require('./Globe')
 
 // The countdown pie. The slice that remains is the time left in the current
 // period: its left edge is fixed at 12 o'clock and its right edge sweeps
@@ -71,7 +72,7 @@ const paintTexture = (texture, size, stops, seconds) => {
   })
 }
 
-const draw = (canvas, state, proportionElapsed, theme, seconds) => {
+const draw = (canvas, state, proportionElapsed, theme, seconds, heart, earth) => {
   const parent = canvas.parentNode
   if (!parent) {
     return
@@ -111,24 +112,67 @@ const draw = (canvas, state, proportionElapsed, theme, seconds) => {
   }
   ctx.closePath()
 
-  if (theme.stops.length === 1) {
+  ctx.save()
+  if (earth) {
+    // Earth Day: a spinning globe fills the slice (unmirrored, so the map reads right)
+    if (!state.globe) {
+      state.globe = document.createElement('canvas')
+    }
+    const size = Math.min(520, Math.max(32, Math.ceil(radius * 1.4)))
+    paintGlobe(state, state.globe, size, seconds, () => state.render && state.render())
+    ctx.clip()
+    ctx.scale(-1, 1)
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(state.globe, -radius, -radius, 2 * radius, 2 * radius)
+  } else if (theme.stops.length === 1) {
     ctx.fillStyle = theme.stops[0]
     ctx.fill()
-    return
+  } else {
+    if (!state.texture) {
+      state.texture = document.createElement('canvas')
+    }
+    const size = Math.max(16, Math.ceil(2 * radius * TEXTURE_SCALE))
+    paintTexture(state.texture, size, theme.stops, seconds)
+    ctx.clip()
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(state.texture, -radius, -radius, 2 * radius, 2 * radius)
   }
-
-  if (!state.texture) {
-    state.texture = document.createElement('canvas')
-  }
-  const size = Math.max(16, Math.ceil(2 * radius * TEXTURE_SCALE))
-  paintTexture(state.texture, size, theme.stops, seconds)
-  ctx.save()
-  ctx.clip()
-  ctx.imageSmoothingEnabled = true
-  ctx.imageSmoothingQuality = 'high'
-  ctx.drawImage(state.texture, -radius, -radius, 2 * radius, 2 * radius)
   ctx.restore()
+
+  // Valentine's heart: centered in the circle and clipped to the remaining
+  // slice, so it empties along with the countdown
+  if (heart) {
+    ctx.save()
+    ctx.clip()
+    ctx.fillStyle = heart
+    heartPath(ctx, radius * 1.15)
+    ctx.fill()
+    ctx.restore()
+  }
 }
+
+// Classic heart curve (x = 16 sin³t, y = 13 cos t - 5 cos 2t - 2 cos 3t - cos 4t),
+// centered on the origin and `size` wide
+const heartPath = (ctx, size) => {
+  const scale = size / 34
+  ctx.beginPath()
+  for (let i = 0; i <= 120; i++) {
+    const t = (i / 120) * 2 * Math.PI
+    const x = 16 * Math.pow(Math.sin(t), 3)
+    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)
+    // Canvas y points down; nudge down so the heart looks centered
+    const px = x * scale
+    const py = (-y + 2.5) * scale
+    if (i === 0) ctx.moveTo(px, py)
+    else ctx.lineTo(px, py)
+  }
+  ctx.closePath()
+}
+
+// Dynamic themes and the globe animate on their own clock; solid colors redraw with the app
+const animated = attrs => attrs.earth || attrs.theme.stops.length > 1
 
 const Pie = {
   oncreate (vnode) {
@@ -137,15 +181,14 @@ const Pie = {
     state.started = Date.now()
     state.lastFrame = 0
     const render = () => {
-      const { proportionElapsed, theme } = state.attrs
-      const seconds = reducedMotion() ? 0 : DRIFT_SPEED * (Date.now() - state.started) / 1000
-      draw(vnode.dom, state, proportionElapsed, theme, seconds)
+      const { proportionElapsed, theme, heart, earth } = state.attrs
+      const elapsed = reducedMotion() ? 0 : (Date.now() - state.started) / 1000
+      draw(vnode.dom, state, proportionElapsed, theme, (earth ? 1 : DRIFT_SPEED) * elapsed, heart, earth)
     }
     state.render = render
-    // Dynamic themes animate on their own clock; solid ones redraw with the app
     const loop = time => {
       state.frame = window.requestAnimationFrame(loop)
-      if (state.attrs.theme.stops.length > 1 && !reducedMotion() && time - state.lastFrame >= FRAME_INTERVAL) {
+      if (animated(state.attrs) && !reducedMotion() && time - state.lastFrame >= FRAME_INTERVAL) {
         state.lastFrame = time
         render()
       }
@@ -155,7 +198,7 @@ const Pie = {
   },
   onupdate (vnode) {
     vnode.state.attrs = vnode.attrs
-    if (vnode.attrs.theme.stops.length === 1 || reducedMotion()) {
+    if (!animated(vnode.attrs) || reducedMotion()) {
       vnode.state.render()
     }
   },

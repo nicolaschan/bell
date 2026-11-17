@@ -60,9 +60,27 @@ const luminance = hex => {
 const isDarkTheme = theme =>
   theme.stops.reduce((sum, color) => sum + luminance(color), 0) / theme.stops.length < 0.179
 
+// Lunar New Year: a golden pie (shown instead of the chosen theme while the
+// "lunar" seasonal overlay is on)
+const lunarTheme = {
+  id: 'lunar-new-year',
+  name: 'Lunar New Year',
+  type: 'dynamic',
+  stops: ['#ffd36b', '#f2b33d', '#e19a22', '#f5c451', '#ffe28f', '#e8a92f']
+}
+
 const Appearance = {
   colorThemes,
   dynamicThemes,
+  lunarTheme,
+
+  // A holiday theme that temporarily replaces the chosen one (set by the timer page)
+  holidayTheme: null,
+
+  // The theme being shown: the holiday theme if there is one, else the chosen theme
+  get current () {
+    return Appearance.holidayTheme || Appearance.theme
+  },
 
   get theme () {
     return findTheme(cookieManager.get(THEME_KEY)) || DEFAULT_THEME
@@ -88,7 +106,7 @@ const Appearance = {
   },
 
   // CSS background for surfaces painted in the theme color (e.g. the schedule page)
-  background (theme = Appearance.theme) {
+  background (theme = Appearance.current) {
     if (theme.stops.length === 1) {
       return theme.stops[0]
     }
@@ -103,7 +121,7 @@ const Appearance = {
       root.setAttribute('data-bell-theme', dark ? 'dark' : 'light')
     }
     // Text on surfaces painted in the theme color turns white for dark themes
-    const surface = isDarkTheme(Appearance.theme) ? 'dark' : 'light'
+    const surface = isDarkTheme(Appearance.current) ? 'dark' : 'light'
     if (root.getAttribute('data-bell-surface') !== surface) {
       root.setAttribute('data-bell-surface', surface)
     }
@@ -115,5 +133,19 @@ const Appearance = {
 }
 
 Appearance.isDarkTheme = isDarkTheme
+
+// Color for the Valentine's heart inside the timer circle, chosen to suit the
+// color underneath it: a lighter tint on medium and dark colors, a slightly
+// darker shade on very light ones. On days without classes the circle is the
+// page color, so the heart takes the theme's own color instead.
+Appearance.heartColor = (theme, noClasses) => {
+  if (noClasses) {
+    const color = theme.stops[Math.floor(theme.stops.length / 2)]
+    const n = parseInt(color.slice(1), 16)
+    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, 0.6)`
+  }
+  const lightness = theme.stops.reduce((sum, color) => sum + luminance(color), 0) / theme.stops.length
+  return lightness > 0.5 ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.3)'
+}
 
 module.exports = Appearance

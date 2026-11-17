@@ -1907,3 +1907,334 @@ button.pill-notice {
 :root[data-bell-theme='dark'] .design-toggle button[aria-checked='true'] img {
   filter: invert(1);
 }
+
+/* ---------- Seasonal overlays ---------- */
+
+/* Drawn above the countdown pie and below the text and controls */
+.seasonal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Snowflakes: white, 70% opacity on light pages and 40% on dark (per Figma) */
+.snowfall {
+  opacity: 0.7;
+}
+
+:root[data-bell-theme='dark'] .snowfall {
+  opacity: 0.4;
+}
+
+.snowfall .flake {
+  position: absolute;
+  top: 0;
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.snowfall .flake-sway {
+  width: 100%;
+  height: 100%;
+  animation-name: snow-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.snowfall img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation-name: snow-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes snow-fall {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100vh); }
+}
+
+@keyframes snow-sway {
+  from { transform: translateX(calc(var(--sway) * -1)); }
+  to { transform: translateX(var(--sway)); }
+}
+
+@keyframes snow-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Without motion the flakes stay where they are, scattered over the screen */
+@media (prefers-reduced-motion: reduce) {
+  .snowfall .flake,
+  .snowfall .flake-sway,
+  .snowfall img {
+    animation-play-state: paused;
+  }
+}
+
+.timer-page > .page-footer,
+.timer-page .countdown,
+.timer-page .empty-state {
+  position: relative;
+  z-index: 2;
+}
+
+/* Above the countdown too, so the school menu opens over it */
+.timer-page > .page-header {
+  position: relative;
+  z-index: 3;
+}
+
+/* Christmas lights wrapped around the date on Christmas Day */
+.lit-date {
+  position: relative;
+  display: inline-block;
+}
+
+/* The frame sits just outside the text; bulbs point outward from it */
+.christmas-lights {
+  position: absolute;
+  inset: -7px -12px;
+  pointer-events: none;
+}
+
+.lights-wire {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid #2f4a2c;
+  border-radius: 10px;
+}
+
+:root[data-bell-theme='dark'] .lights-wire {
+  border-color: #9fb59a;
+}
+
+.christmas-lights .bulb {
+  position: absolute;
+  width: 6px;
+  height: 9px;
+  border-radius: 50% 50% 45% 45% / 40% 40% 60% 60%;
+  background: var(--bulb);
+  box-shadow: 0 0 6px 2px var(--bulb);
+  animation: bulb-twinkle 1.6s ease-in-out infinite;
+}
+
+/* The socket at each bulb's base, which clips onto the wire */
+.christmas-lights .bulb::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 1px;
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  background: #2f4a2c;
+}
+
+:root[data-bell-theme='dark'] .christmas-lights .bulb::before {
+  background: #9fb59a;
+}
+
+/* Each bulb's base sits on the wire and its glass points away from the date */
+.christmas-lights .bulb.top {
+  top: 0;
+  transform: translate(-50%, calc(-100% - 2px)) rotate(180deg);
+}
+
+.christmas-lights .bulb.bottom {
+  bottom: 0;
+  transform: translate(-50%, calc(100% + 2px));
+}
+
+.christmas-lights .bulb.right {
+  right: 0;
+  transform: translate(calc(100% + 3px), -50%) rotate(-90deg);
+}
+
+.christmas-lights .bulb.left {
+  left: 0;
+  transform: translate(calc(-100% - 3px), -50%) rotate(90deg);
+}
+
+.christmas-lights .bulb.red { --bulb: #ff3b3b; }
+.christmas-lights .bulb.green { --bulb: #22c55e; }
+.christmas-lights .bulb.gold { --bulb: #ffc533; }
+.christmas-lights .bulb.blue { --bulb: #3b8bff; }
+
+@keyframes bulb-twinkle {
+  0%, 100% { opacity: 1; box-shadow: 0 0 7px 2px var(--bulb); }
+  50% { opacity: 0.55; box-shadow: 0 0 2px 0 var(--bulb); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .christmas-lights .bulb {
+    animation: none;
+  }
+}
+
+/* Divider above the Holiday effects section */
+/* Holiday effects: a tight heading and a divider below the section */
+.settings-list.holiday-effects {
+  gap: 4px;
+  border-bottom: 1px solid var(--divider-menu);
+  /* Match the 20px around the other dividers in Settings (the toggle row and
+     the next row's button add a little height of their own) */
+  padding-bottom: 12px;
+  margin-bottom: -11px;
+}
+
+/* Fireworks on New Year's Day: rockets rise, then burst into sparks.
+   Each firework's color is its text color; --radius sets the burst size. */
+.fireworks .firework {
+  position: absolute;
+  width: 0;
+  height: 0;
+  animation-name: firework-drift;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+}
+
+.fireworks .rocket,
+.fireworks .spark {
+  position: absolute;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+.fireworks .rocket {
+  left: -1.5px;
+  top: 0;
+  width: 3px;
+  height: 18px;
+  border-radius: 2px;
+  background: linear-gradient(currentColor, transparent);
+  animation-name: firework-rocket;
+  animation-timing-function: linear;
+}
+
+.fireworks .spark {
+  left: -2px;
+  top: -18px;
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: linear-gradient(currentColor, transparent);
+  filter: drop-shadow(0 0 3px currentColor);
+  transform-origin: 50% 100%;
+  animation-name: firework-spark;
+  animation-timing-function: cubic-bezier(0.15, 0.7, 0.3, 1);
+}
+
+.fireworks .flash {
+  position: absolute;
+  left: -40px;
+  top: -40px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(currentColor, transparent 70%);
+  opacity: 0;
+  animation-name: firework-flash;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes firework-flash {
+  0%, 24% { opacity: 0; transform: scale(0.2); }
+  27% { opacity: 0.6; transform: scale(1); }
+  45%, 100% { opacity: 0; transform: scale(1.4); }
+}
+
+@keyframes firework-drift {
+  0%, 25% { transform: translateY(0); }
+  100% { transform: translateY(28px); }
+}
+
+@keyframes firework-rocket {
+  0% { transform: translateY(160px); opacity: 0; }
+  4% { opacity: 1; }
+  24% { transform: translateY(0); opacity: 1; }
+  26%, 100% { transform: translateY(0); opacity: 0; }
+}
+
+@keyframes firework-spark {
+  0%, 25% { transform: rotate(var(--angle)) translateY(0) scaleY(0.2); opacity: 0; }
+  27% { opacity: 1; }
+  45% { transform: rotate(var(--angle)) translateY(calc(var(--radius) * var(--reach) * -0.75)) scaleY(1.2); }
+  75% { opacity: 0.9; }
+  100% { transform: rotate(var(--angle)) translateY(calc(var(--radius) * var(--reach) * -1)) scaleY(0.4); opacity: 0; }
+}
+
+:root[data-bell-theme='dark'] .fireworks {
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fireworks {
+    display: none;
+  }
+}
+
+/* Lunar New Year: red lanterns sway from the top of the page, the pie turns
+   gold (see Appearance.lunarTheme) and the text turns red */
+.lanterns .lantern {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: calc(-30px * var(--size));
+  transform-origin: 50% 0;
+  animation-name: lantern-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.lanterns .lantern-string {
+  width: 1.5px;
+  background: #b8860b;
+}
+
+.lanterns svg {
+  display: block;
+  width: calc(60px * var(--size));
+  height: calc(108px * var(--size));
+  filter: drop-shadow(0 4px 6px rgba(165, 20, 26, 0.25));
+}
+
+@keyframes lantern-sway {
+  from { transform: rotate(-4deg); }
+  to { transform: rotate(4deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lanterns .lantern {
+    animation: none;
+  }
+}
+
+.timer-page.lunar-new-year .countdown,
+.timer-page.lunar-new-year .school-name,
+.timer-page.lunar-new-year > .page-footer > .header-title {
+  color: #c8102e;
+}
+
+:root[data-bell-theme='dark'] .timer-page.lunar-new-year .countdown,
+:root[data-bell-theme='dark'] .timer-page.lunar-new-year .school-name,
+:root[data-bell-theme='dark'] .timer-page.lunar-new-year > .page-footer > .header-title {
+  color: #ff5a4f;
+}
+
+/* On days without classes the page is gold, so use a deeper red */
+:root .timer-page.lunar-new-year.no-classes .countdown,
+:root .timer-page.lunar-new-year.no-classes .school-name,
+:root .timer-page.lunar-new-year.no-classes > .page-footer > .header-title {
+  color: #a10d24;
+}
