@@ -3,11 +3,13 @@ Copyright (c) 2017 Nicolas Chan
 MIT License (https://github.com/nicolaschan/bell)
 -->
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description" content="Countdown to the next time the bell rings at school.">
     <meta name="keywords" content="countdown,bell,schedule,lahs,school">
+    <meta name="theme-color" content="#f8f4f0">
     <meta name="apple-mobile-web-app-title" content="Bell">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -15,8 +17,9 @@ MIT License (https://github.com/nicolaschan/bell)
     <title id="title">Bell Countdown</title>
     <link rel="shortcut icon" type="image/png" href="/favicons/empty.png" id="favicon">
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" type="text/css" href="/css/mithril-selector.min.css">
-    <link rel="stylesheet" href="/css/style-mithril.css">
+    <link rel="preload" href="/fonts/inter/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/inter/inter-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/redesign.css">
     <script type="text/javascript" src="/timesync/timesync.js"></script>
   </head>
   <body>

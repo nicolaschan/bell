@@ -43,16 +43,9 @@ app.get('/', (req, res) => {
 app.get('/offline', (req, res) => {
   res.sendFile(path.join(baseDir, 'html', 'offline.html'))
 })
-app.get('/periods', (req, res) => {
-  res.sendFile(path.join(baseDir, 'html', 'index.html'))
-})
-app.get('/classes', (req, res) => {
-  res.sendFile(path.join(baseDir, 'html', 'index.html'))
-})
-app.get('/enter', (req, res) => {
-  res.sendFile(path.join(baseDir, 'html', 'index.html'))
-})
-app.get('/settings', (req, res) => {
+// Pages rendered by the client-side router
+const clientPages = ['/home', '/about', '/contact', '/periods', '/classes', '/enter', '/settings']
+app.get(clientPages, (req, res) => {
   res.sendFile(path.join(baseDir, 'html', 'index.html'))
 })
 app.get('/stats', (req, res) => {
@@ -82,9 +75,6 @@ app.get('/extension', (req, res) => {
 app.get('/gh', (req, res) => {
   res.redirect('https://github.com/nicolaschan/bell')
 })
-app.get('/about', (req, res) => {
-  res.redirect('https://github.com/nicolaschan/bell/blob/master/README.md')
-})
 
 var bodyParser = require('body-parser')
 app.use(bodyParser.json()) // to support JSON-encoded bodies
@@ -112,6 +102,9 @@ app.use('/css', express.static('css'))
 app.use('/img', express.static('img'))
 app.use('/sounds', express.static('sounds'))
 app.use('/icons', express.static(path.join(baseDir, 'node_modules', 'material-design-icons'), {
+  maxage: '24h'
+}))
+app.use('/fonts/inter', express.static(path.join(baseDir, 'node_modules', '@fontsource', 'inter', 'files'), {
   maxage: '24h'
 }))
 app.use('/fonts', express.static(path.join(baseDir, 'node_modules', 'roboto-fontface', 'fonts'), {

@@ -2,10 +2,10 @@ const m = require('mithril')
 const root = document.body
 
 const Index = require('./ui/Index')
-const Settings = require('./ui/Settings')
 const PeriodEntry = require('./ui/PeriodEntry')
 const Classes = require('./ui/Classes')
-const Enter = require('./ui/Enter')
+const Landing = require('./ui/Landing')
+const { About, Contact } = require('./ui/InfoPages')
 const Loading = require('./ui/Loading').default
 
 const withCookies = function (element) {
@@ -39,25 +39,48 @@ const withCookies = function (element) {
   }
 }
 
+// Send returning visitors straight to their timer; first-time visitors see the landing page
+const Home = {
+  view: function (vnode) {
+    const cookieManager = vnode.attrs.cookieManager
+    if (cookieManager.get('source')) {
+      const sourceManager = require('./SourceManager').default
+      m.route.set(`/${sourceManager.source}`, null, { replace: true })
+      return m('')
+    }
+    return m(Landing)
+  }
+}
+
+// Old bookmarks of /settings open the timer with the settings panel showing
+const OpenSettings = {
+  oninit: function () {
+    const sourceManager = require('./SourceManager').default
+    Index.openTimerWith('settings')
+    m.route.set(`/${sourceManager.source}`, null, { replace: true })
+  },
+  view: function () {
+    return m('')
+  }
+}
+
+const Redirect = path => ({
+  oninit: () => m.route.set(path, null, { replace: true }),
+  view: () => m('')
+})
+
 class MithrilUI {
   constructor () {
     m.route.prefix('', {})
     m.route(root, '/', {
-      '/': withCookies({
-        oninit: function (vnode) {
-          const sourceManager = require('./SourceManager').default
-          m.route.set(`/${sourceManager.source}`, null, {
-            replace: true
-          })
-        },
-        view: function (vnode) {
-          return m('')
-        }
-      }),
-      '/settings': withCookies(Settings),
+      '/': withCookies(Home),
+      '/home': withCookies(Landing),
+      '/about': withCookies(About),
+      '/contact': withCookies(Contact),
+      '/settings': withCookies(OpenSettings),
       '/periods': withCookies(PeriodEntry),
       '/classes': withCookies(Classes),
-      '/enter': withCookies(Enter),
+      '/enter': Redirect('/classes'),
       '/:source': withCookies(Index)
     })
   }
