@@ -9,6 +9,7 @@ const BlockNames = require('./PeriodEntry')
 const SwitchDesignModal = require('./SwitchDesignModal')
 const DesignToggle = require('./DesignToggle')
 const Snowfall = require('./Snowfall')
+const ChristmasLights = require('./ChristmasLights')
 const Seasonal = require('../Seasonal')
 const ScheduleView = require('./ScheduleView')
 const { Dropdown, MenuSeparator, MenuButton } = require('./Dropdown')
@@ -322,7 +323,9 @@ const Index = {
         m(Countdown, attrs)
       ]),
       m('footer.page-footer', [
-        m('.header-title', formatDateTime(bellTimer.date)),
+        m('.header-title', Seasonal.showing(bellTimer.date).some(overlay => overlay.id === 'lights')
+          ? m(ChristmasLights, { text: formatDateTime(bellTimer.date) })
+          : formatDateTime(bellTimer.date)),
         m('.footer-notices', [
           m(DesignToggle, { current: 'new', onselect: setPanel('switch-design') }),
           m(SoundNotice, attrs),
