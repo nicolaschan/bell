@@ -100,8 +100,19 @@ const colonInk = el => {
 const alignToPie = vnode => {
   const el = vnode.dom
   const hero = el.parentNode
+  const time = el.querySelector('.time')
   const colons = el.querySelectorAll('.time .colon')
-  if (!hero || colons.length === 0) return
+  if (!hero || !time || colons.length === 0) return
+
+  // Only re-measure when something that moves the colon changes: the window
+  // size, the number of digits (e.g. 10:00 -> 9:59) or the font loading.
+  // Re-measuring on every redraw let tiny measurement differences between
+  // frames nudge the countdown back and forth in some browsers.
+  const fontsReady = !document.fonts || document.fonts.status === 'loaded'
+  const key = [window.innerWidth, window.innerHeight,
+    (time.getAttribute('aria-label') || '').replace(/\d/g, '0'), fontsReady].join('|')
+  if (key === vnode.state.alignKey) return
+
   const current = vnode.state.shift || 0
   let anchor
   if (colons.length === 1) {
@@ -117,9 +128,11 @@ const alignToPie = vnode => {
   const target = heroRect.left + heroRect.width / 2
   // Keep the block on screen on narrow windows
   const elRect = el.getBoundingClientRect()
-  let shift = Math.round(current + target - anchor)
   const naturalLeft = elRect.left - current
-  shift = Math.max(heroRect.left - naturalLeft, Math.min(shift, heroRect.right - (naturalLeft + elRect.width)))
+  const shift = Math.round(Math.max(heroRect.left - naturalLeft,
+    Math.min(current + target - anchor, heroRect.right - (naturalLeft + elRect.width))))
+
+  vnode.state.alignKey = key
   if (shift !== current) {
     vnode.state.shift = shift
     el.style.transform = `translateX(${shift}px)`
