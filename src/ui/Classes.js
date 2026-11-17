@@ -4,6 +4,7 @@ const shortid = require('shortid')
 const Appearance = require('../Appearance')
 const sourceManager = require('../SourceManager').default
 const Icon = require('./Icon')
+const { sheetTo } = require('./transitions')
 const { formatShortTime, pad } = require('./format')
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -255,10 +256,10 @@ const Classes = {
           disabled: !!(state.draft && !state.draft.id),
           onclick: startNew
         }, [m(Icon, { name: 'plus' }), 'Add a block']) : null,
-        m('a.icon-button.plain.close-button[href=/custom]', {
+        m('button.icon-button.plain.close-button[type=button]', {
           'aria-label': 'Done, back to timer',
           title: 'Back to timer',
-          oncreate: m.route.link
+          onclick: () => sheetTo('/custom', 'down')
         }, m(Icon, { name: 'close', size: 28 }))
       ]),
       m('main.builder-content', cards.length ? cards : m('.empty-state', [

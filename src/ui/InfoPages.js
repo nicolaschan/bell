@@ -42,7 +42,7 @@ const Contact = {
     document.title = 'Contact us'
     return m(InfoPage, { title: 'Contact us' }, [
       m('.info-column', [
-        m('p.strong', 'For general inquiries'),
+        m('p.strong', 'For general inquiries and feedback'),
         m('p', m(`a[href=mailto:${CONTACT_EMAIL}]`, CONTACT_EMAIL))
       ])
     ])

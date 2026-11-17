@@ -71,6 +71,7 @@ const Redirect = path => ({
 
 class MithrilUI {
   constructor () {
+    require('./ui/transitions').installSheetLinks()
     m.route.prefix('', {})
     m.route(root, '/', {
       '/': withCookies(Home),

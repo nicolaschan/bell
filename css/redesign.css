@@ -1793,3 +1793,39 @@ button.pill-notice {
 .dropdown-menu > * {
   flex-shrink: 0;
 }
+
+/* ---------- Page transitions ---------- */
+
+/* The personal schedule builder slides up over the timer like a sheet and
+   slides back down when closed (see ui/transitions.js) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+:root[data-transition='sheet-up']::view-transition-old(root) {
+  z-index: 1;
+}
+
+:root[data-transition='sheet-up']::view-transition-new(root) {
+  z-index: 2;
+  animation: sheet-up 0.5s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+:root[data-transition='sheet-down']::view-transition-new(root) {
+  z-index: 1;
+}
+
+:root[data-transition='sheet-down']::view-transition-old(root) {
+  z-index: 2;
+  animation: sheet-down 0.38s cubic-bezier(0.5, 0, 0.75, 0.2) both;
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+}
+
+@keyframes sheet-down {
+  to { transform: translateY(100%); }
+}
