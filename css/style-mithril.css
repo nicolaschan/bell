@@ -700,7 +700,7 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     opacity: 1;
     z-index: 2;
 }
-/* New / Classic design toggle on the timer page */
+/* "New design" switch on the timer page */
 .classic-design-toggle {
     position: fixed;
     left: 1em;
@@ -708,33 +708,24 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     z-index: 10;
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    padding: 3px 3px 3px 12px;
+    gap: 8px;
+    padding: 4px 4px 4px 12px;
     border-radius: 9999px;
     background: white;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     font-family: 'Roboto', sans-serif;
     font-size: 13px;
     color: #333;
-}
-.classic-design-toggle .design-toggle-label {
-    margin-right: 6px;
-    color: #777;
+    cursor: pointer;
 }
 .classic-design-toggle button {
-    padding: 4px 10px;
+    display: inline-flex;
+    padding: 0;
     border: none;
     border-radius: 9999px;
     background: none;
-    font: inherit;
-    color: #333;
     cursor: pointer;
 }
-.classic-design-toggle button[aria-pressed='true'] {
-    background: #333;
-    color: white;
-    cursor: default;
-}
-.classic-design-toggle button[aria-pressed='false']:hover {
-    background: #eee;
+.classic-design-toggle img {
+    display: block;
 }

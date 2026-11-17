@@ -1878,39 +1878,31 @@ button.pill-notice {
   text-decoration: underline;
 }
 
-/* ---------- New / Classic design toggle (timer footer) ---------- */
+/* ---------- "New design" switch (timer footer) ---------- */
 
 .design-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 3px 3px 3px 12px;
+  gap: 8px;
+  padding: 4px 4px 4px 12px;
   border-radius: 9999px;
   background: var(--background-secondary);
   border: 1px solid var(--stroke-secondary);
   font-size: 12px;
+  font-weight: 600;
   line-height: 1.4;
-}
-
-.design-toggle-label {
-  margin-right: 6px;
-  color: var(--foreground-secondary);
+  cursor: pointer;
 }
 
 .design-toggle button {
-  padding: 4px 10px;
+  display: inline-flex;
   border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--foreground-primary);
 }
 
-.design-toggle button[aria-pressed='true'] {
-  background: var(--background-inverse);
-  color: var(--foreground-primary-inverse);
-  cursor: default;
+.design-toggle img {
+  display: block;
 }
 
-.design-toggle button[aria-pressed='false']:hover {
-  background: var(--background-hover);
+:root[data-bell-theme='dark'] .design-toggle button[aria-checked='true'] img {
+  filter: invert(1);
 }
