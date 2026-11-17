@@ -191,9 +191,15 @@ const Index = {
     const meta = bellTimer.meta || {}
     const name = isCustom ? 'Your personal schedule' : (meta.name || attrs.source)
     const theme = Appearance.theme
+    // On days without classes the page takes the theme color and the pie takes
+    // the page color (cream in light mode, near-black in dark mode)
+    const noClasses = !ScheduleView.hasClassesToday(bellTimer)
+    const pieTheme = noClasses ? { stops: [Appearance.pageColor()] } : theme
     const setPanel = panel => () => { vnode.state.panel = panel }
 
-    return m('.timer-page', [
+    return m('.timer-page', {
+      className: [noClasses ? 'no-classes' : '', noClasses && theme.type === 'dynamic' ? 'dynamic' : ''].join(' ')
+    }, [
       m('header.page-header', [
         m(SchoolMenu, { name, isCustom }),
         m('nav.header-actions', [
@@ -215,8 +221,8 @@ const Index = {
       m('main.hero', isCustom && !hasCourses ? m(EmptyPersonalSchedule) : [
         m(Pie, {
           proportionElapsed: bellTimer.getProportionElapsed(),
-          theme,
-          passing: ScheduleView.isBreak(bellTimer.getCurrentPeriod().name)
+          theme: pieTheme,
+          passing: !noClasses && ScheduleView.isBreak(bellTimer.getCurrentPeriod().name)
         }),
         m(Countdown, attrs)
       ]),

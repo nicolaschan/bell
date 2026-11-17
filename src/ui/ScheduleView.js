@@ -116,5 +116,7 @@ const ScheduleView = {
 }
 
 ScheduleView.isBreak = isBreak
+// Weekends, holidays and breaks: today has nothing but passing or free time
+ScheduleView.hasClassesToday = bellTimer => buildRows(bellTimer).rows.length > 0
 
 module.exports = ScheduleView

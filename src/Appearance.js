@@ -67,6 +67,11 @@ const Appearance = {
     cookieManager.set(DARK_MODE_KEY, !!enabled).catch(() => {})
   },
 
+  // The page background color for the current mode (matches --background-primary)
+  pageColor () {
+    return Appearance.darkMode ? '#161514' : '#f8f4f0'
+  },
+
   // CSS background for surfaces painted in the theme color (e.g. the schedule page)
   background (theme = Appearance.theme) {
     if (theme.stops.length === 1) {

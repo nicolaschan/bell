@@ -362,6 +362,28 @@ input, select {
   overflow: hidden;
 }
 
+/* Days without classes (weekends, holidays, breaks): the page takes the theme
+   color and the pie takes the page color */
+.timer-page.no-classes {
+  background: var(--brand-color-background);
+}
+
+.timer-page.no-classes.dynamic {
+  background-size: 300% 300%;
+  animation: gradient-drift 25s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer-page.no-classes.dynamic {
+    animation: none;
+  }
+}
+
+.timer-page.no-classes .school-select:hover,
+.timer-page.no-classes .school-select[aria-expanded='true'] {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 .school-select {
   display: flex;
   align-items: center;
