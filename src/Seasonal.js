@@ -17,8 +17,8 @@ const OVERLAYS = [
   {
     id: 'snow',
     name: 'Snowflakes',
-    description: 'Falling snowflakes from December 22 through New Year’s Day.',
-    activeOn: date => inRange(date, [12, 22], [1, 1])
+    description: 'Falling snowflakes all through December and on New Year’s Day.',
+    activeOn: date => inRange(date, [12, 1], [1, 1])
   },
   {
     id: 'heart',
