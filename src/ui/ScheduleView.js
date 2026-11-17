@@ -63,8 +63,8 @@ const Divider = {
   }
 }
 
-// Slides down from the top with a slight bounce, and eases back up when closed
-const CLOSE_MS = 380
+// Slides down from the top and back up when closed, easing in and out
+const CLOSE_MS = 400
 
 const ScheduleView = {
   oncreate (vnode) {
