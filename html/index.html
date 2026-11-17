@@ -15,7 +15,6 @@ MIT License (https://github.com/nicolaschan/bell)
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="apple-touch-icon" href="img/logo/logo-square/logo-square-1024.png">
     <title id="title">Bell Countdown</title>
-    <link rel="shortcut icon" type="image/png" href="/favicons/empty.png" id="favicon">
     <link rel="manifest" href="/manifest.json">
     <script>
       // Pick the redesign or the original UI (see src/Design.js) before anything renders
@@ -29,6 +28,14 @@ MIT License (https://github.com/nicolaschan/bell)
         sheets.forEach(function (href) {
           document.write('<link rel="stylesheet" href="' + href + '">')
         })
+        if (design === 'classic') {
+          // The classic timer recolors this icon as the bell gets closer
+          document.write('<link rel="shortcut icon" type="image/png" href="/favicons/empty.png" id="favicon">')
+        } else {
+          // Bell symbol: black, or white when the browser is in dark mode (PNG for browsers without SVG icons)
+          document.write('<link rel="icon" type="image/png" sizes="32x32" href="/img/redesign/favicon-32.png">')
+          document.write('<link rel="icon" type="image/svg+xml" href="/img/redesign/favicon.svg">')
+        }
         if (design !== 'classic') {
           document.write('<link rel="preload" href="/fonts/inter/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>')
           document.write('<link rel="preload" href="/fonts/inter/inter-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>')

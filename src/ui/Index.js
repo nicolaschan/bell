@@ -9,7 +9,6 @@ const BlockNames = require('./PeriodEntry')
 const SwitchDesignModal = require('./SwitchDesignModal')
 const DesignToggle = require('./DesignToggle')
 const ScheduleView = require('./ScheduleView')
-const favicon = require('./favicon')
 const { Dropdown, MenuSeparator, MenuButton } = require('./Dropdown')
 const { default: ErrorIcon } = require('./ErrorIcon')
 const Loading = require('./Loading').default
@@ -156,7 +155,6 @@ const Countdown = {
       soundManager.playSound()
     }
     document.title = periodInTitle ? `${time} | ${period}` : time
-    favicon.update(time)
 
     return m('.countdown', [
       m('.time', { 'aria-label': time }, time.split(':').map((group, i) => [

@@ -15,6 +15,8 @@ const cachedResources = [
   '/fonts/inter/inter-latin-600-normal.woff2',
   '/fonts/inter/inter-latin-700-normal.woff2',
   '/img/redesign/bell-symbol.svg',
+  '/img/redesign/favicon.svg',
+  '/img/redesign/favicon-32.png',
   '/img/redesign/chevron-down.svg',
   '/img/redesign/settings.svg',
   '/img/redesign/close.svg',
