@@ -251,7 +251,7 @@ const Settings = {
       ]),
 
       // Only shown while a holiday overlay is in season
-      holidays.length ? m('section.settings-list', [
+      holidays.length ? m('section.settings-list.holiday-effects', [
         m('h3.section-title', 'Holiday effects'),
         holidays.map(overlay => m('.settings-row.toggle-row', { key: overlay.id }, [
           m('span.toggle-label', overlay.name),

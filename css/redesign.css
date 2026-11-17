@@ -2077,3 +2077,9 @@ button.pill-notice {
     animation: none;
   }
 }
+
+/* Divider above the Holiday effects section */
+.settings-list.holiday-effects {
+  border-top: 1px solid var(--divider-menu);
+  padding-top: 24px;
+}
