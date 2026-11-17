@@ -245,14 +245,6 @@ const Settings = {
         m('.settings-row', [
           m('span.toggle-label', 'Sound selection'),
           m(SoundSelect)
-        ]),
-        m(MenuSeparator),
-        m('.settings-row', [
-          m('.settings-row-text', [
-            m('span.section-title', 'Classic design'),
-            m('span.caption', 'Go back to the original bell.plus look. You can switch to the new design again from Settings.')
-          ]),
-          m('button.button.outline[type=button]', { onclick: vnode.attrs.onswitchdesign }, 'Switch')
         ])
       ])
     ]))

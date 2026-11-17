@@ -74,9 +74,6 @@ const Settings = {
         m('.add-link', (vnode.state.editClasses) ? null : m('a.add#edit-classes-button[href=/periods]', {
           oncreate: m.route.link
         }, 'Edit Period Names')),
-        m('.add-link', m('a.add#try-new-design[href=javascript:void(0);]', {
-          onclick: () => require('../../Design').switchTo('new')
-        }, 'Try the New Design')),
         m('.add-link', m('a.add#edit-classes-button[href=https://edit.bell.plus]', 'Create Shared Schedule')),
         m('.add-link', m('a.add#edit-classes-button[href=/classes]', {
           oncreate: m.route.link

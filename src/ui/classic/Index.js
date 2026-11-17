@@ -8,6 +8,7 @@ const { default: ErrorIcon } = require('./ErrorIcon')
 const Loading = require('./Loading').default
 const SettingsIcon = require('./SettingsIcon').default
 const ScrollArrow = require('./ScrollArrow').default
+const DesignToggle = require('../DesignToggle')
 
 const SimpleLogger = require('../../SimpleLogger').default
 const logger = new SimpleLogger()
@@ -87,7 +88,12 @@ const Index = {
       ]),
       m(SchoolIndicator, vnode.attrs, (vnode.attrs.bellTimer.meta || {}).name || ''),
       m(Popup, vnode.attrs),
-      m(ScrollArrow, { visible: vnode.attrs.cookieManager.get('has_scrolled') })
+      m(ScrollArrow, { visible: vnode.attrs.cookieManager.get('has_scrolled') }),
+      m(DesignToggle, {
+        className: 'classic-design-toggle',
+        current: 'classic',
+        onselect: design => require('../../Design').switchTo(design)
+      })
     ]
   },
   onremove: function (vnode) {

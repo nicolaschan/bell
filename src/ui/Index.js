@@ -7,6 +7,7 @@ const Popup = require('./Popup')
 const Settings = require('./Settings')
 const BlockNames = require('./PeriodEntry')
 const SwitchDesignModal = require('./SwitchDesignModal')
+const DesignToggle = require('./DesignToggle')
 const ScheduleView = require('./ScheduleView')
 const favicon = require('./favicon')
 const { Dropdown, MenuSeparator, MenuButton } = require('./Dropdown')
@@ -300,6 +301,7 @@ const Index = {
       m('footer.page-footer', [
         m('.header-title', formatDateTime(bellTimer.date)),
         m('.footer-notices', [
+          m(DesignToggle, { current: 'new', onselect: setPanel('switch-design') }),
           m(SoundNotice, attrs),
           m(Popup, attrs)
         ])
@@ -309,7 +311,6 @@ const Index = {
       vnode.state.panel === 'settings' ? m(Settings, {
         onclose: setPanel(null),
         oncustomize: setPanel('customize'),
-        onswitchdesign: setPanel('switch-design'),
         showCustomize: !isCustom && Array.isArray(meta.periods) && meta.periods.length > 0
       }) : null,
       vnode.state.panel === 'switch-design' ? m(SwitchDesignModal, { onclose: setPanel(null) }) : null,

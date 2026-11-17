@@ -1877,3 +1877,40 @@ button.pill-notice {
 .feedback-email-text:hover {
   text-decoration: underline;
 }
+
+/* ---------- New / Classic design toggle (timer footer) ---------- */
+
+.design-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 3px 3px 12px;
+  border-radius: 9999px;
+  background: var(--background-secondary);
+  border: 1px solid var(--stroke-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.design-toggle-label {
+  margin-right: 6px;
+  color: var(--foreground-secondary);
+}
+
+.design-toggle button {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--foreground-primary);
+}
+
+.design-toggle button[aria-pressed='true'] {
+  background: var(--background-inverse);
+  color: var(--foreground-primary-inverse);
+  cursor: default;
+}
+
+.design-toggle button[aria-pressed='false']:hover {
+  background: var(--background-hover);
+}
