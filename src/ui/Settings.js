@@ -254,10 +254,7 @@ const Settings = {
       holidays.length ? m('section.settings-list', [
         m('h3.section-title', 'Holiday effects'),
         holidays.map(overlay => m('.settings-row.toggle-row', { key: overlay.id }, [
-          m('.settings-row-text', [
-            m('span.toggle-label', overlay.name),
-            m('span.caption', overlay.description)
-          ]),
+          m('span.toggle-label', overlay.name),
           m(Toggle, {
             label: `Show ${overlay.name.toLowerCase()}`,
             checked: Seasonal.isOn(overlay.id),
