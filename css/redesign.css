@@ -49,7 +49,7 @@
   color-scheme: light;
 }
 
-:root[data-theme='dark'] {
+:root[data-bell-theme='dark'] {
   --background-primary: #161514;
   --background-secondary: #232220;
   --background-secondary-alt: #2c2b29;
@@ -816,7 +816,7 @@ button.pill-notice {
   display: block;
 }
 
-:root[data-theme='dark'] .toggle[aria-checked='true'] img {
+:root[data-bell-theme='dark'] .toggle[aria-checked='true'] img {
   filter: invert(1);
 }
 
@@ -1006,8 +1006,9 @@ button.pill-notice {
   right: 0;
   z-index: 20;
   max-height: min(568px, 50vh);
-  max-height: min(568px, 50dvh);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .search-result {
@@ -1330,7 +1331,7 @@ button.pill-notice {
   color: #bc303d;
 }
 
-:root[data-theme='dark'] .field-error {
+:root[data-bell-theme='dark'] .field-error {
   color: #ff8a94;
 }
 

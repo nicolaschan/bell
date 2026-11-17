@@ -79,8 +79,8 @@ const Appearance = {
   apply () {
     const root = document.documentElement
     const dark = Appearance.darkMode
-    if (root.getAttribute('data-theme') !== (dark ? 'dark' : 'light')) {
-      root.setAttribute('data-theme', dark ? 'dark' : 'light')
+    if (root.getAttribute('data-bell-theme') !== (dark ? 'dark' : 'light')) {
+      root.setAttribute('data-bell-theme', dark ? 'dark' : 'light')
     }
     const background = Appearance.background()
     if (root.style.getPropertyValue('--brand-color-background') !== background) {

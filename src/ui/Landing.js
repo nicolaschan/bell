@@ -154,7 +154,13 @@ const SchoolSearch = {
           onkeydown
         })
       ]),
-      state.open ? m('.menu.search-results#school-results[role=listbox]', items) : null
+      state.open ? m('.menu.search-results#school-results[role=listbox]', {
+        // Fit the list to the space left below the search box, so it scrolls
+        // instead of running off the bottom of the (non-scrolling) page
+        style: state.dom
+          ? { 'max-height': `${Math.max(160, window.innerHeight - state.dom.getBoundingClientRect().bottom - 24)}px` }
+          : {}
+      }, items) : null
     ])
   }
 }
