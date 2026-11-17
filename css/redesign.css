@@ -2079,9 +2079,11 @@ button.pill-notice {
 }
 
 /* Divider above the Holiday effects section */
+/* Holiday effects: a tight heading and a divider below the section */
 .settings-list.holiday-effects {
-  border-top: 1px solid var(--divider-menu);
-  padding-top: 24px;
+  gap: 4px;
+  border-bottom: 1px solid var(--divider-menu);
+  padding-bottom: 24px;
 }
 
 /* Fireworks on New Year's Day: rockets rise, then burst into sparks.

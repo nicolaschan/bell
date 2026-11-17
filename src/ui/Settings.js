@@ -185,6 +185,19 @@ const Settings = {
         m('.swatch-grid', Appearance.dynamicThemes.map(t => m(ThemeSwatch, { theme: t, selected: t.id === theme.id })))
       ]),
 
+      // Only shown while a holiday overlay is in season
+      holidays.length ? m('section.settings-list.holiday-effects', [
+        m('h3.section-title', 'Holiday effects'),
+        holidays.map(overlay => m('.settings-row.toggle-row', { key: overlay.id }, [
+          m('span.toggle-label', overlay.name),
+          m(Toggle, {
+            label: `Show ${overlay.name.toLowerCase()}`,
+            checked: Seasonal.isOn(overlay.id),
+            onchange: on => Seasonal.setOn(overlay.id, on)
+          })
+        ]))
+      ]) : null,
+
       m('section.settings-list', [
         m('.settings-row', [
           m('span.section-title', 'Light / dark mode'),
@@ -248,20 +261,7 @@ const Settings = {
           m('span.toggle-label', 'Sound selection'),
           m(SoundSelect)
         ])
-      ]),
-
-      // Only shown while a holiday overlay is in season
-      holidays.length ? m('section.settings-list.holiday-effects', [
-        m('h3.section-title', 'Holiday effects'),
-        holidays.map(overlay => m('.settings-row.toggle-row', { key: overlay.id }, [
-          m('span.toggle-label', overlay.name),
-          m(Toggle, {
-            label: `Show ${overlay.name.toLowerCase()}`,
-            checked: Seasonal.isOn(overlay.id),
-            onchange: on => Seasonal.setOn(overlay.id, on)
-          })
-        ]))
-      ]) : null
+      ])
     ]))
   }
 }
