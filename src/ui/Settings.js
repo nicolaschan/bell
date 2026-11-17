@@ -8,7 +8,7 @@ const Icon = require('./Icon')
 const { Dropdown, MenuSeparator, MenuButton } = require('./Dropdown')
 
 const MAX_CUSTOM_SOUND_BYTES = 2 * 1024 * 1024
-const DYNAMIC_THEMES_HELP = 'Dynamic themes fill the timer with a gradient, so its color shifts as the period counts down.'
+const DYNAMIC_THEMES_HELP = 'Dynamic themes fill the timer with a blend of colors that slowly drifts. As the period counts down, the color at the timer’s edge changes too.'
 
 const Toggle = {
   view (vnode) {
@@ -165,10 +165,14 @@ const Settings = {
       m('section.settings-section', [
         m('h3.section-title', [
           'Dynamic themes',
-          m('span.info[tabindex=0]', {
-            title: DYNAMIC_THEMES_HELP,
-            'aria-label': DYNAMIC_THEMES_HELP
-          }, m(Icon, { name: 'info', width: 17.5, height: 17.5 }))
+          m('span.info', {
+            tabindex: 0,
+            'aria-label': 'How dynamic themes work',
+            'aria-describedby': 'dynamic-themes-help'
+          }, [
+            m(Icon, { name: 'info', width: 17.5, height: 17.5 }),
+            m('span.tooltip#dynamic-themes-help[role=tooltip]', DYNAMIC_THEMES_HELP)
+          ])
         ]),
         m('.swatch-grid', Appearance.dynamicThemes.map(t => m(ThemeSwatch, { theme: t, selected: t.id === theme.id })))
       ]),

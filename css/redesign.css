@@ -722,9 +722,58 @@ button.pill-notice {
 }
 
 .info {
+  position: relative;
   display: inline-flex;
   cursor: help;
   border-radius: 9999px;
+}
+
+/* Small info box shown when the (i) icon is hovered, focused or tapped */
+.tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: -8px;
+  z-index: 5;
+  width: 260px;
+  max-width: calc(100vw - 64px);
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--background-inverse);
+  color: var(--foreground-primary-inverse);
+  box-shadow: var(--shadow-dropdown);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+}
+
+.tooltip::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 12px;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+.info:hover .tooltip,
+.info:focus .tooltip,
+.info:focus-within .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tooltip {
+    transition: none;
+  }
 }
 
 .swatch-grid {
