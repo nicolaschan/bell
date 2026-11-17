@@ -23,8 +23,8 @@ const OVERLAYS = [
   {
     id: 'heart',
     name: 'Valentine’s heart',
-    description: 'A heart inside the timer from February 12 through Valentine’s Day.',
-    activeOn: date => inRange(date, [2, 12], [2, 14])
+    description: 'A heart inside the timer on Valentine’s Day.',
+    activeOn: date => inRange(date, [2, 14], [2, 14])
   }
 ]
 
