@@ -193,7 +193,8 @@ const Index = {
     const theme = Appearance.theme
     // On days without classes the page takes the theme color and the pie takes
     // the page color (cream in light mode, near-black in dark mode)
-    const noClasses = !ScheduleView.hasClassesToday(bellTimer)
+    // (An empty personal schedule keeps the normal page; it shows its own empty state.)
+    const noClasses = !(isCustom && !hasCourses) && !ScheduleView.hasClassesToday(bellTimer)
     const pieTheme = noClasses ? { stops: [Appearance.pageColor()] } : theme
     const setPanel = panel => () => { vnode.state.panel = panel }
 
