@@ -3,17 +3,14 @@ const m = require('mithril')
 const Design = require('../Design')
 const Icon = require('./Icon')
 
-const CONTACT_EMAIL = 'hello@bell.plus'
+const FEEDBACK_FORM = 'https://forms.gle/BDq418uAvcG22Rzt7'
 
 const reducedMotion = () =>
   window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 // Shown before switching from the redesign back to the classic UI: asks for
-// feedback and shows the contact email. attrs: onclose
+// feedback and links to the feedback survey. attrs: onclose
 const SwitchDesignModal = {
-  oninit (vnode) {
-    vnode.state.copied = false
-  },
   oncreate (vnode) {
     vnode.state.onKeyDown = e => {
       if (e.key === 'Escape') {
@@ -34,27 +31,6 @@ const SwitchDesignModal = {
   },
   view (vnode) {
     const { onclose } = vnode.attrs
-    const state = vnode.state
-    const copy = e => {
-      const done = () => {
-        state.copied = true
-        m.redraw()
-        setTimeout(() => { state.copied = false; m.redraw() }, 2000)
-      }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(CONTACT_EMAIL).then(done, () => selectEmail(e))
-      } else {
-        selectEmail(e)
-      }
-    }
-    const selectEmail = e => {
-      const text = e.currentTarget.closest('.modal').querySelector('.feedback-email-text')
-      const range = document.createRange()
-      range.selectNodeContents(text)
-      const selection = window.getSelection()
-      selection.removeAllRanges()
-      selection.addRange(range)
-    }
 
     return m('.modal-backdrop', {
       onclick: e => {
@@ -68,11 +44,10 @@ const SwitchDesignModal = {
           onclick: onclose
         }, m(Icon, { name: 'x' }))
       ]),
-      m('p.switch-design-body', 'Do you have feedback on the new design? Tell us what you liked or what didn’t work for you, and we’ll use it to make bell better.'),
-      m('.feedback-email', [
-        m(Icon, { name: 'mail' }),
-        m(`a.feedback-email-text[href=mailto:${CONTACT_EMAIL}]`, CONTACT_EMAIL),
-        m('button.button.secondary.copy-button[type=button]', { onclick: copy }, state.copied ? 'Copied' : 'Copy')
+      m('p.switch-design-body', 'Do you have feedback on the new design? Tell us what you liked or what didn’t work for you in a quick survey, and we’ll use it to make bell better.'),
+      m(`a.feedback-link[href=${FEEDBACK_FORM}][target=_blank][rel=noopener]`, [
+        m('span', 'Share feedback'),
+        m('span.feedback-link-arrow[aria-hidden=true]', '↗')
       ]),
       m('.card-actions', [
         m('button.button.secondary.stay-button[type=button]', { onclick: onclose }, 'Keep the new design'),
