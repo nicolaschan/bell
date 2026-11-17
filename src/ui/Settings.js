@@ -179,15 +179,18 @@ const Settings = {
           m('button.mode-toggle[type=button]', {
             'aria-label': dark ? 'Switch to light mode' : 'Switch to dark mode',
             title: dark ? 'Dark mode' : 'Light mode',
-            className: vnode.state.modeToggled ? 'spin' : '',
-            onclick: () => {
-              vnode.state.modeToggled = true
+            onclick: e => {
               Appearance.setDarkMode(!dark)
+              // Restart the spin-in animation on the icon (removing the class and
+              // forcing a reflow lets the same animation play again)
+              const icon = e.currentTarget.querySelector('.mode-icon')
+              icon.classList.remove('spin')
+              void icon.offsetWidth
+              icon.classList.add('spin')
             }
-          }, [
-            // Keyed so the new icon is a fresh element and its spin-in animation replays
-            m('span.mode-icon', { key: dark ? 'moon' : 'sun' }, m(Icon, { name: dark ? 'moon' : 'sun' }))
-          ])
+          }, m('span.mode-icon', {
+            onanimationend: e => e.currentTarget.classList.remove('spin')
+          }, m(Icon, { name: dark ? 'moon' : 'sun' })))
         ]),
         showCustomize ? m('.settings-row.customize-row', [
           m('.settings-row-text', [

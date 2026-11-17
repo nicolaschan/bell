@@ -10,11 +10,12 @@ const m = require('mithril')
 
 const TEXTURE_SCALE = 0.25 // the texture is soft, so it is drawn small and scaled up
 const FRAME_INTERVAL = 1000 / 30
+const DRIFT_SPEED = 1.6 // multiplies how fast the blobs drift
 
 const reducedMotion = () =>
   window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-// Each blob drifts on its own slow, looping path (periods of roughly 25–70 s)
+// Each blob drifts on its own slow, looping path (at DRIFT_SPEED 1.6, periods of roughly 15–45 s)
 const BLOBS = [
   { fx: 0.24, fy: 0.15, px: 0.0, py: 1.3, reach: 0.34, size: 0.55 },
   { fx: 0.11, fy: 0.27, px: 2.1, py: 0.4, reach: 0.38, size: 0.5 },
@@ -137,7 +138,7 @@ const Pie = {
     state.lastFrame = 0
     const render = () => {
       const { proportionElapsed, theme } = state.attrs
-      const seconds = reducedMotion() ? 0 : (Date.now() - state.started) / 1000
+      const seconds = reducedMotion() ? 0 : DRIFT_SPEED * (Date.now() - state.started) / 1000
       draw(vnode.dom, state, proportionElapsed, theme, seconds)
     }
     state.render = render
