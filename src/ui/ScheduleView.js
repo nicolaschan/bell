@@ -1,4 +1,5 @@
 const m = require('mithril')
+const Appearance = require('../Appearance')
 const Icon = require('./Icon')
 const { formatTime, formatDateTime } = require('./format')
 
@@ -62,7 +63,27 @@ const Divider = {
   }
 }
 
+// Slides down from the top with a slight bounce, and eases back up when closed
+const CLOSE_MS = 380
+
 const ScheduleView = {
+  oncreate (vnode) {
+    vnode.state.onKeyDown = e => {
+      if (e.key === 'Escape') {
+        vnode.attrs.onclose()
+        m.redraw()
+      }
+    }
+    document.addEventListener('keydown', vnode.state.onKeyDown)
+    const close = vnode.dom.querySelector('.close-button')
+    if (close) close.focus()
+  },
+  onbeforeremove (vnode) {
+    document.removeEventListener('keydown', vnode.state.onKeyDown)
+    vnode.dom.classList.add('closing')
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    return new Promise(resolve => setTimeout(resolve, reduce ? 0 : CLOSE_MS))
+  },
   view (vnode) {
     const { bellTimer, onclose } = vnode.attrs
     const { rows, inClass } = buildRows(bellTimer)
@@ -80,7 +101,8 @@ const ScheduleView = {
       ]
     }
 
-    return m('.schedule-page', { role: 'dialog', 'aria-label': 'Schedule' }, [
+    const dynamic = Appearance.theme.type === 'dynamic'
+    return m('.schedule-page', { role: 'dialog', 'aria-label': 'Schedule', className: dynamic ? 'dynamic' : '' }, [
       m('header.page-header', [
         m('.header-title', formatDateTime(bellTimer.date)),
         m('button.icon-button.close-button[type=button]', {
@@ -92,5 +114,7 @@ const ScheduleView = {
     ])
   }
 }
+
+ScheduleView.isBreak = isBreak
 
 module.exports = ScheduleView

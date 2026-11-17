@@ -188,10 +188,6 @@ const Index = {
     const theme = Appearance.theme
     const setPanel = panel => () => { vnode.state.panel = panel }
 
-    if (vnode.state.panel === 'schedule') {
-      return m(ScheduleView, { bellTimer, onclose: setPanel(null) })
-    }
-
     return m('.timer-page', [
       m('header.page-header', [
         m(SchoolMenu, { name, isCustom }),
@@ -212,7 +208,11 @@ const Index = {
         ])
       ]),
       m('main.hero', isCustom && !hasCourses ? m(EmptyPersonalSchedule) : [
-        m(Pie, { proportionElapsed: bellTimer.getProportionElapsed(), theme }),
+        m(Pie, {
+          proportionElapsed: bellTimer.getProportionElapsed(),
+          theme,
+          passing: ScheduleView.isBreak(bellTimer.getCurrentPeriod().name)
+        }),
         m(Countdown, attrs)
       ]),
       m('footer.page-footer', [
@@ -223,6 +223,7 @@ const Index = {
         ])
       ]),
       m(SeasonalEffects, attrs),
+      vnode.state.panel === 'schedule' ? m(ScheduleView, { bellTimer, onclose: setPanel(null) }) : null,
       vnode.state.panel === 'settings' ? m(Settings, {
         onclose: setPanel(null),
         showCustomize: !isCustom && Array.isArray(meta.periods) && meta.periods.length > 0
