@@ -1280,10 +1280,15 @@ button.pill-notice {
   transform: rotate(180deg);
 }
 
-/* Invisible click targets over the screenshot's own buttons */
+/* Invisible click targets over the screenshot's own buttons (no hover state) */
 .preview-hotspot {
   position: absolute;
   border-radius: 9999px;
+  cursor: pointer;
+}
+
+.preview-hotspot:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .preview-hotspot.schedule-hotspot {
@@ -1301,9 +1306,6 @@ button.pill-notice {
   border-radius: 4px;
 }
 
-.preview-hotspot:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
 
 /* About / Contact */
 
