@@ -179,8 +179,15 @@ const Settings = {
           m('button.mode-toggle[type=button]', {
             'aria-label': dark ? 'Switch to light mode' : 'Switch to dark mode',
             title: dark ? 'Dark mode' : 'Light mode',
-            onclick: () => Appearance.setDarkMode(!dark)
-          }, m(Icon, { name: dark ? 'moon' : 'sun' }))
+            className: vnode.state.modeToggled ? 'spin' : '',
+            onclick: () => {
+              vnode.state.modeToggled = true
+              Appearance.setDarkMode(!dark)
+            }
+          }, [
+            // Keyed so the new icon is a fresh element and its spin-in animation replays
+            m('span.mode-icon', { key: dark ? 'moon' : 'sun' }, m(Icon, { name: dark ? 'moon' : 'sun' }))
+          ])
         ]),
         showCustomize ? m('.settings-row.customize-row', [
           m('.settings-row-text', [

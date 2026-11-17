@@ -835,6 +835,32 @@ button.pill-notice {
   border: 1px solid var(--stroke-primary);
 }
 
+/* Light / dark toggle: the new icon spins in with a little overshoot */
+.mode-icon {
+  display: inline-flex;
+}
+
+.mode-toggle.spin .mode-icon {
+  animation: mode-spin 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes mode-spin {
+  from {
+    transform: rotate(-200deg) scale(0.3);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mode-toggle.spin .mode-icon {
+    animation: none;
+  }
+}
+
 .sound-select {
   display: flex;
   align-items: center;
