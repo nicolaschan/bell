@@ -1547,7 +1547,7 @@ button.pill-notice {
 
 .period-row {
   display: grid;
-  grid-template-columns: minmax(80px, 160px) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(80px, 200px) minmax(0, 1fr);
   align-items: center;
   gap: 16px;
 }
@@ -1767,11 +1767,8 @@ button.pill-notice {
   }
 
   .period-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .period-row .period-label {
-    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
   }
 }
 
