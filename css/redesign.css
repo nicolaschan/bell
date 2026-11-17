@@ -734,8 +734,8 @@ button.pill-notice {
   top: calc(100% + 8px);
   left: -8px;
   z-index: 5;
-  width: 260px;
-  max-width: calc(100vw - 64px);
+  width: max-content;
+  max-width: min(260px, calc(100vw - 64px));
   padding: 10px 12px;
   border-radius: 8px;
   background: var(--background-inverse);

@@ -8,7 +8,7 @@ const Icon = require('./Icon')
 const { Dropdown, MenuSeparator, MenuButton } = require('./Dropdown')
 
 const MAX_CUSTOM_SOUND_BYTES = 2 * 1024 * 1024
-const DYNAMIC_THEMES_HELP = 'Dynamic themes fill the timer with a blend of colors that slowly drifts. As the period counts down, the color at the timer’s edge changes too.'
+const DYNAMIC_THEMES_HELP = 'Dynamic themes fill the timer with a moving blend of colors.'
 
 const Toggle = {
   view (vnode) {
