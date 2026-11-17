@@ -8,6 +8,8 @@ const Settings = require('./Settings')
 const BlockNames = require('./PeriodEntry')
 const SwitchDesignModal = require('./SwitchDesignModal')
 const DesignToggle = require('./DesignToggle')
+const Snowfall = require('./Snowfall')
+const Seasonal = require('../Seasonal')
 const ScheduleView = require('./ScheduleView')
 const { Dropdown, MenuSeparator, MenuButton } = require('./Dropdown')
 const { default: ErrorIcon } = require('./ErrorIcon')
@@ -184,10 +186,12 @@ const EmptyPersonalSchedule = {
   }
 }
 
-// Seasonal effects (snow in December, the April Fools duck) from the original themes
+// The April Fools duck from the original themes. (The original December snow
+// is replaced by the snowflake overlay below.)
 const SeasonalEffects = {
   view (vnode) {
-    const effects = vnode.attrs.themeManager.defaultTheme.specialEffects
+    const theme = vnode.attrs.themeManager.defaultTheme
+    const effects = theme.name === 'Quack' && theme.specialEffects
     if (!effects) {
       return null
     }
@@ -323,10 +327,13 @@ const Index = {
         ])
       ]),
       m(SeasonalEffects, attrs),
+      // Holiday overlays (each can be turned off in Settings while it's active)
+      Seasonal.showing(bellTimer.date).map(overlay => overlay.id === 'snow' ? m(Snowfall, { key: overlay.id }) : null),
       vnode.state.panel === 'schedule' ? m(ScheduleView, { bellTimer, onclose: setPanel(null) }) : null,
       vnode.state.panel === 'settings' ? m(Settings, {
         onclose: setPanel(null),
         oncustomize: setPanel('customize'),
+        date: bellTimer.date,
         showCustomize: !isCustom && Array.isArray(meta.periods) && meta.periods.length > 0
       }) : null,
       vnode.state.panel === 'switch-design' ? m(SwitchDesignModal, { onclose: setPanel(null) }) : null,

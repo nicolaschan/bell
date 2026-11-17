@@ -5,6 +5,7 @@ const notificationManager = require('../NotificationManager').default
 const soundManager = require('../SoundManager').default
 const { SOUND_OPTIONS } = require('../SoundManager')
 const Icon = require('./Icon')
+const Seasonal = require('../Seasonal')
 const { Dropdown, MenuSeparator, MenuButton } = require('./Dropdown')
 
 const MAX_CUSTOM_SOUND_BYTES = 2 * 1024 * 1024
@@ -147,6 +148,7 @@ const Settings = {
     const theme = Appearance.theme
     const dark = Appearance.darkMode
     const blocked = notificationManager.notificationsBlocked()
+    const holidays = Seasonal.available(vnode.attrs.date || new Date())
 
     return m('.modal-backdrop', {
       onclick: e => {
@@ -246,7 +248,23 @@ const Settings = {
           m('span.toggle-label', 'Sound selection'),
           m(SoundSelect)
         ])
-      ])
+      ]),
+
+      // Only shown while a holiday overlay is in season
+      holidays.length ? m('section.settings-list', [
+        m('h3.section-title', 'Holiday effects'),
+        holidays.map(overlay => m('.settings-row.toggle-row', { key: overlay.id }, [
+          m('.settings-row-text', [
+            m('span.toggle-label', overlay.name),
+            m('span.caption', overlay.description)
+          ]),
+          m(Toggle, {
+            label: `Show ${overlay.name.toLowerCase()}`,
+            checked: Seasonal.isOn(overlay.id),
+            onchange: on => Seasonal.setOn(overlay.id, on)
+          })
+        ]))
+      ]) : null
     ]))
   }
 }
