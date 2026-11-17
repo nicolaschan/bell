@@ -172,7 +172,8 @@ const EmptyPersonalSchedule = {
     return m('.empty-state', [
       m('p.empty-title', 'Your schedule is empty'),
       m('img', {
-        src: `/img/redesign/${Appearance.darkMode ? 'empty-schedule-dark' : 'empty-schedule'}.png`,
+        src: `/img/redesign/${Appearance.darkMode ? 'empty-schedule-dark' : 'empty-schedule'}.webp`,
+        decoding: 'async',
         width: 204,
         height: 215,
         alt: ''
@@ -200,7 +201,24 @@ const SeasonalEffects = {
   }
 }
 
+// Fetch images for screens people are likely to open next (the personal
+// schedule builder, the other preview state) once the page is idle, so they
+// are already cached when needed
+const PREFETCH = ['no-blocks', 'no-blocks-dark', 'empty-schedule', 'empty-schedule-dark']
+let prefetched = false
+const prefetchImages = () => {
+  if (prefetched) return
+  prefetched = true
+  const run = () => PREFETCH.forEach(name => {
+    const img = new window.Image()
+    img.src = `/img/redesign/${name}.webp`
+  })
+  if (window.requestIdleCallback) window.requestIdleCallback(run, { timeout: 3000 })
+  else setTimeout(run, 1500)
+}
+
 const Index = {
+  oncreate: prefetchImages,
   oninit: async function (vnode) {
     const cookieManager = vnode.attrs.cookieManager
     vnode.state.panel = pendingPanel

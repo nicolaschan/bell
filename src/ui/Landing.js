@@ -171,13 +171,20 @@ const Preview = {
   oninit (vnode) {
     vnode.state.showSchedule = false
   },
+  // Load the schedule screenshot ahead of time so switching is instant
+  oncreate () {
+    const img = new window.Image()
+    img.src = '/img/redesign/landing-preview-schedule.webp'
+  },
   view (vnode) {
     const state = vnode.state
     const showSchedule = state.showSchedule
     return m('section.landing-preview', { 'aria-label': 'Preview of bell' }, m('.preview-frame', m('.preview-switch', [
-      m('img.preview-background', { src: '/img/redesign/landing-background.png', alt: '' }),
+      m('img.preview-background', { src: '/img/redesign/landing-background.webp', width: 1344, height: 768, alt: '' }),
       m('.preview-app', { className: showSchedule ? 'schedule' : 'timer' }, m('img', {
-        src: `/img/redesign/${showSchedule ? 'landing-preview-schedule' : 'landing-preview'}.png`,
+        src: `/img/redesign/${showSchedule ? 'landing-preview-schedule' : 'landing-preview'}.webp`,
+        width: 1838,
+        height: 752,
         alt: showSchedule
           ? 'The schedule page, listing today’s classes with the current one in bold'
           : 'The timer page, counting down 27:16:00 until Lunch & Advisory ends'

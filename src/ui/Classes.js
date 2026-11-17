@@ -265,7 +265,8 @@ const Classes = {
       m('main.builder-content', cards.length ? cards : m('.empty-state', [
         m('p.empty-title', 'You haven’t added any blocks yet.'),
         m('img', {
-          src: `/img/redesign/${Appearance.darkMode ? 'no-blocks-dark' : 'no-blocks'}.svg`,
+          src: `/img/redesign/${Appearance.darkMode ? 'no-blocks-dark' : 'no-blocks'}.webp`,
+          decoding: 'async',
           width: 208.605,
           height: 196.771,
           alt: ''

@@ -37,7 +37,7 @@ const dynamicThemes = [
   name,
   type: 'dynamic',
   stops,
-  icon: `/img/redesign/themes/dynamic-${i + 1}.png`
+  icon: `/img/redesign/themes/dynamic-${i + 1}.webp`
 }))
 
 const allThemes = colorThemes.concat(dynamicThemes)

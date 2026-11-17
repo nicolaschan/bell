@@ -20,7 +20,14 @@ const sheetTo = (path, direction) => {
     // on a timer makes the next redraw render immediately instead.
     setTimeout(() => {
       m.redraw()
-      setTimeout(resolve, 0)
+      // Let the new page's images finish decoding (up to 200ms) so it slides
+      // in complete instead of having illustrations pop in afterwards
+      const images = Array.prototype.slice.call(document.querySelectorAll('img'))
+        .filter(img => !img.complete && img.decode)
+      Promise.race([
+        Promise.all(images.map(img => img.decode().catch(() => {}))),
+        new Promise(resolve => setTimeout(resolve, 200))
+      ]).then(resolve)
     }, 20)
   }))
   transition.finished.then(() => root.removeAttribute('data-transition'), () => root.removeAttribute('data-transition'))
