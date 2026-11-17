@@ -505,16 +505,17 @@ button.pill-notice {
 /* ---------- Schedule page ---------- */
 
 .schedule-page {
-  /* Covers the timer. It extends 48px above the screen so the bounce never shows a gap. */
+  /* Covers the timer. It extends 64px above the screen, more than the bounce's
+     24px overshoot, so the bounce never shows a gap at the top. */
   position: fixed;
-  top: -48px;
+  top: -64px;
   right: 0;
   bottom: 0;
   left: 0;
   z-index: 30;
-  padding-top: 48px;
+  padding-top: 64px;
   overflow-y: auto;
-  animation: schedule-in 0.65s cubic-bezier(0.34, 1.45, 0.64, 1) both;
+  animation: schedule-in 0.7s both;
   background: var(--brand-color-background);
   /* The schedule is always drawn in dark text on the theme color */
   --foreground-primary: #000000;
@@ -524,8 +525,21 @@ button.pill-notice {
 }
 
 @keyframes schedule-in {
-  from { transform: translateY(-100%); }
-  to { transform: translateY(0); }
+  0% {
+    transform: translateY(-100%);
+    animation-timing-function: cubic-bezier(0.25, 0.8, 0.4, 1);
+  }
+  65% {
+    transform: translateY(24px);
+    animation-timing-function: ease-in-out;
+  }
+  85% {
+    transform: translateY(-4px);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @keyframes schedule-out {
@@ -540,7 +554,7 @@ button.pill-notice {
 /* Dynamic themes: the gradient drifts slowly behind the schedule */
 .schedule-page.dynamic {
   background-size: 300% 300%;
-  animation: schedule-in 0.65s cubic-bezier(0.34, 1.45, 0.64, 1) both,
+  animation: schedule-in 0.7s both,
     gradient-drift 40s ease-in-out infinite alternate;
 }
 
