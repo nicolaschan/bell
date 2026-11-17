@@ -159,6 +159,34 @@ const SchoolSearch = {
   }
 }
 
+// Screenshot of the app over a landscape. Its "View schedule" button switches the
+// screenshot to the schedule page, and that page's close button switches it back.
+const Preview = {
+  oninit (vnode) {
+    vnode.state.showSchedule = false
+  },
+  view (vnode) {
+    const state = vnode.state
+    const showSchedule = state.showSchedule
+    return m('section.landing-preview', { 'aria-label': 'Preview of bell' }, m('.preview-frame', m('.preview-switch', [
+      m('img.preview-background', { src: '/img/redesign/landing-background.png', alt: '' }),
+      m('.preview-app', { className: showSchedule ? 'schedule' : 'timer' }, m('img', {
+        src: `/img/redesign/${showSchedule ? 'landing-preview-schedule' : 'landing-preview'}.png`,
+        alt: showSchedule
+          ? 'The schedule page, listing today’s classes with the current one in bold'
+          : 'The timer page, counting down 27:16:00 until Lunch & Advisory ends'
+      })),
+      m('p.preview-caption', 'Easily switch between timer / schedule'),
+      m('img.preview-arrow', { src: '/img/redesign/arrow-down.svg', width: 9.833, height: 21, alt: '' }),
+      m('button.preview-hotspot[type=button]', {
+        className: showSchedule ? 'close-hotspot' : 'schedule-hotspot',
+        'aria-label': showSchedule ? 'Show the timer in the preview' : 'Show the schedule in the preview',
+        onclick: () => { state.showSchedule = !showSchedule }
+      })
+    ])))
+  }
+}
+
 const Landing = {
   view () {
     Appearance.apply()
@@ -179,12 +207,7 @@ const Landing = {
           ])
         ])
       ]),
-      m('section.landing-preview[aria-hidden=true]', m('.preview-frame', [
-        m('img.preview-background', { src: '/img/redesign/landing-background.png', alt: '' }),
-        m('.preview-app', m('img', { src: '/img/redesign/landing-preview.png', alt: '' })),
-        m('p.preview-caption', 'Easily switch between timer / schedule'),
-        m('img.preview-arrow', { src: '/img/redesign/arrow-down.svg', width: 9.833, height: 21, alt: '' })
-      ]))
+      m(Preview)
     ])
   }
 }

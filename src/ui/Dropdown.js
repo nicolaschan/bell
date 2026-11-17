@@ -41,10 +41,38 @@ const Dropdown = {
     return m('.dropdown', { className }, [
       vnode.attrs.trigger({ open: state.open, toggle }),
       state.open
-        ? m(`.menu.dropdown-menu.align-${align}`, { role: 'menu' }, vnode.attrs.menu({ close: state.close }))
+        ? m(`.menu.dropdown-menu.align-${align}`, {
+          role: 'menu',
+          style: state.dom ? menuPosition(state.dom, align) : { visibility: 'hidden' }
+        }, vnode.attrs.menu({ close: state.close }))
         : null
     ])
   }
+}
+
+// Menus float above the page (and above scrolling containers such as the
+// settings modal), anchored to their trigger. They open upwards when there is
+// more room above the trigger than below it.
+const GAP = 8
+const EDGE = 8
+function menuPosition (dropdown, align) {
+  const rect = dropdown.getBoundingClientRect()
+  const spaceBelow = window.innerHeight - rect.bottom - GAP - EDGE
+  const spaceAbove = rect.top - GAP - EDGE
+  const style = { position: 'fixed' }
+  if (spaceBelow >= 240 || spaceBelow >= spaceAbove) {
+    style.top = `${rect.bottom + GAP}px`
+    style['max-height'] = `${spaceBelow}px`
+  } else {
+    style.bottom = `${window.innerHeight - rect.top + GAP}px`
+    style['max-height'] = `${spaceAbove}px`
+  }
+  if (align === 'right') {
+    style.right = `${Math.max(EDGE, window.innerWidth - rect.right)}px`
+  } else {
+    style.left = `${Math.max(EDGE, rect.left)}px`
+  }
+  return style
 }
 
 const MenuSeparator = { view: () => m('.menu-separator', m('.rule')) }

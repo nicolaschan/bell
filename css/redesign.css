@@ -290,20 +290,13 @@ input, select {
 }
 
 .dropdown-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  z-index: 20;
+  /* Placed next to its trigger with position: fixed by Dropdown.js */
+  position: fixed;
+  z-index: 40;
+  overflow-y: auto;
   min-width: 215px;
   width: max-content;
   max-width: calc(100vw - 2 * var(--page-gutter));
-}
-
-.dropdown-menu.align-left {
-  left: 0;
-}
-
-.dropdown-menu.align-right {
-  right: 0;
 }
 
 .school-menu .dropdown-menu {
@@ -806,6 +799,13 @@ button.pill-notice {
   min-height: 100dvh;
 }
 
+/* The landing page fits the window exactly; the preview gives up height first */
+.landing-page {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
 .site-header .wordmark {
   display: inline-flex;
 }
@@ -832,13 +832,13 @@ button.pill-notice {
 
 .landing-hero {
   flex: 1 0 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
   gap: 24px;
   padding: 24px var(--page-gutter);
-  min-height: 448px;
 }
 
 .landing-intro {
@@ -909,7 +909,8 @@ button.pill-notice {
   left: 0;
   right: 0;
   z-index: 20;
-  max-height: min(568px, 60vh);
+  max-height: min(568px, 50vh);
+  max-height: min(568px, 50dvh);
   overflow-y: auto;
 }
 
@@ -971,32 +972,48 @@ button.pill-notice {
 }
 
 .landing-preview {
+  /* 470px tall at full width, scaled with the width, and shrinks on short windows */
+  flex: 0 1 min(470px, calc((100vw - 2 * var(--page-gutter)) * 470 / 1448));
+  min-height: 0;
   padding: 0 var(--page-gutter);
-  flex-shrink: 0;
 }
 
 .preview-frame {
   position: relative;
-  aspect-ratio: 1448 / 470;
+  height: 100%;
   overflow: hidden;
   border-radius: 24px 24px 0 0;
+}
+
+/* Positions below are percentages of the 1448 x 532 design frame */
+.preview-switch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1448 / 532;
 }
 
 .preview-background {
   position: absolute;
   left: 0;
-  top: -26.97%;
+  top: -24.48%;
   width: 100%;
-  height: auto;
+  height: 155.53%;
+  object-fit: cover;
+  max-width: none;
 }
 
 .preview-app {
   position: absolute;
   left: 18.99%;
   right: 17.54%;
-  top: 20%;
+  top: 17.67%;
   aspect-ratio: 877 / 418;
   overflow: hidden;
+}
+
+.preview-app.timer {
   border-radius: 12px 12px 0 0;
 }
 
@@ -1009,7 +1026,7 @@ button.pill-notice {
 .preview-caption {
   position: absolute;
   left: 78.56%;
-  top: 6.6%;
+  top: 5.83%;
   width: 133px;
   transform: translateX(-50%);
   font-size: 12px;
@@ -1020,8 +1037,33 @@ button.pill-notice {
 .preview-arrow {
   position: absolute;
   left: 78.22%;
-  top: 14.6%;
+  top: 12.97%;
   transform: rotate(180deg);
+}
+
+/* Invisible click targets over the screenshot's own buttons */
+.preview-hotspot {
+  position: absolute;
+  border-radius: 9999px;
+}
+
+.preview-hotspot.schedule-hotspot {
+  left: 76.45%;
+  top: 20.11%;
+  width: 5.25%;
+  height: 4.32%;
+}
+
+.preview-hotspot.close-hotspot {
+  left: 79.83%;
+  top: 21.05%;
+  width: 1.31%;
+  height: 3.38%;
+  border-radius: 4px;
+}
+
+.preview-hotspot:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* About / Contact */
@@ -1520,4 +1562,8 @@ button.pill-notice {
   .period-row .period-label {
     grid-column: 1 / -1;
   }
+}
+
+.dropdown-menu > * {
+  flex-shrink: 0;
 }
