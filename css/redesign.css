@@ -138,6 +138,7 @@ input, select {
 .icon {
   display: block;
   flex-shrink: 0;
+  max-width: none;
   filter: var(--icon-filter);
 }
 
@@ -209,7 +210,8 @@ input, select {
 .icon-button.bordered {
   width: 36px;
   height: 36px;
-  padding: 8px;
+  /* 1px border + 5px padding on each side leaves room for a 24px icon */
+  padding: 5px;
   background: var(--background-secondary);
   border: 1px solid var(--stroke-secondary);
 }
