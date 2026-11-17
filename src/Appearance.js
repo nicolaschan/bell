@@ -3,17 +3,17 @@ const cookieManager = require('./LocalForageCookieManager').default
 const THEME_KEY = 'appearance_theme'
 const DARK_MODE_KEY = 'dark_mode'
 
-// Solid theme colors. `swatch` is the color shown in the settings picker and
-// `pie` is the (lighter) color used for the countdown pie and schedule page.
+// Solid theme colors, used at full strength for the swatch in Settings, the
+// countdown pie and the schedule page
 const colorThemes = [
-  { id: 'sky', name: 'Sky', swatch: '#14c1f9', pie: '#67daff' },
-  { id: 'green', name: 'Green', swatch: '#47ad76', pie: '#84cba4' },
-  { id: 'red', name: 'Red', swatch: '#bc303d', pie: '#d6737c' },
-  { id: 'orange', name: 'Orange', swatch: '#f16445', pie: '#f6977f' },
-  { id: 'pink', name: 'Pink', swatch: '#ff91b4', pie: '#ffb5cc' },
-  { id: 'yellow', name: 'Yellow', swatch: '#f8ce4b', pie: '#fbdc7c' },
-  { id: 'periwinkle', name: 'Periwinkle', swatch: '#757af9', pie: '#a0a3fb' }
-].map(theme => Object.assign({ type: 'color', stops: [theme.pie] }, theme))
+  { id: 'sky', name: 'Sky', swatch: '#14c1f9' },
+  { id: 'green', name: 'Green', swatch: '#47ad76' },
+  { id: 'red', name: 'Red', swatch: '#bc303d' },
+  { id: 'orange', name: 'Orange', swatch: '#f16445' },
+  { id: 'pink', name: 'Pink', swatch: '#ff91b4' },
+  { id: 'yellow', name: 'Yellow', swatch: '#f8ce4b' },
+  { id: 'periwinkle', name: 'Periwinkle', swatch: '#757af9' }
+].map(theme => Object.assign({ type: 'color', stops: [theme.swatch] }, theme))
 
 // Dynamic themes fill the pie with a gradient that sweeps around the clock
 // face, so the color at the shrinking edge changes as the period counts down.

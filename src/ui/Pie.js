@@ -162,9 +162,8 @@ const Pie = {
   onremove (vnode) {
     window.cancelAnimationFrame(vnode.state.frame)
   },
-  view (vnode) {
-    // Passing periods are drawn lighter than classes
-    return m('canvas.pie', { 'aria-hidden': 'true', className: vnode.attrs.passing ? 'passing' : '' })
+  view () {
+    return m('canvas.pie', { 'aria-hidden': 'true' })
   }
 }
 

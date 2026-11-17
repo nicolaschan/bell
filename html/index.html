@@ -17,9 +17,24 @@ MIT License (https://github.com/nicolaschan/bell)
     <title id="title">Bell Countdown</title>
     <link rel="shortcut icon" type="image/png" href="/favicons/empty.png" id="favicon">
     <link rel="manifest" href="/manifest.json">
-    <link rel="preload" href="/fonts/inter/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/fonts/inter/inter-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/css/redesign.css">
+    <script>
+      // Pick the redesign or the original UI (see src/Design.js) before anything renders
+      (function () {
+        var design = 'new'
+        try { design = window.localStorage.getItem('bell_design') || 'new' } catch (e) {}
+        document.documentElement.setAttribute('data-design', design)
+        var sheets = design === 'classic'
+          ? ['/css/mithril-selector.min.css', '/css/style-mithril.css']
+          : ['/css/redesign.css']
+        sheets.forEach(function (href) {
+          document.write('<link rel="stylesheet" href="' + href + '">')
+        })
+        if (design !== 'classic') {
+          document.write('<link rel="preload" href="/fonts/inter/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>')
+          document.write('<link rel="preload" href="/fonts/inter/inter-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>')
+        }
+      })()
+    </script>
     <script type="text/javascript" src="/timesync/timesync.js"></script>
   </head>
   <body>

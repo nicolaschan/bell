@@ -3,7 +3,10 @@ const handler = new UnexpectedErrorHandler()
 handler.initialize()
 
 const SimpleLogger = require('./SimpleLogger').default
-const MithrilUI = require('./MithrilUI')
+// The redesign, or the original UI for people who switched back (see Design.js)
+const MithrilUI = require('./Design').current === 'classic'
+  ? require('./ui/classic/ClassicUI')
+  : require('./MithrilUI')
 const VERSION = require('./Version')
 global.VERSION = VERSION
 
