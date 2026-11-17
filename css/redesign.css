@@ -1991,71 +1991,81 @@ button.pill-notice {
   z-index: 3;
 }
 
-/* Christmas lights draped across the date on Christmas Day */
+/* Christmas lights wrapped around the date on Christmas Day */
 .lit-date {
   position: relative;
   display: inline-block;
 }
 
+/* The frame sits just outside the text; bulbs point outward from it */
 .christmas-lights {
   position: absolute;
-  left: -6px;
-  right: -6px;
-  top: -10px;
-  height: 26px;
+  inset: -7px -12px;
   pointer-events: none;
 }
 
 .lights-wire {
   position: absolute;
-  inset: 0 0 auto;
-  width: 100%;
-  height: 12px;
-  overflow: visible;
+  inset: 0;
+  border: 1.5px solid #2f4a2c;
+  border-radius: 10px;
 }
 
-.lights-wire path {
-  fill: none;
-  stroke: #2f4a2c;
-  stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
-}
-
-:root[data-bell-theme='dark'] .lights-wire path {
-  stroke: #9fb59a;
+:root[data-bell-theme='dark'] .lights-wire {
+  border-color: #9fb59a;
 }
 
 .christmas-lights .bulb {
   position: absolute;
-  top: 9px;
-  width: 7px;
-  height: 11px;
+  width: 6px;
+  height: 9px;
   border-radius: 50% 50% 45% 45% / 40% 40% 60% 60%;
-  transform-origin: 50% 0;
+  background: var(--bulb);
+  box-shadow: 0 0 6px 2px var(--bulb);
   animation: bulb-twinkle 1.6s ease-in-out infinite;
 }
 
-/* The little socket each bulb hangs from */
+/* The socket at each bulb's base, which clips onto the wire */
 .christmas-lights .bulb::before {
   content: '';
   position: absolute;
   top: -3px;
-  left: 1.5px;
+  left: 1px;
   width: 4px;
   height: 4px;
   border-radius: 1px;
   background: #2f4a2c;
 }
 
+:root[data-bell-theme='dark'] .christmas-lights .bulb::before {
+  background: #9fb59a;
+}
+
+/* Each bulb's base sits on the wire and its glass points away from the date */
+.christmas-lights .bulb.top {
+  top: 0;
+  transform: translate(-50%, calc(-100% - 2px)) rotate(180deg);
+}
+
+.christmas-lights .bulb.bottom {
+  bottom: 0;
+  transform: translate(-50%, calc(100% + 2px));
+}
+
+.christmas-lights .bulb.right {
+  right: 0;
+  transform: translate(calc(100% + 3px), -50%) rotate(-90deg);
+}
+
+.christmas-lights .bulb.left {
+  left: 0;
+  transform: translate(calc(-100% - 3px), -50%) rotate(90deg);
+}
+
 .christmas-lights .bulb.red { --bulb: #ff3b3b; }
 .christmas-lights .bulb.green { --bulb: #22c55e; }
 .christmas-lights .bulb.gold { --bulb: #ffc533; }
 .christmas-lights .bulb.blue { --bulb: #3b8bff; }
-
-.christmas-lights .bulb {
-  background: var(--bulb);
-  box-shadow: 0 0 6px 2px var(--bulb);
-}
 
 @keyframes bulb-twinkle {
   0%, 100% { opacity: 1; box-shadow: 0 0 7px 2px var(--bulb); }
