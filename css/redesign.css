@@ -2083,7 +2083,10 @@ button.pill-notice {
 .settings-list.holiday-effects {
   gap: 4px;
   border-bottom: 1px solid var(--divider-menu);
-  padding-bottom: 24px;
+  /* Match the 20px around the other dividers in Settings (the toggle row and
+     the next row's button add a little height of their own) */
+  padding-bottom: 12px;
+  margin-bottom: -11px;
 }
 
 /* Fireworks on New Year's Day: rockets rise, then burst into sparks.
