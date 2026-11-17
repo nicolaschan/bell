@@ -314,7 +314,10 @@ const Index = {
       m('main.hero', isCustom && !hasCourses ? m(EmptyPersonalSchedule) : [
         m(Pie, {
           proportionElapsed: bellTimer.getProportionElapsed(),
-          theme: pieTheme
+          theme: pieTheme,
+          heart: Seasonal.showing(bellTimer.date).some(overlay => overlay.id === 'heart')
+            ? Appearance.heartColor(theme, noClasses)
+            : null
         }),
         m(Countdown, attrs)
       ]),

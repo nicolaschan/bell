@@ -116,4 +116,18 @@ const Appearance = {
 
 Appearance.isDarkTheme = isDarkTheme
 
+// Color for the Valentine's heart inside the timer circle, chosen to suit the
+// color underneath it: a lighter tint on medium and dark colors, a slightly
+// darker shade on very light ones. On days without classes the circle is the
+// page color, so the heart takes the theme's own color instead.
+Appearance.heartColor = (theme, noClasses) => {
+  if (noClasses) {
+    const color = theme.stops[Math.floor(theme.stops.length / 2)]
+    const n = parseInt(color.slice(1), 16)
+    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, 0.6)`
+  }
+  const lightness = theme.stops.reduce((sum, color) => sum + luminance(color), 0) / theme.stops.length
+  return lightness > 0.5 ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.3)'
+}
+
 module.exports = Appearance

@@ -71,7 +71,7 @@ const paintTexture = (texture, size, stops, seconds) => {
   })
 }
 
-const draw = (canvas, state, proportionElapsed, theme, seconds) => {
+const draw = (canvas, state, proportionElapsed, theme, seconds, heart) => {
   const parent = canvas.parentNode
   if (!parent) {
     return
@@ -111,23 +111,51 @@ const draw = (canvas, state, proportionElapsed, theme, seconds) => {
   }
   ctx.closePath()
 
+  ctx.save()
   if (theme.stops.length === 1) {
     ctx.fillStyle = theme.stops[0]
     ctx.fill()
-    return
+  } else {
+    if (!state.texture) {
+      state.texture = document.createElement('canvas')
+    }
+    const size = Math.max(16, Math.ceil(2 * radius * TEXTURE_SCALE))
+    paintTexture(state.texture, size, theme.stops, seconds)
+    ctx.clip()
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(state.texture, -radius, -radius, 2 * radius, 2 * radius)
   }
-
-  if (!state.texture) {
-    state.texture = document.createElement('canvas')
-  }
-  const size = Math.max(16, Math.ceil(2 * radius * TEXTURE_SCALE))
-  paintTexture(state.texture, size, theme.stops, seconds)
-  ctx.save()
-  ctx.clip()
-  ctx.imageSmoothingEnabled = true
-  ctx.imageSmoothingQuality = 'high'
-  ctx.drawImage(state.texture, -radius, -radius, 2 * radius, 2 * radius)
   ctx.restore()
+
+  // Valentine's heart: centered in the circle and clipped to the remaining
+  // slice, so it empties along with the countdown
+  if (heart) {
+    ctx.save()
+    ctx.clip()
+    ctx.fillStyle = heart
+    heartPath(ctx, radius * 1.15)
+    ctx.fill()
+    ctx.restore()
+  }
+}
+
+// Classic heart curve (x = 16 sin³t, y = 13 cos t - 5 cos 2t - 2 cos 3t - cos 4t),
+// centered on the origin and `size` wide
+const heartPath = (ctx, size) => {
+  const scale = size / 34
+  ctx.beginPath()
+  for (let i = 0; i <= 120; i++) {
+    const t = (i / 120) * 2 * Math.PI
+    const x = 16 * Math.pow(Math.sin(t), 3)
+    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)
+    // Canvas y points down; nudge down so the heart looks centered
+    const px = x * scale
+    const py = (-y + 2.5) * scale
+    if (i === 0) ctx.moveTo(px, py)
+    else ctx.lineTo(px, py)
+  }
+  ctx.closePath()
 }
 
 const Pie = {
@@ -137,9 +165,9 @@ const Pie = {
     state.started = Date.now()
     state.lastFrame = 0
     const render = () => {
-      const { proportionElapsed, theme } = state.attrs
+      const { proportionElapsed, theme, heart } = state.attrs
       const seconds = reducedMotion() ? 0 : DRIFT_SPEED * (Date.now() - state.started) / 1000
-      draw(vnode.dom, state, proportionElapsed, theme, seconds)
+      draw(vnode.dom, state, proportionElapsed, theme, seconds, heart)
     }
     state.render = render
     // Dynamic themes animate on their own clock; solid ones redraw with the app
