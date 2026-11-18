@@ -110,7 +110,7 @@ const alignToPie = vnode => {
   const colons = el.querySelectorAll('.time .colon')
   if (!hero || !time || colons.length === 0) return
 
-  // Only re-measure when something that moves the colon changes: the window
+  // Only re-measure when something that changes the layout changes: the window
   // size, the number of digits (e.g. 10:00 -> 9:59) or the font loading.
   // Re-measuring on every redraw let tiny measurement differences between
   // frames nudge the countdown back and forth in some browsers.
@@ -120,16 +120,19 @@ const alignToPie = vnode => {
   if (key === vnode.state.alignKey) return
 
   const current = vnode.state.shift || 0
-  let anchor
-  if (colons.length === 1) {
-    // Center the colon's visible ink, not its text box: the glyph's side
-    // bearings are uneven and letter-spacing trims only its right side
-    const r = colons[0].getBoundingClientRect()
-    const ink = colonInk(colons[0])
-    anchor = ink ? r.left + (ink.left + ink.right) / 2 : r.left + r.width / 2
-  } else {
-    anchor = (colons[0].getBoundingClientRect().right + colons[1].getBoundingClientRect().left) / 2
-  }
+  // Place the countdown where an MM:SS time ("xx:xx") would have its colon on
+  // the pie's edge, whatever the time actually shows. The text then starts at
+  // the same spot for 9:59, 10:00 or 1:05:00 instead of jumping left and right.
+  // Digits are tabular, so one digit's width is the first group's width / its length.
+  const first = time.querySelector('.group')
+  const firstRect = first.getBoundingClientRect()
+  const digit = firstRect.width / Math.max(1, first.textContent.length)
+  // Center the colon's visible ink, not its text box: the glyph's side
+  // bearings are uneven and letter-spacing trims only its right side
+  const colonRect = colons[0].getBoundingClientRect()
+  const ink = colonInk(colons[0])
+  const colonCenter = ink ? (ink.left + ink.right) / 2 : colonRect.width / 2
+  const anchor = firstRect.left + 2 * digit + colonCenter
   const heroRect = hero.getBoundingClientRect()
   const target = heroRect.left + heroRect.width / 2
   // Keep the block on screen on narrow windows
