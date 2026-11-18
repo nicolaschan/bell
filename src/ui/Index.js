@@ -35,7 +35,7 @@ const SchoolMenu = {
     const { name, isCustom } = vnode.attrs
     return m(Dropdown, {
       className: 'school-menu',
-      trigger: ({ open, toggle }) => m('button.school-select[type=button]', {
+      trigger: ({ open, toggle }) => m('button.school-select.idle-fade[type=button]', {
         'aria-haspopup': 'menu',
         'aria-expanded': open ? 'true' : 'false',
         onclick: toggle
@@ -227,7 +227,7 @@ const prefetchImages = () => {
 // Seasonal overlays drawn over the whole page (the others change the pie or the date)
 const OVERLAY_COMPONENTS = { snow: Snowfall, fireworks: Fireworks, lunar: Lanterns }
 
-// On computers, the timer's controls (settings, schedule, design switch) fade
+// On computers, the timer's controls (school menu, settings, schedule, design switch) fade
 // out after 3 seconds without mouse movement and come straight back when the
 // mouse moves. The fade only applies to mouse-driven screens (see CSS).
 const IDLE_AFTER = 3000
