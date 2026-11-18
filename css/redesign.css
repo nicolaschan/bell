@@ -445,6 +445,13 @@ input, select {
   background: var(--background-hover);
 }
 
+/* The chevron sits close to the school name (6px instead of the 12px gap) */
+@media (min-width: 641px) {
+  .school-select .school-name + .icon {
+    margin-left: -6px;
+  }
+}
+
 .school-name {
   max-width: 50vw;
   white-space: nowrap;
