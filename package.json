@@ -20,6 +20,7 @@
     "author": "Nicolas Chan",
     "license": "MIT",
     "dependencies": {
+        "@fontsource/inter": "5.0.16",
         "@types/jquery": "^3.3.5",
         "@types/mithril": "^1.1.12",
         "@types/react": "^16.4.9",

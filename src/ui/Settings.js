@@ -1,136 +1,268 @@
 const m = require('mithril')
 
-const cookieManager = require('../LocalForageCookieManager').default
-const requestManager = require('../RequestManager2').default
-const sourceManager = require('../SourceManager').default
+const Appearance = require('../Appearance')
 const notificationManager = require('../NotificationManager').default
 const soundManager = require('../SoundManager').default
-const ThemeManager = require('../ThemeManager').default
-const themeManager = new ThemeManager()
-const { Select } = require('mithril-selector')
+const { SOUND_OPTIONS } = require('../SoundManager')
+const Icon = require('./Icon')
+const Seasonal = require('../Seasonal')
+const { Dropdown, MenuSeparator, MenuButton } = require('./Dropdown')
 
-function containsCurrentSource (sources, currentSource) {
-  for (let source of sources) {
-    if (source.value === currentSource) {
-      return true
-    }
+const MAX_CUSTOM_SOUND_BYTES = 2 * 1024 * 1024
+const DYNAMIC_THEMES_HELP = 'Dynamic themes fill the timer with a moving blend of colors.'
+
+const Toggle = {
+  view (vnode) {
+    const { checked, disabled, onchange, label } = vnode.attrs
+    return m('button.toggle[type=button][role=switch]', {
+      'aria-checked': checked ? 'true' : 'false',
+      'aria-label': label,
+      disabled,
+      onclick: () => onchange(!checked)
+    }, m('img', {
+      src: `/img/redesign/toggle-${checked ? 'on' : 'off'}.svg`,
+      width: 40,
+      height: 24,
+      alt: ''
+    }))
   }
-  return false
+}
+
+const ThemeSwatch = {
+  view (vnode) {
+    const { theme, selected } = vnode.attrs
+    const attrs = {
+      title: theme.name,
+      'aria-label': theme.name,
+      'aria-pressed': selected ? 'true' : 'false',
+      className: selected ? 'selected' : '',
+      onclick: () => Appearance.setTheme(theme.id)
+    }
+    if (theme.type === 'color') {
+      return m('button.swatch.color-swatch[type=button]', Object.assign(attrs, {
+        style: { background: theme.swatch }
+      }))
+    }
+    return m('button.swatch.dynamic-swatch[type=button]', attrs,
+      m('img', { src: theme.icon, alt: '', width: 62, height: 62 }))
+  }
+}
+
+const pickCustomSound = () => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'audio/*'
+  input.onchange = () => {
+    const file = input.files && input.files[0]
+    if (!file) {
+      return
+    }
+    if (file.size > MAX_CUSTOM_SOUND_BYTES) {
+      window.alert('Please choose a sound file smaller than 2 MB.')
+      return
+    }
+    const reader = new window.FileReader()
+    reader.onload = async () => {
+      await soundManager.setCustomSound(file.name, reader.result)
+      soundManager.reportInteraction()
+      soundManager.preview('custom')
+      m.redraw()
+    }
+    reader.readAsDataURL(file)
+  }
+  input.click()
+}
+
+const SoundSelect = {
+  view () {
+    const selection = soundManager.getSelection()
+    const customName = soundManager.getCustomSoundName()
+    const options = SOUND_OPTIONS.concat(customName ? [{ id: 'custom', name: customName }] : [])
+    const current = options.find(option => option.id === selection) || options[0]
+
+    return m('.sound-select', [
+      m('button.icon-button.plain[type=button]', {
+        title: 'Preview sound',
+        'aria-label': 'Preview sound',
+        onclick: () => soundManager.preview(current.id)
+      }, m(Icon, { name: 'volume' })),
+      m(Dropdown, {
+        align: 'right',
+        trigger: ({ open, toggle }) => m('button.select-button[type=button]', {
+          'aria-haspopup': 'menu',
+          'aria-expanded': open ? 'true' : 'false',
+          onclick: toggle
+        }, [m('span.select-label', current.name), m(Icon, { name: 'chevron-down', size: 16 })]),
+        menu: ({ close }) => {
+          const items = []
+          options.forEach(option => {
+            items.push(m(MenuButton, {
+              onclick: () => {
+                soundManager.setSelection(option.id)
+                soundManager.reportInteraction()
+                soundManager.preview(option.id)
+                close()
+              }
+            }, option.name))
+            items.push(m(MenuSeparator))
+          })
+          items.push(m(MenuButton, {
+            icon: 'upload',
+            onclick: () => {
+              close()
+              pickCustomSound()
+            }
+          }, 'Upload your own'))
+          return items
+        }
+      })
+    ])
+  }
 }
 
 const Settings = {
-  oninit: async function (vnode) {
-    vnode.state.sources = (await requestManager.get('/api/sources'))
-      .map(source => ({
-        display: `${source.name} (${source.id})`,
-        value: source.id
-      }))
-
-    if (!containsCurrentSource(vnode.state.sources, sourceManager.source)) {
-      const currentSchool = await requestManager.get(`/api/data/${sourceManager.source}/meta`)
-      vnode.state.sources.push({
-        display: currentSchool.name,
-        value: sourceManager.source
-      })
-    }
-  },
-  onupdate: function (vnode) {
-    var source = sourceManager.source
-    if (source === vnode.state.previousSource) {
-      return
-    }
-    if (source === 'custom') {
-      vnode.state.editClasses = true
-      m.redraw()
-    } else {
-      vnode.state.editClasses = true
-      requestManager.get(`/api/data/${source}/meta`).then(meta => {
-        vnode.state.editClasses = !meta.periods
+  oncreate (vnode) {
+    vnode.state.onKeyDown = e => {
+      if (e.key === 'Escape' && !vnode.dom.querySelector('.dropdown-menu')) {
+        vnode.attrs.onclose()
         m.redraw()
-      })
+      }
     }
-    vnode.state.previousSource = source
+    document.addEventListener('keydown', vnode.state.onKeyDown)
+    const close = vnode.dom.querySelector('.close-button')
+    if (close) {
+      close.focus()
+    }
   },
-  view: function (vnode) {
-    document.title = 'Settings'
-    return [
-      m('.header', m('h1', 'Settings')),
-      m('.settings-section', [
-        m('.desc', [
-          'School schedule source',
-          m('br'),
-          '(No guarantee of correctness. Check with school for official schedules.)']),
-        m(Select, {
-          value: (vnode.state.sources) ? sourceManager.source : '',
-          options: vnode.state.sources || [''],
-          onselect: source => { sourceManager.source = source }
-        }),
-        m('.desc', 'Theme'),
-        m(Select, {
-          value: new ThemeManager(cookieManager.get('theme')).currentTheme.name,
-          options: themeManager.availableThemes,
-          onselect: theme => cookieManager.set('theme', theme)
-        }),
-        m('.add-link', (vnode.state.editClasses) ? null : m('a.add#edit-classes-button[href=/periods]', {
-          oncreate: m.route.link
-        }, 'Edit Period Names')),
-        m('.add-link', m('a.add#edit-classes-button[href=https://edit.bell.plus]', 'Create Shared Schedule')),
-        m('.add-link', m('a.add#edit-classes-button[href=/classes]', {
-          oncreate: m.route.link
-        }, (vnode.state.editClasses ? 'Edit' : 'Use') + ' Custom Schedule (private)')),
-        m('.add-link', m('a.add#edit-classes-button[href=https://blog.bell.plus/contact/]', 'Request School or Report Issue')),
-        m('span',
-          m('label.control.control--checkbox', [
-            m('input.checkbox[type=checkbox]', {
-              onclick: m.withAttr('checked', checked => {
-                cookieManager.set('title_period', checked)
-              }),
-              checked: cookieManager.get('title_period', true)
-            }),
-            m('.control__indicator'),
-            m('span', 'Show period name in page title')
-          ]),
-          m('span',
-            m('label.control.control--checkbox', [
-              m('input.checkbox[type=checkbox]', {
-                onclick: m.withAttr('checked', checked => {
-                  if (checked) {
-                    return notificationManager.enable()
-                  } else {
-                    return notificationManager.disable()
-                  }
-                }),
-                checked: notificationManager.isEnabled(),
-                disabled: notificationManager.notificationsBlocked()
-              }),
-              m('.control__indicator'),
-              m('span', (notificationManager.notificationsBlocked())
-                ? `Notifications not available (please allow in your browser and refresh if you want them) (${window.Notification.permission})` : 'Send notification when bell rings')
-            ])),
-          m('span',
-            m('label.control.control--checkbox', [
-              m('input.checkbox[type=checkbox]', {
-                onclick: m.withAttr('checked', soundManager.setEnabled),
-                checked: soundManager.isEnabled()
-              }),
-              m('.control__indicator'),
-              m('span', 'Play sound when bell rings')
-            ])
-          )),
+  // Fade and shrink away before being removed
+  onbeforeremove (vnode) {
+    vnode.dom.classList.add('closing')
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    return new Promise(resolve => setTimeout(resolve, reduce ? 0 : 180))
+  },
+  onremove (vnode) {
+    document.removeEventListener('keydown', vnode.state.onKeyDown)
+  },
+  view (vnode) {
+    const { onclose, showCustomize } = vnode.attrs
+    const theme = Appearance.theme
+    const dark = Appearance.darkMode
+    const blocked = notificationManager.notificationsBlocked()
+    const holidays = Seasonal.available(vnode.attrs.date || new Date())
 
-        m('.footer-right[style=position: fixed;]', m('a[href=javascript:void(0);]', {
-          onclick: () => {
-            m.route.set('/')
-          }
-        }, m('i.done-icon.icon.material-icons', 'done'))),
-        m('.footer-left[style=position: fixed;]', [m('a[style=margin-right: 2em;]', {
-          href: 'https://bell.plus/about'
-        }, 'About'),
-        m('a', {
-          href: '/xt'
-        }, 'Chrome Extension')])
+    return m('.modal-backdrop', {
+      onclick: e => {
+        if (e.target === e.currentTarget) {
+          onclose()
+        }
+      }
+    }, m('.modal.settings[role=dialog][aria-modal=true][aria-labelledby=settings-title]', [
+      m('.modal-title-row', [
+        m('h2#settings-title.modal-title', 'Settings'),
+        m('button.icon-button.plain.close-button[type=button]', {
+          'aria-label': 'Close settings',
+          onclick: onclose
+        }, m(Icon, { name: 'x' }))
+      ]),
+
+      m('section.settings-section', [
+        m('h3.section-title', 'Theme colors'),
+        m('.swatch-grid', Appearance.colorThemes.map(t => m(ThemeSwatch, { theme: t, selected: t.id === theme.id })))
+      ]),
+
+      m('section.settings-section', [
+        m('h3.section-title', [
+          'Dynamic themes',
+          m('span.info', {
+            tabindex: 0,
+            'aria-label': 'How dynamic themes work',
+            'aria-describedby': 'dynamic-themes-help'
+          }, [
+            m(Icon, { name: 'info', width: 17.5, height: 17.5 }),
+            m('span.tooltip#dynamic-themes-help[role=tooltip]', DYNAMIC_THEMES_HELP)
+          ])
+        ]),
+        m('.swatch-grid', Appearance.dynamicThemes.map(t => m(ThemeSwatch, { theme: t, selected: t.id === theme.id })))
+      ]),
+
+      // Only shown while a holiday overlay is in season
+      holidays.length ? m('section.settings-list.holiday-effects', [
+        m('h3.section-title', 'Holiday effects'),
+        holidays.map(overlay => m('.settings-row.toggle-row', { key: overlay.id }, [
+          m('span.toggle-label', overlay.name),
+          m(Toggle, {
+            label: `Show ${overlay.name.toLowerCase()}`,
+            checked: Seasonal.isOn(overlay.id),
+            onchange: on => Seasonal.setOn(overlay.id, on)
+          })
+        ]))
+      ]) : null,
+
+      m('section.settings-list', [
+        m('.settings-row', [
+          m('span.section-title', 'Light / dark mode'),
+          m('button.mode-toggle[type=button]', {
+            'aria-label': dark ? 'Switch to light mode' : 'Switch to dark mode',
+            title: dark ? 'Dark mode' : 'Light mode',
+            onclick: e => {
+              Appearance.setDarkMode(!dark)
+              // Restart the spin-in animation on the icon (removing the class and
+              // forcing a reflow lets the same animation play again)
+              const icon = e.currentTarget.querySelector('.mode-icon')
+              icon.classList.remove('spin')
+              void icon.offsetWidth
+              icon.classList.add('spin')
+            }
+          }, m('span.mode-icon', {
+            onanimationend: e => e.currentTarget.classList.remove('spin')
+          }, m(Icon, { name: dark ? 'moon' : 'sun' })))
+        ]),
+        showCustomize ? m('.settings-row.customize-row', [
+          m('.settings-row-text', [
+            m('span.section-title', 'Customize block names'),
+            m('span.caption', 'Rename your class blocks so your schedule matches your real day — like “Math,” “English,” or “PE.”')
+          ]),
+          m('button.button.outline[type=button]', { onclick: vnode.attrs.oncustomize }, [
+            m(Icon, { name: 'edit' }),
+            m('span', 'Customize')
+          ])
+        ]) : null,
+        m(MenuSeparator),
+        m('.settings-row.toggle-row', [
+          m('span.toggle-label', blocked
+            ? 'Notifications are blocked. Allow them in your browser settings to get a notification when each period starts / ends.'
+            : 'Send a push notification when each period starts / ends'),
+          m(Toggle, {
+            label: 'Send a push notification when each period starts / ends',
+            checked: notificationManager.isEnabled(),
+            disabled: blocked,
+            onchange: async checked => {
+              if (checked) {
+                await notificationManager.enable()
+              } else {
+                notificationManager.disable()
+              }
+              m.redraw()
+            }
+          })
+        ]),
+        m('.settings-row.toggle-row', [
+          m('span.toggle-label', 'Play a sound when each period starts / ends'),
+          m(Toggle, {
+            label: 'Play a sound when each period starts / ends',
+            checked: soundManager.isEnabled(),
+            onchange: checked => {
+              soundManager.setEnabled(checked)
+              soundManager.reportInteraction()
+            }
+          })
+        ]),
+        m('.settings-row', [
+          m('span.toggle-label', 'Sound selection'),
+          m(SoundSelect)
+        ])
       ])
-    ]
+    ]))
   }
 }
 

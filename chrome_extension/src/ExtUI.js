@@ -25,7 +25,7 @@ var SchoolIndicator = {
     ])))
   }
 }
-var Page1 = require('../../src/ui/Page1')
+var Page1 = require('../../src/ui/classic/Page1')
 
 class ExtUI {
   constructor (uiModel) {

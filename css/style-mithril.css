@@ -700,3 +700,32 @@ checkbox css is modified from https://kyusuf.com/post/completely-css-custom-chec
     opacity: 1;
     z-index: 2;
 }
+/* "New design" switch on the timer page */
+.classic-design-toggle {
+    position: fixed;
+    left: 1em;
+    bottom: 1em;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 4px 4px 12px;
+    border-radius: 9999px;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+}
+.classic-design-toggle button {
+    display: inline-flex;
+    padding: 0;
+    border: none;
+    border-radius: 9999px;
+    background: none;
+    cursor: pointer;
+}
+.classic-design-toggle img {
+    display: block;
+}

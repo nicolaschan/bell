@@ -1,0 +1,2292 @@
+/* bell redesign */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/inter/inter-latin-400-normal.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/fonts/inter/inter-latin-600-normal.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/fonts/inter/inter-latin-700-normal.woff2) format('woff2');
+}
+
+/* ---------- Tokens ---------- */
+
+:root {
+  --background-primary: #f8f4f0;
+  --background-secondary: #ffffff;
+  --background-secondary-alt: #f8f8f8;
+  --background-menu: #ffffff;
+  --background-hover: #f3efea;
+  --background-inverse: #000000;
+  --foreground-primary: #000000;
+  --foreground-primary-inverse: #f8f4f0;
+  --foreground-secondary: #5a5a5a;
+  --foreground-tertiary: #969696;
+  --foreground-disabled: #d9d9d9;
+  --stroke-primary: #2e2e2e;
+  --stroke-secondary: #d9d9d9;
+  --divider-menu: #d9d9d9;
+  --brand-color-link: #0095da;
+  --brand-color-background: #14c1f9;
+  --backdrop: rgba(0, 0, 0, 0.2);
+  --shadow-dropdown: 0 1.2px 3.6px rgba(0, 0, 0, 0.11), 0 6.4px 14.4px rgba(0, 0, 0, 0.13);
+  --shadow-card: 0 0 2px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+  --icon-filter: none;
+  --page-gutter: 32px;
+  color-scheme: light;
+}
+
+:root[data-bell-theme='dark'] {
+  --background-primary: #161514;
+  --background-secondary: #232220;
+  --background-secondary-alt: #2c2b29;
+  --background-menu: #232220;
+  --background-hover: #2f2e2b;
+  --background-inverse: #f8f4f0;
+  --foreground-primary: #f8f4f0;
+  --foreground-primary-inverse: #000000;
+  --foreground-secondary: #b3afaa;
+  --foreground-tertiary: #8a8682;
+  --foreground-disabled: #4a4845;
+  --stroke-primary: #e6e2dd;
+  --stroke-secondary: #3d3b38;
+  --divider-menu: #3d3b38;
+  --brand-color-link: #4dbdf0;
+  --backdrop: rgba(0, 0, 0, 0.5);
+  --shadow-dropdown: 0 1.2px 3.6px rgba(0, 0, 0, 0.3), 0 6.4px 14.4px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 0 2px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.3);
+  --icon-filter: invert(1);
+  color-scheme: dark;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --page-gutter: 20px;
+  }
+}
+
+/* ---------- Base ---------- */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--background-primary);
+  color: var(--foreground-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+  font-weight: inherit;
+  font-size: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+input, select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-color-link);
+  outline-offset: 2px;
+}
+
+.icon {
+  display: block;
+  flex-shrink: 0;
+  max-width: none;
+  filter: var(--icon-filter);
+}
+
+.link {
+  color: var(--brand-color-link);
+  font-weight: 600;
+}
+
+/* ---------- Buttons ---------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 10px 12px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.button.primary {
+  background: var(--background-inverse);
+  color: var(--foreground-primary-inverse);
+}
+
+.button.secondary {
+  background: var(--background-secondary);
+  border-color: var(--stroke-secondary);
+  color: var(--foreground-primary);
+}
+
+.button.outline {
+  border-color: var(--stroke-primary);
+  color: var(--foreground-primary);
+}
+
+.button:not(:disabled):hover {
+  filter: brightness(0.96);
+}
+
+.button.primary:not(:disabled):hover {
+  filter: none;
+  opacity: 0.85;
+}
+
+.button:disabled {
+  background: var(--background-secondary);
+  border-color: var(--stroke-secondary);
+  color: var(--foreground-disabled);
+}
+
+.button:disabled .icon {
+  opacity: 0.3;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+
+.icon-button.bordered {
+  width: 36px;
+  height: 36px;
+  /* 1px border + 5px padding on each side leaves room for a 24px icon */
+  padding: 5px;
+  background: var(--background-secondary);
+  border: 1px solid var(--stroke-secondary);
+}
+
+.icon-button.bordered:hover,
+.icon-button.plain:not(:disabled):hover {
+  background: var(--background-hover);
+}
+
+/* Bare gear, as tall as the "View schedule" button next to it */
+.icon-button.settings-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 8px;
+}
+
+.icon-button.settings-button:hover {
+  opacity: 0.7;
+}
+
+.icon-button.plain {
+  padding: 4px;
+}
+
+.icon-button.small {
+  padding: 2px;
+}
+
+.icon-button:disabled {
+  opacity: 0.3;
+}
+
+.text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  align-self: flex-start;
+}
+
+.text-button:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Page layout ---------- */
+
+.page-header,
+.page-footer {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px var(--page-gutter);
+  flex-shrink: 0;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.header-subtitle {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 1 0 0;
+}
+
+/* ---------- Dropdown menus ---------- */
+
+.dropdown {
+  position: relative;
+}
+
+.menu {
+  background: var(--background-menu);
+  border: 1px solid var(--divider-menu);
+  border-radius: 8px;
+  box-shadow: var(--shadow-dropdown);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-menu {
+  /* Placed next to its trigger with position: fixed by Dropdown.js */
+  position: fixed;
+  z-index: 40;
+  overflow-y: auto;
+  min-width: 215px;
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--page-gutter));
+}
+
+.school-menu .dropdown-menu {
+  width: 340px;
+}
+
+.menu-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px 8px;
+}
+
+.menu-header-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.menu-header a {
+  font-size: 14px;
+}
+
+.menu-header a.link:hover,
+.menu-header a:hover .link {
+  text-decoration: underline;
+}
+
+.menu-separator {
+  padding: 8px 0;
+}
+
+.menu-separator .rule {
+  height: 1px;
+  background: var(--divider-menu);
+}
+
+.menu-button {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.menu-button:hover,
+.menu-button:focus-visible {
+  background: var(--background-hover);
+}
+
+/* ---------- Timer page ---------- */
+
+.timer-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Dark themes (e.g. Twilight, Cocoa): white text wherever the theme color is the
+   background, i.e. the schedule page and the timer on days without classes */
+:root[data-bell-surface='dark'] .schedule-page {
+  --foreground-primary: #ffffff;
+  --stroke-primary: rgba(255, 255, 255, 0.85);
+  --icon-filter: invert(1);
+  color: #ffffff;
+}
+
+:root[data-bell-surface='dark'] .schedule-row.completed {
+  color: rgba(255, 255, 255, 0.45);
+  mix-blend-mode: normal;
+}
+
+:root[data-bell-surface='dark'] .timer-page.no-classes .school-select,
+:root[data-bell-surface='dark'] .timer-page.no-classes .countdown,
+:root[data-bell-surface='dark'] .timer-page.no-classes .page-footer > .header-title {
+  color: #ffffff;
+}
+
+/* In light mode the countdown spans both the cream pie and the dark page, so
+   it inverts whatever is behind it to stay readable on both */
+:root[data-bell-surface='dark']:not([data-bell-theme='dark']) .timer-page.no-classes .countdown {
+  mix-blend-mode: difference;
+}
+
+:root[data-bell-surface='dark'] .timer-page.no-classes .school-select .icon,
+:root[data-bell-surface='dark'] .timer-page.no-classes .settings-button .icon {
+  filter: invert(1);
+}
+
+/* Days without classes (weekends, holidays, breaks): the page takes the theme
+   color and the pie takes the page color */
+.timer-page.no-classes {
+  background: var(--brand-color-background);
+}
+
+.timer-page.no-classes.dynamic {
+  background-size: 300% 300%;
+  animation: gradient-drift 25s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer-page.no-classes.dynamic {
+    animation: none;
+  }
+}
+
+.timer-page.no-classes .school-select:hover,
+.timer-page.no-classes .school-select[aria-expanded='true'] {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.school-select {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  padding: 12px 12px 12px 16px;
+  margin-left: -16px;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.school-select:hover,
+.school-select[aria-expanded='true'] {
+  background: var(--background-hover);
+}
+
+/* The chevron sits close to the school name (6px instead of the 12px gap) */
+@media (min-width: 641px) {
+  .school-select .school-name + .icon {
+    margin-left: -6px;
+  }
+}
+
+.school-name {
+  max-width: 50vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timer-page .page-header .dropdown {
+  min-width: 0;
+}
+
+.hero {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.pie {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.countdown {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0 var(--page-gutter);
+  max-width: 100%;
+}
+
+.countdown .time {
+  font-size: min(140px, 22vw, 16vh);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.countdown .period,
+.countdown .schedule-name {
+  font-size: min(28px, 7vw);
+  line-height: 1.2;
+}
+
+.countdown .period {
+  font-weight: 600;
+}
+
+.page-footer {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.footer-notices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pill-notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
+  border-radius: 9999px;
+  background: var(--background-secondary);
+  border: 1px solid var(--stroke-secondary);
+  font-size: 14px;
+  max-width: 100%;
+}
+
+button.pill-notice {
+  padding-right: 12px;
+}
+
+.pill-notice a:hover {
+  text-decoration: underline;
+}
+
+.seasonal-effects {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ---------- Empty states ---------- */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px;
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 20px;
+  line-height: normal;
+}
+
+.empty-state img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---------- Schedule page ---------- */
+
+.schedule-page {
+  /* Covers the timer */
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  overflow-y: auto;
+  animation: schedule-in 0.5s cubic-bezier(0.65, 0, 0.35, 1) both;
+  background: var(--brand-color-background);
+  /* The schedule is always drawn in dark text on the theme color */
+  --foreground-primary: #000000;
+  --stroke-primary: #2e2e2e;
+  --icon-filter: none;
+  color: #000000;
+}
+
+@keyframes schedule-in {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes schedule-out {
+  from { transform: translateY(0); }
+  to { transform: translateY(-100%); }
+}
+
+.schedule-page.closing {
+  animation: schedule-out 0.4s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+/* Dynamic themes: the gradient drifts slowly behind the schedule */
+.schedule-page.dynamic {
+  background-size: 300% 300%;
+  animation: schedule-in 0.5s cubic-bezier(0.65, 0, 0.35, 1) both,
+    gradient-drift 25s ease-in-out infinite alternate;
+}
+
+.schedule-page.dynamic.closing {
+  animation: schedule-out 0.4s cubic-bezier(0.65, 0, 0.35, 1) both,
+    gradient-drift 25s ease-in-out infinite alternate;
+}
+
+@keyframes gradient-drift {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 60%; }
+  100% { background-position: 40% 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .schedule-page,
+  .schedule-page.dynamic,
+  .schedule-page.closing,
+  .schedule-page.dynamic.closing {
+    animation: none;
+  }
+}
+
+.schedule-page .page-header {
+  justify-content: space-between;
+}
+
+.close-button {
+  margin-right: -4px;
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px var(--page-gutter);
+  font-size: clamp(28px, 2.8vw, 42px);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.schedule-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0 0.571em;
+}
+
+.schedule-times {
+  display: flex;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.schedule-times .start {
+  width: 4.857em;
+}
+
+.schedule-times .dash {
+  width: 0.5em;
+  text-align: right;
+}
+
+.schedule-times .end {
+  width: 4.857em;
+  text-align: right;
+}
+
+.schedule-name {
+  flex: 1 0 0;
+  min-width: 6em;
+}
+
+.schedule-row.completed {
+  color: #d9d9d9;
+  mix-blend-mode: multiply;
+}
+
+.schedule-row.current {
+  font-weight: 700;
+}
+
+.schedule-divider {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 8px 0;
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.schedule-divider .rule {
+  flex: 1 0 0;
+  height: 1px;
+  background: var(--stroke-primary);
+}
+
+.schedule-divider .rule.short {
+  flex: 0 0 auto;
+  width: calc(10.214 * clamp(28px, 2.8vw, 42px));
+}
+
+.schedule-divider .label {
+  white-space: nowrap;
+}
+
+.schedule-empty {
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+/* ---------- Modal (settings) ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: var(--backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal {
+  width: 548px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  background: var(--background-secondary);
+  border: 1px solid var(--stroke-primary);
+  border-radius: 8px;
+  padding: 24px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Settings opens with the backdrop fading in and the panel rising and
+   growing slightly into place; it closes with a quicker fade */
+.modal-backdrop {
+  animation: backdrop-in 0.2s ease-out both;
+}
+
+.modal-backdrop .modal {
+  /* "backwards", not "both": a transform left in place after the animation would
+     make the panel the positioning box for its floating menus */
+  animation: modal-in 0.32s cubic-bezier(0.34, 1.3, 0.64, 1) backwards;
+}
+
+.modal-backdrop.closing {
+  animation: backdrop-out 0.18s ease-in both;
+}
+
+.modal-backdrop.closing .modal {
+  animation: modal-out 0.18s ease-in both;
+}
+
+@keyframes backdrop-in {
+  from { background-color: rgba(0, 0, 0, 0); }
+}
+
+@keyframes backdrop-out {
+  to { background-color: rgba(0, 0, 0, 0); }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+
+@keyframes modal-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop,
+  .modal-backdrop .modal,
+  .modal-backdrop.closing,
+  .modal-backdrop.closing .modal {
+    animation: none;
+  }
+}
+
+.modal-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-size: 20px;
+  line-height: normal;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.info {
+  position: relative;
+  display: inline-flex;
+  cursor: help;
+  border-radius: 9999px;
+}
+
+/* Small info box shown when the (i) icon is hovered, focused or tapped */
+.tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: -8px;
+  z-index: 5;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 64px));
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--background-inverse);
+  color: var(--foreground-primary-inverse);
+  box-shadow: var(--shadow-dropdown);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+}
+
+.tooltip::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 12px;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+.info:hover .tooltip,
+.info:focus .tooltip,
+.info:focus-within .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tooltip {
+    transition: none;
+  }
+}
+
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.swatch {
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 4px solid transparent;
+}
+
+.color-swatch.selected {
+  border-color: var(--stroke-primary);
+}
+
+.dynamic-swatch {
+  border: none;
+  padding: 0;
+  position: relative;
+}
+
+.dynamic-swatch img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The design shows these mirrored, with the missing slice at the top right */
+  transform: scaleX(-1);
+}
+
+.dynamic-swatch.selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 4px solid var(--stroke-primary);
+}
+
+.swatch:hover {
+  filter: brightness(1.05);
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.settings-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 0 0;
+}
+
+.caption {
+  font-size: 12px;
+  color: var(--foreground-secondary);
+}
+
+.toggle-row {
+  min-height: 36px;
+  gap: 12px;
+}
+
+.toggle-label {
+  flex: 1 0 0;
+  font-size: 14px;
+}
+
+.toggle {
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+
+.toggle img {
+  display: block;
+}
+
+:root[data-bell-theme='dark'] .toggle[aria-checked='true'] img {
+  filter: invert(1);
+}
+
+.toggle:disabled {
+  opacity: 0.4;
+}
+
+.mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: var(--background-primary);
+  border: 1px solid var(--stroke-primary);
+}
+
+/* Light / dark toggle: the new icon spins in with a little overshoot */
+.mode-icon {
+  display: inline-flex;
+}
+
+.mode-icon.spin {
+  animation: mode-spin 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes mode-spin {
+  from {
+    transform: rotate(-200deg) scale(0.3);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mode-icon.spin {
+    animation: none;
+  }
+}
+
+.sound-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.select-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--stroke-secondary);
+  background: var(--background-menu);
+  font-size: 14px;
+}
+
+.select-label {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Site pages (landing, about, contact) ---------- */
+
+.landing-page,
+.info-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* The landing page fits the window exactly; the preview gives up height first */
+.landing-page {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.site-header .wordmark {
+  display: inline-flex;
+}
+
+.site-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0 16px;
+  flex: 1 0 0;
+  font-size: 14px;
+}
+
+.site-links a:hover {
+  text-decoration: underline;
+}
+
+.display-title {
+  font-size: 71px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.landing-hero {
+  flex: 1 0 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+  padding: 24px var(--page-gutter);
+}
+
+.landing-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.landing-intro .display-title {
+  font-weight: 400;
+}
+
+.landing-intro .strong {
+  font-weight: 600;
+}
+
+.landing-subtitle {
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.school-search {
+  position: relative;
+  width: 600px;
+  max-width: 100%;
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 8px 12px;
+  border-radius: 9999px;
+  background: var(--background-secondary);
+  border: 1px solid var(--stroke-secondary);
+  cursor: text;
+}
+
+.search-field:focus-within {
+  border-color: var(--stroke-primary);
+}
+
+.search-field input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  padding: 0;
+}
+
+.search-field input::placeholder {
+  color: var(--foreground-secondary);
+  opacity: 1;
+}
+
+.search-field input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.search-results {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: min(568px, 50vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.search-result {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.search-result:hover,
+.search-result.active {
+  background: var(--background-hover);
+}
+
+.search-message {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--foreground-secondary);
+}
+
+.menu-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 16px;
+}
+
+.menu-prompt-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.menu-prompt-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.menu-prompt-actions .button {
+  flex: 1 0 0;
+}
+
+.landing-alternatives {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.landing-alternative-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.landing-preview {
+  /* 470px tall at full width, scaled with the width, and shrinks on short windows */
+  flex: 0 1 min(470px, calc((100vw - 2 * var(--page-gutter)) * 470 / 1448));
+  min-height: 0;
+  padding: 0 var(--page-gutter);
+}
+
+.preview-frame {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 24px 24px 0 0;
+}
+
+/* Positions below are percentages of the 1448 x 532 design frame */
+.preview-switch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1448 / 532;
+}
+
+.preview-background {
+  position: absolute;
+  left: 0;
+  top: -24.48%;
+  width: 100%;
+  height: 155.53%;
+  object-fit: cover;
+  max-width: none;
+}
+
+.preview-app {
+  position: absolute;
+  left: 18.99%;
+  right: 17.54%;
+  top: 17.67%;
+  aspect-ratio: 877 / 418;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+}
+
+.preview-app img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.preview-caption {
+  position: absolute;
+  left: 78.56%;
+  top: 5.83%;
+  width: 133px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  text-align: center;
+  color: #000000;
+}
+
+.preview-arrow {
+  position: absolute;
+  left: 78.22%;
+  top: 12.97%;
+  transform: rotate(180deg);
+}
+
+/* Invisible click targets over the screenshot's own buttons (no hover state) */
+.preview-hotspot {
+  position: absolute;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.preview-hotspot:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.preview-hotspot.schedule-hotspot {
+  left: 76.45%;
+  top: 20.11%;
+  width: 5.25%;
+  height: 4.32%;
+}
+
+.preview-hotspot.close-hotspot {
+  left: 79.83%;
+  top: 21.05%;
+  width: 1.31%;
+  height: 3.38%;
+  border-radius: 4px;
+}
+
+
+/* About / Contact */
+
+.info-content {
+  flex: 1 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  row-gap: 24px;
+  padding: 24px var(--page-gutter);
+}
+
+.info-content .display-title {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: end;
+}
+
+.info-body {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-body > .rule {
+  height: 1px;
+  margin: 8px 0;
+  background: var(--stroke-primary);
+}
+
+.info-columns {
+  display: flex;
+  gap: 16px;
+}
+
+.info-column {
+  flex: 1 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-column .strong {
+  font-weight: 600;
+}
+
+.info-column a {
+  text-decoration: underline;
+}
+
+/* ---------- Builder pages (personal schedule, block names) ---------- */
+
+.builder-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.builder-header {
+  align-items: center;
+}
+
+.builder-heading {
+  flex: 1 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.builder-content {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px var(--page-gutter);
+}
+
+.builder-content > .empty-state {
+  margin-top: 48px;
+}
+
+.card {
+  width: 100%;
+  max-width: 1000px;
+  background: var(--background-secondary);
+  border: 1px solid var(--stroke-secondary);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.class-card.editing {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.card-question {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 20px;
+  line-height: normal;
+}
+
+.text-input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--stroke-secondary);
+  background: var(--background-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.text-input::placeholder {
+  color: var(--foreground-tertiary);
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--stroke-primary);
+}
+
+.text-input:disabled {
+  background: var(--background-secondary-alt);
+}
+
+.time-row {
+  background: var(--background-secondary-alt);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: -12px;
+}
+
+.class-card.editing > .card-question + .time-row {
+  margin-top: 0;
+}
+
+.time-row-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.day-field {
+  flex: 1 0 160px;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.field-error {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #bc303d;
+}
+
+:root[data-bell-theme='dark'] .field-error {
+  color: #ff8a94;
+}
+
+.select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-wrap select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 36px;
+  padding: 8px 36px 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--stroke-secondary);
+  background: var(--background-secondary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.select-wrap .icon {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+}
+
+.select-wrap.is-placeholder select {
+  color: var(--foreground-tertiary);
+}
+
+.select-wrap select option {
+  color: var(--foreground-primary);
+}
+
+.select-wrap.bare select {
+  height: 36px;
+  border: none;
+  background: transparent;
+  padding: 8px 22px 8px 0;
+}
+
+.select-wrap.bare .icon {
+  right: 0;
+}
+
+.time-picker {
+  display: flex;
+  gap: 8px;
+  min-width: 135px;
+}
+
+.remove-row {
+  width: 36px;
+  height: 36px;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.class-card.saved {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.saved-text {
+  flex: 1 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.saved-name {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.saved-times {
+  font-size: 16px;
+  color: var(--foreground-secondary);
+}
+
+.period-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.block-names-intro {
+  margin-top: -12px;
+  font-size: 14px;
+}
+
+.period-row {
+  display: grid;
+  grid-template-columns: minmax(80px, 200px) minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+}
+
+.period-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ---------- Loading / error ---------- */
+
+.status-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+  font-size: 20px;
+}
+
+.status-page a {
+  text-decoration: underline;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid var(--stroke-secondary);
+  border-top-color: var(--foreground-primary);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 3s;
+  }
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 640px) {
+  .page-header,
+  .page-footer {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .timer-page .school-name {
+    display: none;
+  }
+
+  .timer-page .school-select {
+    gap: 8px;
+    padding: 8px;
+    margin-left: -8px;
+  }
+
+  .header-title {
+    font-size: 16px;
+  }
+
+  .schedule-page .header-title {
+    font-size: 20px;
+  }
+
+  .countdown .period,
+  .countdown .schedule-name {
+    font-size: 24px;
+    /* Wrap to the countdown's width instead of widening the block, so a long
+       period name doesn't stop the colon from lining up with the pie's edge */
+    width: 0;
+    min-width: 100%;
+  }
+
+  .schedule-list {
+    font-size: 28px;
+  }
+
+  .schedule-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .schedule-times .start,
+  .schedule-times .end,
+  .schedule-times .dash {
+    width: auto;
+  }
+
+  .schedule-times .dash {
+    padding: 0 0.15em;
+  }
+
+  .schedule-name {
+    min-width: 0;
+  }
+
+  .schedule-divider {
+    font-size: 12px;
+    gap: 12px;
+  }
+
+  .schedule-divider .rule.short {
+    flex: 1 0 0;
+    width: auto;
+  }
+
+  .modal-backdrop {
+    align-items: flex-start;
+  }
+
+  .modal {
+    padding: 20px 16px 24px;
+  }
+
+  .swatch-grid {
+    grid-template-columns: repeat(7, 62px);
+    overflow-x: auto;
+    margin: 0 -16px;
+    padding: 0 16px 4px;
+    scrollbar-width: none;
+  }
+
+  .swatch-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .display-title {
+    font-size: 40px;
+  }
+
+  .landing-hero {
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .landing-subtitle {
+    font-size: 16px;
+  }
+
+  .landing-alternatives {
+    flex-direction: column;
+    font-size: 16px;
+    gap: 16px;
+  }
+
+  .landing-alternative-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .landing-preview {
+    display: none;
+  }
+
+  .menu-prompt-actions {
+    flex-direction: column;
+  }
+
+  .info-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+  }
+
+  .info-columns {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .builder-header {
+    flex-wrap: wrap;
+    position: relative;
+    padding-right: 64px;
+  }
+
+  .builder-header .close-button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+  }
+
+  .builder-header .header-subtitle {
+    font-size: 14px;
+  }
+
+  .builder-heading {
+    flex-basis: 100%;
+  }
+
+  .builder-header {
+    gap: 16px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .class-card.saved {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .time-row-fields {
+    gap: 12px 16px;
+  }
+
+  .day-field {
+    flex-basis: 100%;
+  }
+
+  .period-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}
+
+.dropdown-menu > * {
+  flex-shrink: 0;
+}
+
+/* ---------- Page transitions ---------- */
+
+/* The personal schedule builder slides up over the timer like a sheet and
+   slides back down when closed (see ui/transitions.js) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+:root[data-transition='sheet-up']::view-transition-old(root) {
+  z-index: 1;
+}
+
+:root[data-transition='sheet-up']::view-transition-new(root) {
+  z-index: 2;
+  animation: sheet-up 0.5s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+:root[data-transition='sheet-down']::view-transition-new(root) {
+  z-index: 1;
+}
+
+:root[data-transition='sheet-down']::view-transition-old(root) {
+  z-index: 2;
+  animation: sheet-down 0.38s cubic-bezier(0.5, 0, 0.75, 0.2) both;
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+}
+
+@keyframes sheet-down {
+  to { transform: translateY(100%); }
+}
+
+/* ---------- Switch to classic design ---------- */
+
+.switch-design {
+  width: 480px;
+}
+
+.switch-design-body {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.feedback-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: var(--background-secondary-alt);
+  border: 1px solid var(--stroke-secondary);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.feedback-link:hover {
+  border-color: var(--stroke-primary);
+}
+
+.feedback-link-arrow {
+  font-size: 18px;
+}
+
+/* ---------- "New design" switch (timer footer) ---------- */
+
+.design-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 12px;
+  border-radius: 9999px;
+  background: var(--background-secondary);
+  border: 1px solid var(--stroke-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.design-toggle button {
+  display: inline-flex;
+  border-radius: 9999px;
+}
+
+.design-toggle img {
+  display: block;
+}
+
+:root[data-bell-theme='dark'] .design-toggle button[aria-checked='true'] img {
+  filter: invert(1);
+}
+
+/* Phones: a compact switch, so it fits on the same line as the date */
+@media (max-width: 640px) {
+  .page-footer {
+    column-gap: 10px;
+  }
+
+  .page-footer > .header-title {
+    font-size: 15px;
+  }
+
+  /* Let the switch sit next to the date; other notices wrap below it */
+  .page-footer > .footer-notices {
+    display: contents;
+  }
+
+  .page-footer > .footer-notices > :not(.design-toggle) {
+    margin-left: auto;
+  }
+
+  .design-toggle {
+    gap: 6px;
+    padding: 2px 2px 2px 8px;
+    font-size: 11px;
+  }
+
+  .design-toggle img {
+    width: 28px;
+    height: 17px;
+  }
+}
+
+/* ---------- Seasonal overlays ---------- */
+
+/* Drawn above the countdown pie and below the text and controls */
+.seasonal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Snowflakes: white, 70% opacity on light pages and 40% on dark (per Figma) */
+.snowfall {
+  opacity: 0.7;
+}
+
+:root[data-bell-theme='dark'] .snowfall {
+  opacity: 0.4;
+}
+
+.snowfall .flake {
+  position: absolute;
+  top: 0;
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.snowfall .flake-sway {
+  width: 100%;
+  height: 100%;
+  animation-name: snow-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.snowfall img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation-name: snow-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes snow-fall {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100vh); }
+}
+
+@keyframes snow-sway {
+  from { transform: translateX(calc(var(--sway) * -1)); }
+  to { transform: translateX(var(--sway)); }
+}
+
+@keyframes snow-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Without motion the flakes stay where they are, scattered over the screen */
+@media (prefers-reduced-motion: reduce) {
+  .snowfall .flake,
+  .snowfall .flake-sway,
+  .snowfall img {
+    animation-play-state: paused;
+  }
+}
+
+.timer-page > .page-footer,
+.timer-page .countdown,
+.timer-page .empty-state {
+  position: relative;
+  z-index: 2;
+}
+
+/* Above the countdown too, so the school menu opens over it */
+.timer-page > .page-header {
+  position: relative;
+  z-index: 3;
+}
+
+/* Christmas lights wrapped around the date on Christmas Day */
+.lit-date {
+  position: relative;
+  display: inline-block;
+}
+
+/* The frame sits just outside the text; bulbs point outward from it */
+.christmas-lights {
+  position: absolute;
+  inset: -7px -12px;
+  pointer-events: none;
+}
+
+.lights-wire {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid #2f4a2c;
+  border-radius: 10px;
+}
+
+:root[data-bell-theme='dark'] .lights-wire {
+  border-color: #9fb59a;
+}
+
+.christmas-lights .bulb {
+  position: absolute;
+  width: 6px;
+  height: 9px;
+  border-radius: 50% 50% 45% 45% / 40% 40% 60% 60%;
+  background: var(--bulb);
+  box-shadow: 0 0 6px 2px var(--bulb);
+  animation: bulb-twinkle 1.6s ease-in-out infinite;
+}
+
+/* The socket at each bulb's base, which clips onto the wire */
+.christmas-lights .bulb::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 1px;
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  background: #2f4a2c;
+}
+
+:root[data-bell-theme='dark'] .christmas-lights .bulb::before {
+  background: #9fb59a;
+}
+
+/* Each bulb's base sits on the wire and its glass points away from the date */
+.christmas-lights .bulb.top {
+  top: 0;
+  transform: translate(-50%, calc(-100% - 2px)) rotate(180deg);
+}
+
+.christmas-lights .bulb.bottom {
+  bottom: 0;
+  transform: translate(-50%, calc(100% + 2px));
+}
+
+.christmas-lights .bulb.right {
+  right: 0;
+  transform: translate(calc(100% + 3px), -50%) rotate(-90deg);
+}
+
+.christmas-lights .bulb.left {
+  left: 0;
+  transform: translate(calc(-100% - 3px), -50%) rotate(90deg);
+}
+
+.christmas-lights .bulb.red { --bulb: #ff3b3b; }
+.christmas-lights .bulb.green { --bulb: #22c55e; }
+.christmas-lights .bulb.gold { --bulb: #ffc533; }
+.christmas-lights .bulb.blue { --bulb: #3b8bff; }
+
+@keyframes bulb-twinkle {
+  0%, 100% { opacity: 1; box-shadow: 0 0 7px 2px var(--bulb); }
+  50% { opacity: 0.55; box-shadow: 0 0 2px 0 var(--bulb); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .christmas-lights .bulb {
+    animation: none;
+  }
+}
+
+/* Divider above the Holiday effects section */
+/* Holiday effects: a tight heading and a divider below the section */
+.settings-list.holiday-effects {
+  gap: 4px;
+  border-bottom: 1px solid var(--divider-menu);
+  /* Match the 20px around the other dividers in Settings (the toggle row and
+     the next row's button add a little height of their own) */
+  padding-bottom: 12px;
+  margin-bottom: -11px;
+}
+
+/* Fireworks on New Year's Day: rockets rise, then burst into sparks.
+   Each firework's color is its text color; --radius sets the burst size. */
+.fireworks .firework {
+  position: absolute;
+  width: 0;
+  height: 0;
+  animation-name: firework-drift;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+}
+
+.fireworks .rocket,
+.fireworks .spark {
+  position: absolute;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+.fireworks .rocket {
+  left: -1.5px;
+  top: 0;
+  width: 3px;
+  height: 18px;
+  border-radius: 2px;
+  background: linear-gradient(currentColor, transparent);
+  animation-name: firework-rocket;
+  animation-timing-function: linear;
+}
+
+.fireworks .spark {
+  left: -2px;
+  top: -18px;
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: linear-gradient(currentColor, transparent);
+  filter: drop-shadow(0 0 3px currentColor);
+  transform-origin: 50% 100%;
+  animation-name: firework-spark;
+  animation-timing-function: cubic-bezier(0.15, 0.7, 0.3, 1);
+}
+
+.fireworks .flash {
+  position: absolute;
+  left: -40px;
+  top: -40px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(currentColor, transparent 70%);
+  opacity: 0;
+  animation-name: firework-flash;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes firework-flash {
+  0%, 24% { opacity: 0; transform: scale(0.2); }
+  27% { opacity: 0.6; transform: scale(1); }
+  45%, 100% { opacity: 0; transform: scale(1.4); }
+}
+
+@keyframes firework-drift {
+  0%, 25% { transform: translateY(0); }
+  100% { transform: translateY(28px); }
+}
+
+@keyframes firework-rocket {
+  0% { transform: translateY(160px); opacity: 0; }
+  4% { opacity: 1; }
+  24% { transform: translateY(0); opacity: 1; }
+  26%, 100% { transform: translateY(0); opacity: 0; }
+}
+
+@keyframes firework-spark {
+  0%, 25% { transform: rotate(var(--angle)) translateY(0) scaleY(0.2); opacity: 0; }
+  27% { opacity: 1; }
+  45% { transform: rotate(var(--angle)) translateY(calc(var(--radius) * var(--reach) * -0.75)) scaleY(1.2); }
+  75% { opacity: 0.9; }
+  100% { transform: rotate(var(--angle)) translateY(calc(var(--radius) * var(--reach) * -1)) scaleY(0.4); opacity: 0; }
+}
+
+:root[data-bell-theme='dark'] .fireworks {
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fireworks {
+    display: none;
+  }
+}
+
+/* Lunar New Year: red lanterns sway from the top of the page, the pie turns
+   gold (see Appearance.lunarTheme) and the text turns red */
+.lanterns .lantern {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: calc(-30px * var(--size));
+  transform-origin: 50% 0;
+  animation-name: lantern-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.lanterns .lantern-string {
+  width: 1.5px;
+  background: #b8860b;
+}
+
+.lanterns svg {
+  display: block;
+  width: calc(60px * var(--size));
+  height: calc(108px * var(--size));
+  filter: drop-shadow(0 4px 6px rgba(165, 20, 26, 0.25));
+}
+
+@keyframes lantern-sway {
+  from { transform: rotate(-4deg); }
+  to { transform: rotate(4deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lanterns .lantern {
+    animation: none;
+  }
+}
+
+.timer-page.lunar-new-year .countdown,
+.timer-page.lunar-new-year .school-name,
+.timer-page.lunar-new-year > .page-footer > .header-title {
+  color: #c8102e;
+}
+
+:root[data-bell-theme='dark'] .timer-page.lunar-new-year .countdown,
+:root[data-bell-theme='dark'] .timer-page.lunar-new-year .school-name,
+:root[data-bell-theme='dark'] .timer-page.lunar-new-year > .page-footer > .header-title {
+  color: #ff5a4f;
+}
+
+/* On days without classes the page is gold, so use a deeper red */
+:root .timer-page.lunar-new-year.no-classes .countdown,
+:root .timer-page.lunar-new-year.no-classes .school-name,
+:root .timer-page.lunar-new-year.no-classes > .page-footer > .header-title {
+  color: #a10d24;
+}
+
+/* Timer controls fade out after 3 seconds without mouse movement (set by
+   ui/Index.js) and reappear instantly when it moves. Computers only: phones
+   and tablets have no mouse to bring them back. */
+@media (hover: hover) and (pointer: fine) {
+  :root.bell-idle .timer-page .idle-fade:not(:focus-within):not(:focus-visible) {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+}
