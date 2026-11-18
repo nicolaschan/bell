@@ -2273,3 +2273,13 @@ button.pill-notice {
 :root .timer-page.lunar-new-year.no-classes > .page-footer > .header-title {
   color: #a10d24;
 }
+
+/* Timer controls fade out after 3 seconds without mouse movement (set by
+   ui/Index.js) and reappear instantly when it moves. Computers only: phones
+   and tablets have no mouse to bring them back. */
+@media (hover: hover) and (pointer: fine) {
+  :root.bell-idle .timer-page .idle-fade:not(:focus-within):not(:focus-visible) {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+}

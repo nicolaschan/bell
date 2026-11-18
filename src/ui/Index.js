@@ -227,8 +227,36 @@ const prefetchImages = () => {
 // Seasonal overlays drawn over the whole page (the others change the pie or the date)
 const OVERLAY_COMPONENTS = { snow: Snowfall, fireworks: Fireworks, lunar: Lanterns }
 
+// On computers, the timer's controls (settings, schedule, design switch) fade
+// out after 3 seconds without mouse movement and come straight back when the
+// mouse moves. The fade only applies to mouse-driven screens (see CSS).
+const IDLE_AFTER = 3000
+const idleControls = {
+  start () {
+    const root = document.documentElement
+    const wake = () => {
+      root.classList.remove('bell-idle')
+      clearTimeout(idleControls.timer)
+      idleControls.timer = setTimeout(() => root.classList.add('bell-idle'), IDLE_AFTER)
+    }
+    idleControls.wake = wake
+    ;['mousemove', 'mousedown', 'keydown', 'wheel', 'touchstart'].forEach(type =>
+      window.addEventListener(type, wake, { passive: true }))
+    wake()
+  },
+  stop () {
+    clearTimeout(idleControls.timer)
+    ;['mousemove', 'mousedown', 'keydown', 'wheel', 'touchstart'].forEach(type =>
+      window.removeEventListener(type, idleControls.wake))
+    document.documentElement.classList.remove('bell-idle')
+  }
+}
+
 const Index = {
-  oncreate: prefetchImages,
+  oncreate: () => {
+    prefetchImages()
+    idleControls.start()
+  },
   oninit: async function (vnode) {
     const cookieManager = vnode.attrs.cookieManager
     vnode.state.panel = pendingPanel
@@ -310,17 +338,17 @@ const Index = {
       m('header.page-header', [
         m(SchoolMenu, { name, isCustom }),
         m('nav.header-actions', [
-          m('button.icon-button.settings-button[type=button]', {
+          m('button.icon-button.settings-button.idle-fade[type=button]', {
             'aria-label': 'Settings',
             title: 'Settings',
             onclick: setPanel('settings')
           }, m(Icon, { name: 'settings', size: 36 })),
-          isCustom && hasCourses ? m('a.icon-button.bordered[href=/classes]', {
+          isCustom && hasCourses ? m('a.icon-button.bordered.idle-fade[href=/classes]', {
             'aria-label': 'Edit your schedule',
             title: 'Edit your schedule',
             oncreate: m.route.link
           }, m(Icon, { name: 'edit' })) : null,
-          isCustom && !hasCourses ? null : m('button.button.primary[type=button]', {
+          isCustom && !hasCourses ? null : m('button.button.primary.idle-fade[type=button]', {
             onclick: setPanel('schedule')
           }, 'View schedule')
         ])
@@ -339,7 +367,7 @@ const Index = {
           ? m(ChristmasLights, { text: formatDateTime(bellTimer.date) })
           : formatDateTime(bellTimer.date)),
         m('.footer-notices', [
-          m(DesignToggle, { current: 'new', onselect: setPanel('switch-design') }),
+          m(DesignToggle, { current: 'new', className: 'idle-fade', onselect: setPanel('switch-design') }),
           m(SoundNotice, attrs),
           m(Popup, attrs)
         ])
@@ -371,6 +399,7 @@ const Index = {
     ])
   },
   onremove: function (vnode) {
+    idleControls.stop()
     Appearance.holidayTheme = null
     if (vnode.attrs.bellTimer) {
       vnode.attrs.bellTimer.stopRefreshing()
