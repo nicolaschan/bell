@@ -1660,6 +1660,10 @@ button.pill-notice {
   .countdown .period,
   .countdown .schedule-name {
     font-size: 24px;
+    /* Wrap to the countdown's width instead of widening the block, so a long
+       period name doesn't stop the colon from lining up with the pie's edge */
+    width: 0;
+    min-width: 100%;
   }
 
   .schedule-list {
