@@ -1908,6 +1908,37 @@ button.pill-notice {
   filter: invert(1);
 }
 
+/* Phones: a compact switch, so it fits on the same line as the date */
+@media (max-width: 640px) {
+  .page-footer {
+    column-gap: 10px;
+  }
+
+  .page-footer > .header-title {
+    font-size: 15px;
+  }
+
+  /* Let the switch sit next to the date; other notices wrap below it */
+  .page-footer > .footer-notices {
+    display: contents;
+  }
+
+  .page-footer > .footer-notices > :not(.design-toggle) {
+    margin-left: auto;
+  }
+
+  .design-toggle {
+    gap: 6px;
+    padding: 2px 2px 2px 8px;
+    font-size: 11px;
+  }
+
+  .design-toggle img {
+    width: 28px;
+    height: 17px;
+  }
+}
+
 /* ---------- Seasonal overlays ---------- */
 
 /* Drawn above the countdown pie and below the text and controls */
