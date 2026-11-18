@@ -13,8 +13,7 @@ const DesignToggle = {
         'aria-label': 'New design',
         onclick: () => onselect(on ? 'classic' : 'new')
       }, m('img', {
-        // A grey "on" state, softer than the black switches in Settings
-        src: `/img/redesign/toggle-${on ? 'on-grey' : 'off'}.svg`,
+        src: `/img/redesign/toggle-${on ? 'on' : 'off'}.svg`,
         width: 35,
         height: 21,
         alt: ''
